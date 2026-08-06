@@ -1,0 +1,107 @@
+---
+# What does cross-organisational endorsement cost, measured against the noise?
+#
+# The framework's defence against a single organisation altering committed
+# results rests on requiring endorsement from two organisational classes rather
+# than one. Its price was previously read off two rounds run at different points
+# of a benchmark suite. On a host whose between-round variation is itself larger
+# than the effect (see state-scaling.yaml), a difference of two separately
+# measured means cannot resolve it: across three sequential passes of the suite
+# the apparent cost ran from 26% to nothing.
+#
+# Here the two arms alternate, so the members of a pair are adjacent in time and
+# share whatever host condition is in force, and the difference is taken within
+# pairs. A leading warm-up round is discarded: the first round after a heavy
+# write phase runs while the state databases are still absorbing it, and in one
+# execution that round returned 0.3 TPS at a mean latency of nineteen minutes,
+# which is a measurement of recovery rather than of endorsement.
+#
+# Run:  CONFIG=benchmark/endorsement-paired.yaml
+#       REPORT=benchmark/endorsement-paired.html
+#       LOG=benchmark/endorsement-paired.log ./scripts/run-benchmark.sh
+
+test:
+  name: endorsement-paired
+  description: >
+    Article 5.3 custody initiation under a single-organisation and then a
+    two-organisation endorsement policy, alternating over four pairs after a
+    discarded warm-up round, so that the cost of cross-organisational
+    endorsement is measured within pairs.
+  workers:
+    type: local
+    number: 2
+  rounds:
+    - label: paired-warmup
+      description: >
+        Discarded. Absorbs any state-database backlog left by preceding work so
+        that the first measured pair is not measuring recovery.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
+    - label: paired-1org-a
+      description: Single-organisation endorsement (NADO only), pair a.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
+    - label: paired-2org-a
+      description: Endorsement spanning two organisational classes (NADO and laboratory), pair a.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-dual-endorsed.js
+    - label: paired-1org-b
+      description: Single-organisation endorsement (NADO only), pair b.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
+    - label: paired-2org-b
+      description: Endorsement spanning two organisational classes (NADO and laboratory), pair b.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-dual-endorsed.js
+    - label: paired-1org-c
+      description: Single-organisation endorsement (NADO only), pair c.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
+    - label: paired-2org-c
+      description: Endorsement spanning two organisational classes (NADO and laboratory), pair c.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-dual-endorsed.js
+    - label: paired-1org-d
+      description: Single-organisation endorsement (NADO only), pair d.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
+    - label: paired-2org-d
+      description: Endorsement spanning two organisational classes (NADO and laboratory), pair d.
+      txNumber: 400
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 60 }
+      workload:
+        module: benchmark/workloads/initiate-dual-endorsed.js

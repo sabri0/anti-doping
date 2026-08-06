@@ -1,0 +1,64 @@
+# Dependencies — restored with `npm ci` in each package
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# ---------------------------------------------------------------------------
+# Generated cryptographic material.
+#
+# Every certificate and private key under network/organizations is issued by the
+# six Fabric certification authorities when ./scripts/network-up.sh runs. None of
+# it is a durable secret and none of it belongs in version control: a fresh
+# network mints its own. Committing it would publish CA signing keys and give
+# every clone the same identity set.
+# ---------------------------------------------------------------------------
+network/organizations/
+network/channel-artifacts/
+network/chaincode-packages/
+*.pem
+*_sk
+*.key
+wallet/
+wallets/
+**/wallet/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Benchmark working files.
+#
+# The raw output the manuscript's numbers derive from is kept, under
+# docs/measurements/. Excluded here is the scratch copy each run writes into
+# benchmark/ before it is parsed: same content, no provenance.
+# ---------------------------------------------------------------------------
+benchmark/generated/
+benchmark/results/
+benchmark/*.html
+*.log
+
+# The measurement record is evidence, not scratch — keep it.
+!docs/measurements/
+!docs/measurements/*.log
+
+# Editor and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archives
+*.zip
+*.tar.gz
+
+# Submission-strategy material, not part of the artefact.
+# The cover letter names suggested reviewers and declares the manuscript's
+# editorial history; neither belongs in a public repository. The build scripts
+# and their inputs stay, so the .docx remains reproducible from the measurements.
+manuscript-build/cover-letter.md
+manuscript-build/submission-notes.md

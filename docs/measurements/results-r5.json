@@ -1,0 +1,150 @@
+{
+  "rounds": {
+    "sweep-10tps": {
+      "label": "sweep-10tps",
+      "successful": 200,
+      "failed": 0,
+      "sendRateTps": 10.1,
+      "maxLatencyS": 13.01,
+      "minLatencyS": 2.25,
+      "avgLatencyS": 7.86,
+      "throughputTps": 8.1
+    },
+    "sweep-25tps": {
+      "label": "sweep-25tps",
+      "successful": 374,
+      "failed": 0,
+      "sendRateTps": 22.2,
+      "maxLatencyS": 26.15,
+      "minLatencyS": 17.89,
+      "avgLatencyS": 21.91,
+      "throughputTps": 9.9
+    },
+    "sweep-50tps": {
+      "label": "sweep-50tps",
+      "successful": 500,
+      "failed": 0,
+      "sendRateTps": 31.6,
+      "maxLatencyS": 40.65,
+      "minLatencyS": 21.54,
+      "avgLatencyS": 30.54,
+      "throughputTps": 10.3
+    },
+    "sweep-100tps": {
+      "label": "sweep-100tps",
+      "successful": 600,
+      "failed": 0,
+      "sendRateTps": 34.5,
+      "maxLatencyS": 43.59,
+      "minLatencyS": 24.16,
+      "avgLatencyS": 32.38,
+      "throughputTps": 11.3
+    },
+    "sweep-saturated": {
+      "label": "sweep-saturated",
+      "successful": 600,
+      "failed": 0,
+      "sendRateTps": 30.9,
+      "maxLatencyS": 43.77,
+      "minLatencyS": 26.15,
+      "avgLatencyS": 35.36,
+      "throughputTps": 10.6
+    },
+    "endorse-1org-initiateSampleCustody": {
+      "label": "endorse-1org-initiateSampleCustody",
+      "successful": 500,
+      "failed": 0,
+      "sendRateTps": 29.1,
+      "maxLatencyS": 36.84,
+      "minLatencyS": 21.75,
+      "avgLatencyS": 28.33,
+      "throughputTps": 10.8
+    },
+    "endorse-2org-initiateSampleCustody": {
+      "label": "endorse-2org-initiateSampleCustody",
+      "successful": 500,
+      "failed": 0,
+      "sendRateTps": 37.9,
+      "maxLatencyS": 41.08,
+      "minLatencyS": 22.3,
+      "avgLatencyS": 31.57,
+      "throughputTps": 10.3
+    },
+    "recordCustodyTransfer": {
+      "label": "recordCustodyTransfer",
+      "successful": 400,
+      "failed": 0,
+      "sendRateTps": 42.6,
+      "maxLatencyS": 35.63,
+      "minLatencyS": 11.74,
+      "avgLatencyS": 28.68,
+      "throughputTps": 10.0
+    },
+    "recordSampleAnalysisResult": {
+      "label": "recordSampleAnalysisResult",
+      "successful": 400,
+      "failed": 0,
+      "sendRateTps": 39.6,
+      "maxLatencyS": 16.03,
+      "minLatencyS": 10.41,
+      "avgLatencyS": 13.08,
+      "throughputTps": 16.3
+    },
+    "triggerResultsManagement": {
+      "label": "triggerResultsManagement",
+      "successful": 300,
+      "failed": 0,
+      "sendRateTps": 45.3,
+      "maxLatencyS": 44.18,
+      "minLatencyS": 21.19,
+      "avgLatencyS": 35.14,
+      "throughputTps": 6.2
+    },
+    "validateConsent": {
+      "label": "validateConsent",
+      "successful": 400,
+      "failed": 0,
+      "sendRateTps": 59.2,
+      "maxLatencyS": 7.43,
+      "minLatencyS": 2.17,
+      "avgLatencyS": 4.45,
+      "throughputTps": 38.6
+    },
+    "evaluateDecisionTable": {
+      "label": "evaluateDecisionTable",
+      "successful": 2000,
+      "failed": 0,
+      "sendRateTps": 168.8,
+      "maxLatencyS": 0.27,
+      "minLatencyS": 0.01,
+      "avgLatencyS": 0.04,
+      "throughputTps": 168.6
+    },
+    "previewConsentDecision": {
+      "label": "previewConsentDecision",
+      "successful": 1500,
+      "failed": 0,
+      "sendRateTps": 197.3,
+      "maxLatencyS": 0.92,
+      "minLatencyS": 0.01,
+      "avgLatencyS": 0.27,
+      "throughputTps": 196.5
+    },
+    "getCustodyChain": {
+      "label": "getCustodyChain",
+      "successful": 1500,
+      "failed": 0,
+      "sendRateTps": 154.3,
+      "maxLatencyS": 3.75,
+      "minLatencyS": 0.04,
+      "avgLatencyS": 1.65,
+      "throughputTps": 142.2
+    }
+  },
+  "totals": {
+    "rounds": 14,
+    "successfulTransactions": 9774,
+    "failedTransactions": 0,
+    "roundsWithFailures": []
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "rounds": {
+    "sweep-50tps-w6": {
+      "label": "sweep-50tps-w6",
+      "successful": 498,
+      "failed": 0,
+      "sendRateTps": 25.1,
+      "maxLatencyS": 41.08,
+      "minLatencyS": 23.81,
+      "avgLatencyS": 30.52,
+      "throughputTps": 9.8
+    },
+    "sweep-100tps-w6": {
+      "label": "sweep-100tps-w6",
+      "successful": 600,
+      "failed": 0,
+      "sendRateTps": 43.0,
+      "maxLatencyS": 51.06,
+      "minLatencyS": 20.24,
+      "avgLatencyS": 35.11,
+      "throughputTps": 10.9
+    },
+    "sweep-200tps-w6": {
+      "label": "sweep-200tps-w6",
+      "successful": 600,
+      "failed": 0,
+      "sendRateTps": 38.1,
+      "maxLatencyS": 50.34,
+      "minLatencyS": 18.88,
+      "avgLatencyS": 36.34,
+      "throughputTps": 10.3
+    }
+  },
+  "totals": {
+    "rounds": 3,
+    "successfulTransactions": 1698,
+    "failedTransactions": 0,
+    "roundsWithFailures": []
+  }
+}

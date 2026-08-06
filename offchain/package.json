@@ -1,0 +1,21 @@
+{
+  "name": "antidoping-offchain",
+  "version": "1.0.0",
+  "description": "AES-256 off-chain storage, Shamir 2-of-3 recovery and GDPR Article 17 cryptographic erasure",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha",
+    "typecheck": "tsc -p tsconfig.test.json"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.9",
+    "chai": "^4.4.1",
+    "fast-check": "^3.19.0",
+    "mocha": "^10.6.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  }
+}

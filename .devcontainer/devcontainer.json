@@ -1,0 +1,23 @@
+{
+  "name": "antidoping-chain",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": { "version": "latest" },
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" }
+  },
+  "postCreateCommand": "./scripts/preflight.sh",
+  "remoteEnv": {
+    "IPFS_ENDPOINTS": "http://ipfs0:5001,http://ipfs1:5001,http://ipfs2:5001"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  },
+  "comments": [
+    "Node 20 and Python are the only host-side requirements: Fabric binaries,",
+    "the CA client and Caliper all run inside containers, which is why this",
+    "definition pins no Fabric versions of its own. Those are pinned in",
+    "docker-compose.yaml and benchmark/Dockerfile."
+  ]
+}

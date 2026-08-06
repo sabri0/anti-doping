@@ -1,0 +1,77 @@
+{
+  "main": [
+    {
+      "id": "F1",
+      "source": "media/image1.png",
+      "title": "Governance of biological data in the elite-sport ecosystem.",
+      "legend": "Institutional actors that hold or process elite athletes' biological data, the flows between them, and the trust deficits those flows carry. Current-state flows run through bilateral institutional agreements in which the athlete is a data source rather than a party. The proposed arrangement inserts a permissioned ledger as the governance layer through which every flow is authorised and recorded, with the athlete holding a network identity issued by a certification authority of their own organisational class. NADO, national anti-doping organisation; WADA, World Anti-Doping Agency.",
+      "width_in": 4.5
+    },
+    {
+      "id": "F2",
+      "source": "media/image2.png",
+      "title": "Architecture of the deployed five-organisation network.",
+      "legend": "Five organisational classes — athletes, clubs and federations, national anti-doping organisations, accredited laboratories and research institutions — each operate a certification authority that issues the identities of the actors in its domain, and two peer nodes each backed by a dedicated CouchDB state database. A sixth certification authority serves the ordering service, which sequences transactions under the Raft consensus protocol. Encrypted biological payloads are held in a private three-node InterPlanetary File System cluster; only the content identifier and a key reference are written to the ledger. An HL7 FHIR R4 adapter maps custody and analysis records onto clinical resource types, and a REST gateway exposes the workflows to the athlete-facing application without holding any authorisation of its own. CA, certification authority; FHIR, Fast Healthcare Interoperability Resources; IPFS, InterPlanetary File System; NADO, national anti-doping organisation.",
+      "width_in": 4.5
+    },
+    {
+      "id": "F3",
+      "source": "media/image3.png",
+      "title": "Chain-of-custody transaction sequence.",
+      "legend": "The five phases through which a sample passes: custody initiation under WADA Code Article 5.3, transport verification and laboratory receipt under Article 5.4, commitment of the analysis result under Article 2.1, and the triggering of results management under Article 7.1. Each transfer requires signed endorsement from both the transferring and the receiving organisation before commitment, so no single party can record a custody event unilaterally. A handover recorded after the contractual window has elapsed is still written but raises an exception record and an alert to the national anti-doping organisation, because suppressing it would destroy the audit trail. The athlete receives a contract-emitted notification at every custody event involving their sample. AAF, adverse analytical finding; NADO, national anti-doping organisation; WADA, World Anti-Doping Agency.",
+      "width_in": 4.5
+    },
+    {
+      "id": "F4",
+      "source": "media/image4.png",
+      "title": "Consent and erasure workflow across the six biological data categories.",
+      "legend": "Consent grant, amendment and withdrawal for each of the six independently governed categories — global positioning and accelerometry data, biochemical markers, Athlete Biological Passport haematological and steroidal data, psychological assessments and genetic data. An access request is evaluated against the purpose-limitation ceiling, then against the athlete's consent for the specific category, its validity period and the explicit Article 9 authorisation that special-category data requires; every evaluation writes an audit record whether or not data is released. The key-management path shows encryption of the payload, storage of the ciphertext off-chain, and the two erasure routes of Article 17: destruction of the data-encryption key alone, which is reversible by a two-of-three Shamir share quorum, and destruction of the key together with unpinning of the ciphertext, which is not. GDPR, General Data Protection Regulation; IPFS, InterPlanetary File System.",
+      "width_in": 4.5
+    },
+    {
+      "id": "F5",
+      "source": "docs/figure-performance.png",
+      "vector": "docs/figure-performance.pdf",
+      "title": "{{F5_TITLE}}",
+      "legend": "{{F5_LEGEND}}"
+    }
+  ],
+  "supplementary": [
+    {
+      "id": "SF1",
+      "source": "diagrams/S1-aaf-confirmed.png",
+      "title": "Executed adverse-analytical-finding pathway.",
+      "legend": "Scenario S1 as it executes against the deployed network: a complete chain of custody, an analysis committed by an accredited laboratory against a hash-verified Prohibited List revision, and the decision engine returning AAF confirmed, which starts the Article 7.3 statutory notification clock. AAF, adverse analytical finding."
+    },
+    {
+      "id": "SF2",
+      "source": "diagrams/S2-process-invalidated-incomplete-custody.png",
+      "title": "Precedence guard in operation.",
+      "legend": "Scenario S2. A mandatory custody step is missing, so the process-invalidation guard fires before any finding rule is considered and the adverse analytical finding that would otherwise have been confirmed is suppressed and audited. The rule that would have matched is retained in the record rather than discarded."
+    },
+    {
+      "id": "SF3",
+      "source": "diagrams/S9-purpose-limited-abac.png",
+      "title": "Purpose-limited access control across six data categories.",
+      "legend": "Scenario S9. A researcher authorised for a cardiovascular performance study requests all six biological data categories and receives two; each of the four refusals carries its own recorded reason and the regulatory article on which it rests."
+    },
+    {
+      "id": "SF4",
+      "source": "diagrams/S11-erasure-and-recovery.png",
+      "title": "The two erasure pathways of GDPR Article 17.",
+      "legend": "Scenario S11. Destroying the data-encryption key alone leaves the ciphertext in place and is reversible by a two-of-three Shamir share quorum; destroying the key and unpinning the content across every node is not reversible by any quorum, because the ciphertext itself is gone. The ledger is appended to in both cases and never rewritten."
+    },
+    {
+      "id": "SF5",
+      "source": "diagrams/S7-insider-endorsement-blocked.png",
+      "title": "Cross-organisational endorsement enforced at validation.",
+      "legend": "Scenario S7. A national anti-doping organisation attempting to alter committed results-management state with its own endorsement alone is rejected at validation, because the record carries a key-level endorsement policy naming peers from two distinct organisational classes."
+    },
+    {
+      "id": "SF6",
+      "source": "diagrams/F1-fabric-transaction-flow.png",
+      "title": "Transaction processing sequence of the deployed network.",
+      "legend": "The six phases every transaction passes through: proposal submission by an organisationally scoped identity, independent simulation by each endorsing peer, endorsement collection, ordering under Raft, validation — including the key-level endorsement policies on which the insider-collusion mitigation depends — and commitment. Transactions that fail validation are retained in their block and flagged, so a rejected attempt remains part of the audit trail rather than disappearing."
+    }
+  ]
+}

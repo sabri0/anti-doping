@@ -1,0 +1,22 @@
+{
+  "name": "antidoping-gateway",
+  "version": "1.0.0",
+  "description": "REST gateway over the Fabric Gateway API for the anti-doping governance framework",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.9",
+    "@hyperledger/fabric-gateway": "^1.5.1",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  }
+}

@@ -1,0 +1,220 @@
+# configtx.yaml — channel configuration for the anti-doping governance network.
+#
+# Mirrors §3.2 of the manuscript: five classes of institutional participant
+# (Athlete, Federation/Club, NADO, WADA-accredited Laboratory, Research), each
+# backed by its own certification authority, plus a separate orderer CA.
+
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: ../organizations/ordererOrganizations/antidoping.org/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+    OrdererEndpoints:
+      - orderer.antidoping.org:7050
+
+  - &Athlete
+    Name: AthleteMSP
+    ID: AthleteMSP
+    MSPDir: ../organizations/peerOrganizations/athlete.antidoping.org/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('AthleteMSP.admin', 'AthleteMSP.peer', 'AthleteMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('AthleteMSP.admin', 'AthleteMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('AthleteMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('AthleteMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.athlete.antidoping.org
+        Port: 7051
+
+  - &Federation
+    Name: FederationMSP
+    ID: FederationMSP
+    MSPDir: ../organizations/peerOrganizations/federation.antidoping.org/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('FederationMSP.admin', 'FederationMSP.peer', 'FederationMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('FederationMSP.admin', 'FederationMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('FederationMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('FederationMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.federation.antidoping.org
+        Port: 8051
+
+  - &NADO
+    Name: NADOMSP
+    ID: NADOMSP
+    MSPDir: ../organizations/peerOrganizations/nado.antidoping.org/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('NADOMSP.admin', 'NADOMSP.peer', 'NADOMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('NADOMSP.admin', 'NADOMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('NADOMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('NADOMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.nado.antidoping.org
+        Port: 9051
+
+  - &Lab
+    Name: LabMSP
+    ID: LabMSP
+    MSPDir: ../organizations/peerOrganizations/lab.antidoping.org/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('LabMSP.admin', 'LabMSP.peer', 'LabMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('LabMSP.admin', 'LabMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('LabMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('LabMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.lab.antidoping.org
+        Port: 10051
+
+  - &Research
+    Name: ResearchMSP
+    ID: ResearchMSP
+    MSPDir: ../organizations/peerOrganizations/research.antidoping.org/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('ResearchMSP.admin', 'ResearchMSP.peer', 'ResearchMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('ResearchMSP.admin', 'ResearchMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('ResearchMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('ResearchMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.research.antidoping.org
+        Port: 11051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_5: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer.antidoping.org:7050
+  EtcdRaft:
+    Consenters:
+      - Host: orderer.antidoping.org
+        Port: 7050
+        ClientTLSCert: ../organizations/ordererOrganizations/antidoping.org/orderers/orderer.antidoping.org/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/antidoping.org/orderers/orderer.antidoping.org/tls/server.crt
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 500
+    AbsoluteMaxBytes: 10 MB
+    PreferredMaxBytes: 2 MB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  # Baseline profile: Raft ordering, all five organizational classes.
+  AntidopingChannel:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Athlete
+        - *Federation
+        - *NADO
+        - *Lab
+        - *Research
+      Capabilities: *ApplicationCapabilities

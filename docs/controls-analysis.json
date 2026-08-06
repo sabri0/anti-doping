@@ -1,0 +1,160 @@
+{
+  "stateScaling": {
+    "rounds": 12,
+    "txPerRound": 600,
+    "totalSamplesWritten": 7200,
+    "medianTps": 26.2,
+    "meanTps": 26.2,
+    "sdTps": 8.4,
+    "cvPercent": 31.9,
+    "minTps": 15.7,
+    "maxTps": 36.3,
+    "maxOverMin": 2.31,
+    "firstThreeMeanTps": 34.1,
+    "lastThreeMeanTps": 33.4,
+    "correlationWithRoundIndex": 0.047,
+    "correlationWithLatency": -0.932,
+    "stateHypothesisSupported": false,
+    "series": [
+      {
+        "round": "state-01",
+        "samplesBefore": 0,
+        "throughputTps": 34.3,
+        "sendRateTps": 47.4,
+        "avgLatencyS": 8.02
+      },
+      {
+        "round": "state-02",
+        "samplesBefore": 600,
+        "throughputTps": 34.5,
+        "sendRateTps": 51.9,
+        "avgLatencyS": 6.2
+      },
+      {
+        "round": "state-03",
+        "samplesBefore": 1200,
+        "throughputTps": 33.5,
+        "sendRateTps": 59.0,
+        "avgLatencyS": 6.78
+      },
+      {
+        "round": "state-04",
+        "samplesBefore": 1800,
+        "throughputTps": 15.7,
+        "sendRateTps": 29.4,
+        "avgLatencyS": 21.75
+      },
+      {
+        "round": "state-05",
+        "samplesBefore": 2400,
+        "throughputTps": 16.1,
+        "sendRateTps": 25.3,
+        "avgLatencyS": 15.68
+      },
+      {
+        "round": "state-06",
+        "samplesBefore": 3000,
+        "throughputTps": 16.9,
+        "sendRateTps": 54.4,
+        "avgLatencyS": 19.56
+      },
+      {
+        "round": "state-07",
+        "samplesBefore": 3600,
+        "throughputTps": 21.8,
+        "sendRateTps": 32.4,
+        "avgLatencyS": 11.38
+      },
+      {
+        "round": "state-08",
+        "samplesBefore": 4200,
+        "throughputTps": 23.9,
+        "sendRateTps": 33.8,
+        "avgLatencyS": 11.24
+      },
+      {
+        "round": "state-09",
+        "samplesBefore": 4800,
+        "throughputTps": 17.9,
+        "sendRateTps": 25.6,
+        "avgLatencyS": 14.67
+      },
+      {
+        "round": "state-10",
+        "samplesBefore": 5400,
+        "throughputTps": 28.6,
+        "sendRateTps": 43.8,
+        "avgLatencyS": 9.79
+      },
+      {
+        "round": "state-11",
+        "samplesBefore": 6000,
+        "throughputTps": 36.3,
+        "sendRateTps": 48.3,
+        "avgLatencyS": 6.24
+      },
+      {
+        "round": "state-12",
+        "samplesBefore": 6600,
+        "throughputTps": 35.2,
+        "sendRateTps": 50.2,
+        "avgLatencyS": 6.43
+      }
+    ]
+  },
+  "endorsementPaired": {
+    "pairs": 4,
+    "excludedPairs": [],
+    "oneOrgTpsMean": 10.7,
+    "oneOrgTpsRange": [
+      10.0,
+      11.0
+    ],
+    "twoOrgTpsMean": 9.5,
+    "twoOrgTpsRange": [
+      8.8,
+      10.8
+    ],
+    "pairedReductionPercentMean": 11.1,
+    "pairedReductionPercentRange": [
+      1.8,
+      17.8
+    ],
+    "sameSign": true,
+    "driftAcrossPairsPercent": -2.8,
+    "detail": [
+      {
+        "pair": "a",
+        "oneOrgTps": 10.7,
+        "twoOrgTps": 8.8,
+        "reductionPercent": 17.8,
+        "oneOrgLatencyS": 22.28,
+        "twoOrgLatencyS": 29.66
+      },
+      {
+        "pair": "b",
+        "oneOrgTps": 10.0,
+        "twoOrgTps": 8.9,
+        "reductionPercent": 11.0,
+        "oneOrgLatencyS": 25.96,
+        "twoOrgLatencyS": 28.06
+      },
+      {
+        "pair": "c",
+        "oneOrgTps": 11.0,
+        "twoOrgTps": 9.5,
+        "reductionPercent": 13.6,
+        "oneOrgLatencyS": 24.21,
+        "twoOrgLatencyS": 26.76
+      },
+      {
+        "pair": "d",
+        "oneOrgTps": 11.0,
+        "twoOrgTps": 10.8,
+        "reductionPercent": 1.8,
+        "oneOrgLatencyS": 23.37,
+        "twoOrgLatencyS": 23.25
+      }
+    ]
+  }
+}

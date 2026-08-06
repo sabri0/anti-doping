@@ -1,0 +1,929 @@
+# GENERATED FILE — edit scripts/gen-compose.py and rerun, do not edit by hand.
+# Anti-doping governance network: 6 CAs, 10 peers, 10 CouchDB, Raft orderer, 3 IPFS.
+
+networks:
+  antidoping_net:
+    name: antidoping_net
+
+volumes:
+  orderer.antidoping.org:
+  peer0.athlete.antidoping.org:
+  couchdb0-athlete:
+  peer1.athlete.antidoping.org:
+  couchdb1-athlete:
+  peer0.federation.antidoping.org:
+  couchdb0-federation:
+  peer1.federation.antidoping.org:
+  couchdb1-federation:
+  peer0.nado.antidoping.org:
+  couchdb0-nado:
+  peer1.nado.antidoping.org:
+  couchdb1-nado:
+  peer0.lab.antidoping.org:
+  couchdb0-lab:
+  peer1.lab.antidoping.org:
+  couchdb1-lab:
+  peer0.research.antidoping.org:
+  couchdb0-research:
+  peer1.research.antidoping.org:
+  couchdb1-research:
+  ipfs0-data:
+  ipfs1-data:
+  ipfs2-data:
+
+services:
+
+  # ---------------------------------------------------------- Certification authorities
+  # One CA per organizational class — the multi-CA structure is the paper's
+  # core mitigation against single-authority credential compromise (§4.1).
+
+  ca-athlete:
+    image: hyperledger/fabric-ca:1.5.15
+    container_name: ca-athlete
+    labels: { antidoping.role: "ca", antidoping.org: "athlete" }
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-athlete
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=7054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:17054
+      - FABRIC_CA_SERVER_CSR_CN=ca-athlete
+      - FABRIC_CA_SERVER_CSR_HOSTS=ca-athlete,localhost,127.0.0.1
+    ports:
+      - "7054:7054"
+      - "17054:17054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/athlete:/etc/hyperledger/fabric-ca-server
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -sfk https://localhost:7054/cainfo || wget -q --no-check-certificate -O- https://localhost:7054/cainfo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ca-federation:
+    image: hyperledger/fabric-ca:1.5.15
+    container_name: ca-federation
+    labels: { antidoping.role: "ca", antidoping.org: "federation" }
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-federation
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=8054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:18054
+      - FABRIC_CA_SERVER_CSR_CN=ca-federation
+      - FABRIC_CA_SERVER_CSR_HOSTS=ca-federation,localhost,127.0.0.1
+    ports:
+      - "8054:8054"
+      - "18054:18054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/federation:/etc/hyperledger/fabric-ca-server
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -sfk https://localhost:8054/cainfo || wget -q --no-check-certificate -O- https://localhost:8054/cainfo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ca-nado:
+    image: hyperledger/fabric-ca:1.5.15
+    container_name: ca-nado
+    labels: { antidoping.role: "ca", antidoping.org: "nado" }
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-nado
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=9054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:19054
+      - FABRIC_CA_SERVER_CSR_CN=ca-nado
+      - FABRIC_CA_SERVER_CSR_HOSTS=ca-nado,localhost,127.0.0.1
+    ports:
+      - "9054:9054"
+      - "19054:19054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/nado:/etc/hyperledger/fabric-ca-server
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -sfk https://localhost:9054/cainfo || wget -q --no-check-certificate -O- https://localhost:9054/cainfo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ca-lab:
+    image: hyperledger/fabric-ca:1.5.15
+    container_name: ca-lab
+    labels: { antidoping.role: "ca", antidoping.org: "lab" }
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-lab
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=10054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:20054
+      - FABRIC_CA_SERVER_CSR_CN=ca-lab
+      - FABRIC_CA_SERVER_CSR_HOSTS=ca-lab,localhost,127.0.0.1
+    ports:
+      - "10054:10054"
+      - "20054:20054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/lab:/etc/hyperledger/fabric-ca-server
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -sfk https://localhost:10054/cainfo || wget -q --no-check-certificate -O- https://localhost:10054/cainfo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ca-research:
+    image: hyperledger/fabric-ca:1.5.15
+    container_name: ca-research
+    labels: { antidoping.role: "ca", antidoping.org: "research" }
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-research
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=11054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:21054
+      - FABRIC_CA_SERVER_CSR_CN=ca-research
+      - FABRIC_CA_SERVER_CSR_HOSTS=ca-research,localhost,127.0.0.1
+    ports:
+      - "11054:11054"
+      - "21054:21054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/research:/etc/hyperledger/fabric-ca-server
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -sfk https://localhost:11054/cainfo || wget -q --no-check-certificate -O- https://localhost:11054/cainfo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ca-orderer:
+    image: hyperledger/fabric-ca:1.5.15
+    container_name: ca-orderer
+    labels: { antidoping.role: "ca", antidoping.org: "orderer" }
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-orderer
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=12054
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:22054
+      - FABRIC_CA_SERVER_CSR_CN=ca-orderer
+      - FABRIC_CA_SERVER_CSR_HOSTS=ca-orderer,localhost,127.0.0.1
+    ports:
+      - "12054:12054"
+      - "22054:22054"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./network/organizations/fabric-ca/orderer:/etc/hyperledger/fabric-ca-server
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -sfk https://localhost:12054/cainfo || wget -q --no-check-certificate -O- https://localhost:12054/cainfo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # ---------------------------------------------------------- Ordering service (Raft)
+  orderer.antidoping.org:
+    image: hyperledger/fabric-orderer:2.5.13
+    container_name: orderer.antidoping.org
+    labels: { antidoping.role: "orderer" }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+      - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+      - ORDERER_ADMIN_TLS_ENABLED=true
+      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7053
+      - ORDERER_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - ORDERER_METRICS_PROVIDER=prometheus
+    working_dir: /root
+    command: orderer
+    volumes:
+      - ./network/organizations/ordererOrganizations/antidoping.org/orderers/orderer.antidoping.org/msp:/var/hyperledger/orderer/msp
+      - ./network/organizations/ordererOrganizations/antidoping.org/orderers/orderer.antidoping.org/tls:/var/hyperledger/orderer/tls
+      - orderer.antidoping.org:/var/hyperledger/production/orderer
+    ports:
+      - "7050:7050"
+      - "7053:7053"
+      - "19443:9443"
+    networks: [antidoping_net]
+
+  # ---------------------------------------------------------- Peers and CouchDB state stores
+
+  couchdb0-athlete:
+    image: couchdb:3.3.3
+    container_name: couchdb0-athlete
+    labels: { antidoping.role: "statedb", antidoping.org: "athlete" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15984:5984"
+    volumes:
+      - couchdb0-athlete:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer0.athlete.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer0.athlete.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "athlete" }
+    depends_on:
+      couchdb0-athlete: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer0.athlete.antidoping.org
+      - CORE_PEER_ADDRESS=peer0.athlete.antidoping.org:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.athlete.antidoping.org:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.athlete.antidoping.org:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.athlete.antidoping.org:7051
+      - CORE_PEER_LOCALMSPID=AthleteMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0-athlete:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0.athlete.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer0.athlete.antidoping.org:/var/hyperledger/production
+    ports:
+      - "7051:7051"
+      - "19000:9443"
+    networks: [antidoping_net]
+
+  couchdb1-athlete:
+    image: couchdb:3.3.3
+    container_name: couchdb1-athlete
+    labels: { antidoping.role: "statedb", antidoping.org: "athlete" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15985:5984"
+    volumes:
+      - couchdb1-athlete:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer1.athlete.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer1.athlete.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "athlete" }
+    depends_on:
+      couchdb1-athlete: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer1.athlete.antidoping.org
+      - CORE_PEER_ADDRESS=peer1.athlete.antidoping.org:7061
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7061
+      - CORE_PEER_CHAINCODEADDRESS=peer1.athlete.antidoping.org:7062
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7062
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.athlete.antidoping.org:7061
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.athlete.antidoping.org:7061
+      - CORE_PEER_LOCALMSPID=AthleteMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1-athlete:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer1.athlete.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer1.athlete.antidoping.org:/var/hyperledger/production
+    ports:
+      - "7061:7061"
+      - "19001:9443"
+    networks: [antidoping_net]
+
+  couchdb0-federation:
+    image: couchdb:3.3.3
+    container_name: couchdb0-federation
+    labels: { antidoping.role: "statedb", antidoping.org: "federation" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15986:5984"
+    volumes:
+      - couchdb0-federation:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer0.federation.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer0.federation.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "federation" }
+    depends_on:
+      couchdb0-federation: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer0.federation.antidoping.org
+      - CORE_PEER_ADDRESS=peer0.federation.antidoping.org:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.federation.antidoping.org:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.federation.antidoping.org:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.federation.antidoping.org:8051
+      - CORE_PEER_LOCALMSPID=FederationMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0-federation:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0.federation.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer0.federation.antidoping.org:/var/hyperledger/production
+    ports:
+      - "8051:8051"
+      - "19010:9443"
+    networks: [antidoping_net]
+
+  couchdb1-federation:
+    image: couchdb:3.3.3
+    container_name: couchdb1-federation
+    labels: { antidoping.role: "statedb", antidoping.org: "federation" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15987:5984"
+    volumes:
+      - couchdb1-federation:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer1.federation.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer1.federation.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "federation" }
+    depends_on:
+      couchdb1-federation: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer1.federation.antidoping.org
+      - CORE_PEER_ADDRESS=peer1.federation.antidoping.org:8061
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8061
+      - CORE_PEER_CHAINCODEADDRESS=peer1.federation.antidoping.org:8062
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8062
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.federation.antidoping.org:8061
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.federation.antidoping.org:8061
+      - CORE_PEER_LOCALMSPID=FederationMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1-federation:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer1.federation.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer1.federation.antidoping.org:/var/hyperledger/production
+    ports:
+      - "8061:8061"
+      - "19011:9443"
+    networks: [antidoping_net]
+
+  couchdb0-nado:
+    image: couchdb:3.3.3
+    container_name: couchdb0-nado
+    labels: { antidoping.role: "statedb", antidoping.org: "nado" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15988:5984"
+    volumes:
+      - couchdb0-nado:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer0.nado.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer0.nado.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "nado" }
+    depends_on:
+      couchdb0-nado: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer0.nado.antidoping.org
+      - CORE_PEER_ADDRESS=peer0.nado.antidoping.org:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.nado.antidoping.org:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.nado.antidoping.org:9051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.nado.antidoping.org:9051
+      - CORE_PEER_LOCALMSPID=NADOMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0-nado:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0.nado.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer0.nado.antidoping.org:/var/hyperledger/production
+    ports:
+      - "9051:9051"
+      - "19020:9443"
+    networks: [antidoping_net]
+
+  couchdb1-nado:
+    image: couchdb:3.3.3
+    container_name: couchdb1-nado
+    labels: { antidoping.role: "statedb", antidoping.org: "nado" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15989:5984"
+    volumes:
+      - couchdb1-nado:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer1.nado.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer1.nado.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "nado" }
+    depends_on:
+      couchdb1-nado: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer1.nado.antidoping.org
+      - CORE_PEER_ADDRESS=peer1.nado.antidoping.org:9061
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9061
+      - CORE_PEER_CHAINCODEADDRESS=peer1.nado.antidoping.org:9062
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9062
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.nado.antidoping.org:9061
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.nado.antidoping.org:9061
+      - CORE_PEER_LOCALMSPID=NADOMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1-nado:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer1.nado.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer1.nado.antidoping.org:/var/hyperledger/production
+    ports:
+      - "9061:9061"
+      - "19021:9443"
+    networks: [antidoping_net]
+
+  couchdb0-lab:
+    image: couchdb:3.3.3
+    container_name: couchdb0-lab
+    labels: { antidoping.role: "statedb", antidoping.org: "lab" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15990:5984"
+    volumes:
+      - couchdb0-lab:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer0.lab.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer0.lab.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "lab" }
+    depends_on:
+      couchdb0-lab: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer0.lab.antidoping.org
+      - CORE_PEER_ADDRESS=peer0.lab.antidoping.org:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.lab.antidoping.org:10052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.lab.antidoping.org:10051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.lab.antidoping.org:10051
+      - CORE_PEER_LOCALMSPID=LabMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0-lab:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0.lab.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer0.lab.antidoping.org:/var/hyperledger/production
+    ports:
+      - "10051:10051"
+      - "19030:9443"
+    networks: [antidoping_net]
+
+  couchdb1-lab:
+    image: couchdb:3.3.3
+    container_name: couchdb1-lab
+    labels: { antidoping.role: "statedb", antidoping.org: "lab" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15991:5984"
+    volumes:
+      - couchdb1-lab:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer1.lab.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer1.lab.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "lab" }
+    depends_on:
+      couchdb1-lab: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer1.lab.antidoping.org
+      - CORE_PEER_ADDRESS=peer1.lab.antidoping.org:10061
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10061
+      - CORE_PEER_CHAINCODEADDRESS=peer1.lab.antidoping.org:10062
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10062
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.lab.antidoping.org:10061
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.lab.antidoping.org:10061
+      - CORE_PEER_LOCALMSPID=LabMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1-lab:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer1.lab.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer1.lab.antidoping.org:/var/hyperledger/production
+    ports:
+      - "10061:10061"
+      - "19031:9443"
+    networks: [antidoping_net]
+
+  couchdb0-research:
+    image: couchdb:3.3.3
+    container_name: couchdb0-research
+    labels: { antidoping.role: "statedb", antidoping.org: "research" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15992:5984"
+    volumes:
+      - couchdb0-research:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer0.research.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer0.research.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "research" }
+    depends_on:
+      couchdb0-research: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer0.research.antidoping.org
+      - CORE_PEER_ADDRESS=peer0.research.antidoping.org:11051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:11051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.research.antidoping.org:11052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.research.antidoping.org:11051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.research.antidoping.org:11051
+      - CORE_PEER_LOCALMSPID=ResearchMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0-research:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0.research.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer0.research.antidoping.org:/var/hyperledger/production
+    ports:
+      - "11051:11051"
+      - "19040:9443"
+    networks: [antidoping_net]
+
+  couchdb1-research:
+    image: couchdb:3.3.3
+    container_name: couchdb1-research
+    labels: { antidoping.role: "statedb", antidoping.org: "research" }
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "15993:5984"
+    volumes:
+      - couchdb1-research:/opt/couchdb/data
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5984/_up"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  peer1.research.antidoping.org:
+    image: hyperledger/fabric-peer:2.5.13
+    container_name: peer1.research.antidoping.org
+    labels: { antidoping.role: "peer", antidoping.org: "research" }
+    depends_on:
+      couchdb1-research: { condition: service_healthy }
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=peer1.research.antidoping.org
+      - CORE_PEER_ADDRESS=peer1.research.antidoping.org:11061
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:11061
+      - CORE_PEER_CHAINCODEADDRESS=peer1.research.antidoping.org:11062
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11062
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.research.antidoping.org:11061
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.research.antidoping.org:11061
+      - CORE_PEER_LOCALMSPID=ResearchMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1-research:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9443
+      - CORE_METRICS_PROVIDER=prometheus
+      - 'CORE_CHAINCODE_EXTERNALBUILDERS=[{name: ccaas_builder, path: /opt/hyperledger/ccaas_builder, propagateEnvironment: [CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG]}]'
+      - 'CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer1.research.antidoping.org"}'
+    volumes:
+      - ./network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/msp:/etc/hyperledger/fabric/msp
+      - ./network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/tls:/etc/hyperledger/fabric/tls
+      - peer1.research.antidoping.org:/var/hyperledger/production
+    ports:
+      - "11061:11061"
+      - "19041:9443"
+    networks: [antidoping_net]
+
+  # ---------------------------------------------------------- IPFS (Kubo) off-chain store
+  # Three nodes so that erasure must unpin across a cluster, not a single host (§6).
+
+  ipfs0:
+    image: ipfs/kubo:v0.29.0
+    container_name: ipfs0
+    labels: { antidoping.role: "ipfs" }
+    environment:
+      - IPFS_PROFILE=server
+    ports:
+      - "5011:5001"
+      - "8091:8080"
+    volumes:
+      - ipfs0-data:/data/ipfs
+      - ./network/ipfs/init:/container-init.d:ro
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "ipfs", "id"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  ipfs1:
+    image: ipfs/kubo:v0.29.0
+    container_name: ipfs1
+    labels: { antidoping.role: "ipfs" }
+    environment:
+      - IPFS_PROFILE=server
+    ports:
+      - "5012:5001"
+      - "8092:8080"
+    volumes:
+      - ipfs1-data:/data/ipfs
+      - ./network/ipfs/init:/container-init.d:ro
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "ipfs", "id"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  ipfs2:
+    image: ipfs/kubo:v0.29.0
+    container_name: ipfs2
+    labels: { antidoping.role: "ipfs" }
+    environment:
+      - IPFS_PROFILE=server
+    ports:
+      - "5013:5001"
+      - "8093:8080"
+    volumes:
+      - ipfs2-data:/data/ipfs
+      - ./network/ipfs/init:/container-init.d:ro
+    networks: [antidoping_net]
+    healthcheck:
+      test: ["CMD", "ipfs", "id"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # ---------------------------------------------------------- Tooling containers
+  # All administration runs inside containers so the host needs nothing but Docker.
+  cli:
+    image: hyperledger/fabric-tools:2.5.13
+    container_name: cli
+    tty: true
+    stdin_open: true
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/etc/hyperledger/fabric
+      - CORE_PEER_TLS_ENABLED=true
+    working_dir: /work
+    command: sleep infinity
+    volumes:
+      - .:/work
+    networks: [antidoping_net]
+
+  ca-tools:
+    image: hyperledger/fabric-ca:1.5.15
+    container_name: ca-tools
+    tty: true
+    stdin_open: true
+    working_dir: /work
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["sleep infinity"]
+    volumes:
+      - .:/work
+    networks: [antidoping_net]
+
+  # ---------------------------------------------------------- Chaincode as a service
+  # CHAINCODE_ID values are written into .env by scripts/deploy-chaincode.sh
+  # after `peer lifecycle chaincode install` reports the package identifier.
+  custody-cc:
+    build: ./chaincode/custody
+    image: antidoping/custody-cc:1.0
+    container_name: custody-cc
+    labels: { antidoping.role: "chaincode" }
+    environment:
+      - CHAINCODE_SERVER_ADDRESS=0.0.0.0:9999
+      - CHAINCODE_ID=${CUSTODY_CCID}
+      - CORE_CHAINCODE_ID_NAME=${CUSTODY_CCID}
+    networks: [antidoping_net]
+
+  consent-cc:
+    build: ./chaincode/consent
+    image: antidoping/consent-cc:1.0
+    container_name: consent-cc
+    labels: { antidoping.role: "chaincode" }
+    environment:
+      - CHAINCODE_SERVER_ADDRESS=0.0.0.0:9999
+      - CHAINCODE_ID=${CONSENT_CCID}
+      - CORE_CHAINCODE_ID_NAME=${CONSENT_CCID}
+    networks: [antidoping_net]
+
+  # ---------------------------------------------------------- Application tier
+  gateway:
+    build: ./gateway
+    image: antidoping/gateway:1.0
+    container_name: gateway
+    labels: { antidoping.role: "gateway" }
+    environment:
+      - PORT=3000
+      - CHANNEL=antidopingchannel
+      - CRYPTO_ROOT=/work/network/organizations
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./network/organizations:/work/network/organizations:ro
+    networks: [antidoping_net]
+
+  web:
+    build: ./web
+    image: antidoping/web:1.0
+    container_name: web
+    labels: { antidoping.role: "web" }
+    ports:
+      - "8088:80"
+    networks: [antidoping_net]

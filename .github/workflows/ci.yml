@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain and pinned versions
+        run: ./scripts/preflight.sh
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [chaincode/custody, chaincode/consent, fhir-adapter]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: ${{ matrix.package }}
+      - name: Type-check
+        run: npx tsc -p tsconfig.test.json
+        working-directory: ${{ matrix.package }}
+      - name: Test
+        run: npm test
+        working-directory: ${{ matrix.package }}
+
+  # The off-chain suite needs the live IPFS cluster, so it runs against a real
+  # network rather than being skipped — a skipped acceptance gate must never be
+  # mistaken for a passing one.
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Bring up the network
+        run: ./scripts/network-up.sh
+      - name: Deploy chaincode
+        run: ./scripts/deploy-chaincode.sh
+      - name: Off-chain and erasure acceptance tests
+        run: npm install --no-audit --no-fund && npm test
+        working-directory: offchain
+      - name: End-to-end regulatory workflow
+        run: ./scripts/e2e-demo.sh
+      - name: Tear down
+        if: always()
+        run: ./scripts/network-down.sh --purge
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Dependency audit
+        run: |
+          for pkg in chaincode/custody chaincode/consent offchain fhir-adapter gateway; do
+            echo "== $pkg"
+            (cd "$pkg" && npm install --package-lock-only --no-audit --no-fund \
+              && npm audit --audit-level=high) || exit 1
+          done
+      - name: Static analysis
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: p/typescript p/security-audit

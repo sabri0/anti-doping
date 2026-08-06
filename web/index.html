@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentinel — Athlete Data Sovereignty & Chain of Custody</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0C1D24; --ink-2:#122A33; --ink-3:#1A3A44;
+    --paper:#EDF1F0; --surface:#FFFFFF; --surface-2:#F6F9F8;
+    --line:#D6DEDC; --line-soft:#E7ECEB;
+    --jade:#2E9B82; --jade-deep:#1B7460; --jade-wash:#E4F1EC;
+    --amber:#B87A25; --amber-wash:#F6EDDC;
+    --rose:#AE443B; --rose-wash:#F5E3E1;
+    --text:#0C1D24; --muted:#566B65; --faint:#8397A0;
+    --radius:14px; --radius-sm:9px;
+    --shadow:0 1px 2px rgba(12,29,36,.05), 0 8px 24px rgba(12,29,36,.06);
+    --shadow-lift:0 2px 4px rgba(12,29,36,.06), 0 16px 40px rgba(12,29,36,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    background:var(--paper); color:var(--text);
+    line-height:1.5; letter-spacing:-.005em;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  h1,h2,h3,.display{font-family:"Archivo",sans-serif;letter-spacing:-.02em;line-height:1.1}
+  a{color:inherit}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  :focus-visible{outline:2.5px solid var(--jade);outline-offset:2px;border-radius:6px}
+
+  .app{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+
+  /* ---------- Sidebar ---------- */
+  .rail{
+    background:var(--ink); color:#DCE7E4; position:sticky; top:0; height:100vh;
+    display:flex; flex-direction:column; padding:24px 18px;
+  }
+  .brand{display:flex;align-items:center;gap:11px;padding:4px 6px 22px}
+  .seal{width:34px;height:34px;flex:none;position:relative}
+  .brand-name{font-family:"Archivo";font-weight:800;font-size:18px;color:#fff;letter-spacing:-.03em}
+  .brand-sub{font-size:10.5px;color:#7C948D;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin-top:1px}
+  .nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+  .nav-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#5E7871;padding:14px 10px 6px;font-weight:600}
+  .nav a{
+    display:flex;align-items:center;gap:12px;padding:9px 11px;border-radius:9px;
+    font-size:13.5px;color:#B7C8C3;text-decoration:none;font-weight:500;position:relative;
+    transition:background .15s,color .15s;
+  }
+  .nav a svg{width:17px;height:17px;flex:none;opacity:.8}
+  .nav a:hover{background:#16333C;color:#EAF3F0}
+  .nav a.active{background:linear-gradient(90deg,#16333C,#153039);color:#fff}
+  .nav a.active::before{content:"";position:absolute;left:-18px;top:8px;bottom:8px;width:3px;background:var(--jade);border-radius:0 3px 3px 0}
+  .nav a.active svg{opacity:1;color:var(--jade)}
+  .rail-foot{margin-top:auto;padding-top:16px}
+  .athlete-chip{
+    background:#16333C;border:1px solid #23454E;border-radius:12px;padding:12px 13px;
+    display:flex;align-items:center;gap:11px;
+  }
+  .avatar{
+    width:38px;height:38px;border-radius:10px;flex:none;
+    background:linear-gradient(135deg,var(--jade),var(--jade-deep));
+    display:grid;place-items:center;font-family:"Archivo";font-weight:700;color:#052019;font-size:15px;
+  }
+  .athlete-chip .who{font-size:13px;font-weight:600;color:#EAF3F0;line-height:1.25}
+  .athlete-chip .id{font-size:10.5px;color:#7F9A92;margin-top:1px}
+
+  /* ---------- Main ---------- */
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{
+    display:flex;align-items:center;gap:20px;padding:20px 34px;
+    border-bottom:1px solid var(--line);background:rgba(237,241,240,.85);
+    backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;
+  }
+  .topbar .title h1{font-size:21px;font-weight:700}
+  .topbar .title p{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .netstat{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .pill{
+    display:inline-flex;align-items:center;gap:7px;background:var(--surface);
+    border:1px solid var(--line);border-radius:100px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--muted);
+  }
+  .pill .mono{font-size:11.5px;color:var(--text)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--jade);flex:none;box-shadow:0 0 0 0 rgba(46,155,130,.5)}
+  .dot.live{animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,155,130,.45)}70%{box-shadow:0 0 0 7px rgba(46,155,130,0)}100%{box-shadow:0 0 0 0 rgba(46,155,130,0)}}
+
+  .content{padding:26px 34px 48px;display:grid;grid-template-columns:1.35fr 1fr;gap:22px;align-items:start}
+  @media(max-width:1120px){.content{grid-template-columns:1fr}}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card-head{display:flex;align-items:center;gap:12px;padding:18px 20px 15px;border-bottom:1px solid var(--line-soft)}
+  .card-head h2{font-size:15.5px;font-weight:700}
+  .card-head .sub{font-size:12px;color:var(--muted);margin-top:1px}
+  .eyebrow{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--jade-deep);font-weight:600}
+  .head-ic{width:32px;height:32px;border-radius:9px;background:var(--jade-wash);display:grid;place-items:center;flex:none}
+  .head-ic svg{width:17px;height:17px;color:var(--jade-deep)}
+
+  /* ---------- Chain of custody ---------- */
+  .sample-strip{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:14px 20px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);
+  }
+  .sample-strip .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+  .sample-strip .v{font-size:13px;font-weight:600}
+  .sample-strip .sep{width:1px;height:26px;background:var(--line)}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;border-radius:9px;padding:8px 14px;
+    font-size:13px;font-weight:600;border:1px solid transparent;transition:transform .1s,background .15s,box-shadow .15s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--ink);color:#fff}
+  .btn-primary:hover{background:#173842}
+  .btn-ghost{background:var(--surface);border-color:var(--line);color:var(--text)}
+  .btn-ghost:hover{background:var(--surface-2)}
+  .btn svg{width:15px;height:15px}
+  .btn-sm{padding:6px 11px;font-size:12px}
+
+  .chain{padding:8px 20px 18px;position:relative}
+  .cust{position:relative;padding:15px 0 15px 40px}
+  .cust::before{ /* vertical link line */
+    content:"";position:absolute;left:15px;top:34px;bottom:-15px;width:2px;
+    background:linear-gradient(var(--jade),var(--jade));opacity:.35;
+  }
+  .cust:last-child::before{display:none}
+  .node{
+    position:absolute;left:6px;top:16px;width:20px;height:20px;border-radius:6px;
+    background:var(--jade);display:grid;place-items:center;box-shadow:0 0 0 4px var(--jade-wash);
+    transition:background .3s,box-shadow .3s;
+  }
+  .node svg{width:12px;height:12px;color:#fff}
+  .cust.pending .node{background:var(--amber);box-shadow:0 0 0 4px var(--amber-wash)}
+  .cust.broken .node{background:var(--rose);box-shadow:0 0 0 4px var(--rose-wash)}
+  .cust.broken::before{background:var(--rose);opacity:.5}
+  .cust-body{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:11px;padding:13px 15px;transition:border-color .3s,box-shadow .3s}
+  .cust.broken .cust-body{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose)}
+  .cust-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .phase{font-family:"Archivo";font-weight:700;font-size:14px}
+  .cust-time{font-size:11.5px;color:var(--faint)}
+  .cust-actor{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .hashrow{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .hash{
+    font-family:"IBM Plex Mono";font-size:11px;background:#fff;border:1px solid var(--line);
+    border-radius:6px;padding:3px 7px;color:var(--jade-deep);font-weight:500;
+  }
+  .cust.broken .hash.self{color:var(--rose);border-color:var(--rose);background:var(--rose-wash)}
+  .hash-lbl{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.07em}
+  .endorse{display:flex;align-items:center;gap:6px;margin-top:11px;flex-wrap:wrap}
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+    padding:3px 9px;border-radius:100px;
+  }
+  .badge svg{width:11px;height:11px}
+  .badge.ok{background:var(--jade-wash);color:var(--jade-deep)}
+  .badge.wait{background:var(--amber-wash);color:var(--amber)}
+  .badge.bad{background:var(--rose-wash);color:var(--rose)}
+
+  .verify-banner{
+    margin:2px 20px 18px;border-radius:11px;padding:12px 15px;display:flex;align-items:center;gap:11px;
+    font-size:13px;font-weight:500;border:1px solid var(--line-soft);background:var(--surface-2);color:var(--muted);
+    transition:.25s;
+  }
+  .verify-banner.good{background:var(--jade-wash);border-color:#BFE2D6;color:var(--jade-deep)}
+  .verify-banner.bad{background:var(--rose-wash);border-color:#E9C6C2;color:var(--rose)}
+  .verify-banner svg{width:18px;height:18px;flex:none}
+  .demo-link{margin-left:auto;font-size:11.5px;color:var(--faint);text-decoration:underline;text-underline-offset:2px;background:none;border:none}
+  .demo-link:hover{color:var(--muted)}
+
+  /* ---------- Right column ---------- */
+  .stack{display:flex;flex-direction:column;gap:22px}
+  .cats{padding:6px 14px 16px}
+  .cat{
+    display:flex;align-items:center;gap:13px;padding:13px 8px;border-bottom:1px solid var(--line-soft);
+  }
+  .cat:last-child{border-bottom:none}
+  .cat-ic{width:34px;height:34px;border-radius:9px;flex:none;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--line-soft)}
+  .cat-ic svg{width:17px;height:17px;color:var(--jade-deep)}
+  .cat-info{min-width:0;flex:1}
+  .cat-name{font-size:13.5px;font-weight:600;line-height:1.25}
+  .cat-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .cat-meta .mono{font-size:11px;color:var(--faint)}
+  .cat.erased .cat-name,.cat.erased .cat-meta{color:var(--faint)}
+  .cat.erased .cat-ic{opacity:.5}
+
+  .switch{position:relative;width:44px;height:25px;flex:none}
+  .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+  .track{position:absolute;inset:0;background:#CBD6D3;border-radius:100px;transition:background .2s}
+  .knob{position:absolute;top:3px;left:3px;width:19px;height:19px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .switch input:checked + .track{background:var(--jade)}
+  .switch input:checked ~ .knob{transform:translateX(19px)}
+  .switch input:focus-visible + .track{outline:2.5px solid var(--jade);outline-offset:2px}
+  .state{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;width:56px;text-align:right;flex:none}
+  .state.on{color:var(--jade-deep)}
+  .state.off{color:var(--faint)}
+  .state.erased{color:var(--rose)}
+
+  .erase-row{display:flex;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid var(--line-soft);background:var(--surface-2);border-radius:0 0 var(--radius) var(--radius)}
+  .erase-row p{font-size:12px;color:var(--muted);flex:1}
+  .erase-row p b{color:var(--text);font-weight:600}
+  .btn-danger{background:var(--surface);border:1px solid var(--rose);color:var(--rose)}
+  .btn-danger:hover{background:var(--rose-wash)}
+
+  /* consent request */
+  .req{padding:16px 20px}
+  .req-purpose{font-size:13px;color:var(--muted);margin:8px 0 12px;line-height:1.45}
+  .req-purpose b{color:var(--text);font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+  .chip{font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:100px;border:1px solid var(--line);background:var(--surface-2)}
+  .chip.grant{background:var(--jade-wash);border-color:#BFE2D6;color:var(--jade-deep)}
+  .chip.deny{background:var(--rose-wash);border-color:#E9C6C2;color:var(--rose);text-decoration:line-through;text-decoration-thickness:1px}
+  .req-note{font-size:11.5px;color:var(--faint);margin:10px 0 14px;display:flex;gap:7px;align-items:flex-start}
+  .req-note svg{width:14px;height:14px;flex:none;margin-top:1px;color:var(--jade)}
+  .req-actions{display:flex;gap:9px}
+
+  /* shamir / key card */
+  .keycard{padding:16px 20px}
+  .shards{display:flex;gap:9px;margin-top:12px}
+  .shard{flex:1;border:1px solid var(--line-soft);border-radius:10px;padding:11px 10px;text-align:center;background:var(--surface-2)}
+  .shard .who{font-size:11px;color:var(--muted);font-weight:500}
+  .shard .st{margin-top:7px;display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--jade-wash);align-items:center;justify-content:center}
+  .shard .st svg{width:12px;height:12px;color:var(--jade-deep)}
+  .thresh{font-size:11.5px;color:var(--muted);margin-top:12px;display:flex;align-items:center;gap:7px}
+  .thresh b{color:var(--text)}
+
+  /* audit feed */
+  .feed{padding:8px 20px 16px;max-height:216px;overflow:auto}
+  .fitem{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+  .fitem:last-child{border-bottom:none}
+  .fdot{width:7px;height:7px;border-radius:50%;background:var(--jade);margin-top:6px;flex:none}
+  .fitem.warn .fdot{background:var(--amber)}
+  .fitem.err .fdot{background:var(--rose)}
+  .fitem .ftxt{flex:1;line-height:1.4}
+  .fitem .ftxt b{font-weight:600}
+  .fitem .ftime{font-family:"IBM Plex Mono";font-size:10.5px;color:var(--faint);flex:none}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:13px 20px;border-radius:11px;font-size:13px;font-weight:500;
+    box-shadow:var(--shadow-lift);opacity:0;pointer-events:none;transition:.28s;display:flex;align-items:center;gap:10px;z-index:60;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast svg{width:16px;height:16px;color:var(--jade)}
+
+  @media(max-width:860px){
+    .app{grid-template-columns:1fr}
+    .rail{position:fixed;left:-280px;transition:left .25s;z-index:40}
+    .topbar{padding:16px 18px}.content{padding:18px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="rail">
+    <div class="brand">
+      <svg class="seal" viewBox="0 0 34 34" fill="none">
+        <path d="M17 2l12 5v8c0 8-5 13-12 17C10 28 5 23 5 15V7l12-5z" fill="#153039" stroke="#2E9B82" stroke-width="1.6"/>
+        <path d="M11 17l4 4 8-8" stroke="#2E9B82" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <div class="brand-name">Sentinel</div>
+        <div class="brand-sub">Custody &amp; Consent</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Athlete</div>
+      <a href="#" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Overview
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4" cy="6" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="4" cy="18" r="1.6"/></svg>
+        Chain of custody
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6l7-3z"/></svg>
+        Data sovereignty
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12l5 5L20 6"/></svg>
+        Consent requests
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h6M9 8h3"/></svg>
+        Audit trail
+      </a>
+      <div class="nav-label">System</div>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 7l3 3M17 7l-3 3M7 17l3-3M17 17l-3-3"/></svg>
+        Network status
+      </a>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="athlete-chip">
+        <div class="avatar">MK</div>
+        <div>
+          <div class="who">M. Keïta</div>
+          <div class="id mono">0x7f3a…c21b</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <div class="title">
+        <h1>Your data &amp; samples</h1>
+        <p>Everything below is enforced on-ledger. No organisation sees your data without your grant.</p>
+      </div>
+      <div class="netstat">
+        <span class="pill"><span class="dot live"></span> Ledger verified</span>
+        <span class="pill">5 orgs · <span class="mono">BFT</span></span>
+        <span class="pill">block <span class="mono">#48,201</span></span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ---------- LEFT: chain of custody ---------- -->
+      <section class="card" id="chainCard">
+        <div class="card-head">
+          <div class="head-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12h6"/><rect x="3" y="8" width="8" height="8" rx="2.5"/><rect x="13" y="8" width="8" height="8" rx="2.5"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="eyebrow">WADA Code · Art. 5 &amp; 7</div>
+            <h2>Chain of custody</h2>
+          </div>
+        </div>
+
+        <div class="sample-strip">
+          <div><div class="k">Sample</div><div class="v mono">SMP-2026-0412</div></div>
+          <div class="sep"></div>
+          <div><div class="k">Collected</div><div class="v">18 Jul 2026</div></div>
+          <div class="sep"></div>
+          <div><div class="k">Custody events</div><div class="v" id="evCount">5</div></div>
+          <button class="btn btn-primary btn-sm" id="verifyBtn" style="margin-left:auto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>
+            Verify chain
+          </button>
+        </div>
+
+        <div class="verify-banner" id="verifyBanner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+          <span id="verifyText">Each event is cryptographically linked to the one before it. Run a check to confirm integrity.</span>
+          <button class="demo-link" id="tamperBtn">Simulate tampering</button>
+        </div>
+
+        <div class="chain" id="chain"><!-- events injected by JS --></div>
+      </section>
+
+      <!-- ---------- RIGHT column ---------- -->
+      <div class="stack">
+
+        <!-- Data sovereignty -->
+        <section class="card">
+          <div class="card-head">
+            <div class="head-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6l7-3z"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="eyebrow">GDPR · Art. 7, 9 &amp; 25</div>
+              <h2>Data sovereignty</h2>
+              <div class="sub" id="grantSummary">3 of 6 categories shared · deny by default</div>
+            </div>
+          </div>
+          <div class="cats" id="cats"><!-- categories injected by JS --></div>
+          <div class="erase-row">
+            <p><b>Right to erasure.</b> Destroys the key so a category becomes permanently unreadable.</p>
+            <button class="btn btn-danger btn-sm" id="eraseBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>
+              Erase a category
+            </button>
+          </div>
+        </section>
+
+        <!-- Consent request -->
+        <section class="card">
+          <div class="card-head">
+            <div class="head-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12l5 5L20 6"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="eyebrow">Awaiting your decision</div>
+              <h2>Access request</h2>
+            </div>
+          </div>
+          <div class="req" id="reqBlock">
+            <p class="req-purpose"><b>Institute of Sport Research</b> requests access for a <b>cardiovascular performance study</b>, valid 90 days.</p>
+            <div class="chips">
+              <span class="chip grant">ABP — haematological</span>
+              <span class="chip grant">GPS &amp; accelerometry</span>
+              <span class="chip deny">Steroidal</span>
+              <span class="chip deny">Genetic</span>
+              <span class="chip deny">Psychological</span>
+            </div>
+            <div class="req-note">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+              <span>The contract already blocks the three categories outside this study's purpose. You only decide the two that fit.</span>
+            </div>
+            <div class="req-actions">
+              <button class="btn btn-primary btn-sm" id="grantReq">Grant the 2 that fit</button>
+              <button class="btn btn-ghost btn-sm" id="denyReq">Deny all</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Key recovery -->
+        <section class="card">
+          <div class="card-head">
+            <div class="head-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="15" r="4"/><path d="M11 12l7-7 3 3-3 3M14 9l2 2"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="eyebrow">Shamir 2-of-3</div>
+              <h2>Key recovery</h2>
+            </div>
+          </div>
+          <div class="keycard">
+            <div class="shards">
+              <div class="shard"><div class="who">You</div><div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg></div></div>
+              <div class="shard"><div class="who">Physician</div><div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg></div></div>
+              <div class="shard"><div class="who">Federation</div><div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg></div></div>
+            </div>
+            <div class="thresh">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--jade-deep)" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>
+              <span><b>2 of 3</b> shares needed. No single party can reach your keys alone.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Audit feed -->
+        <section class="card">
+          <div class="card-head">
+            <div class="head-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h6"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="eyebrow">Immutable · every action logged</div>
+              <h2>Audit trail</h2>
+            </div>
+          </div>
+          <div class="feed" id="feed"></div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg><span id="toastMsg"></span></div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = s => document.querySelector(s);
+
+  /* ---------- icons ---------- */
+  const ICON = {
+    seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg>',
+    clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v5l3 2"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 9v4M12 17h.01"/></svg>',
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg>',
+    gps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    bio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v3M16 3v3M8 6c0 4 8 4 8 8s-8 4-8 8M16 6c0 4-8 4-8 8"/></svg>',
+    blood:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg>',
+    steroid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 15l5-5 3 3 8-8"/><circle cx="7" cy="17" r="1.6"/></svg>',
+    brain:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-1 5 3 3 0 002 5 3 3 0 004 1V4zM15 4a3 3 0 013 3 3 3 0 011 5 3 3 0 01-2 5 3 3 0 01-4 1"/></svg>',
+    dna:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 3c0 5 10 5 10 10S7 18 7 23M17 3c0 5-10 5-10 10s10 5 10 10"/><path d="M8.5 6h7M8.5 18h7"/></svg>'
+  };
+
+  /* ---------- state ---------- */
+  let custody = [
+    {phase:'Sample collection', actor:'Doping control officer · NADO', time:'18 Jul · 09:14', hash:'a91f…4d02', prev:'—', end:[['NADO','ok']], status:'ok'},
+    {phase:'Transport handoff', actor:'Courier → Laboratory', time:'18 Jul · 14:40', hash:'c73b…8e15', prev:'a91f…4d02', end:[['Courier','ok'],['Lab','ok']], status:'ok'},
+    {phase:'Laboratory receipt', actor:'WADA-accredited lab', time:'19 Jul · 08:02', hash:'2f6a…b190', prev:'c73b…8e15', end:[['Lab','ok']], status:'ok'},
+    {phase:'Analysis result', actor:'Lab · cross-checked vs prohibited list', time:'21 Jul · 16:27', hash:'9d40…1c77', prev:'2f6a…b190', end:[['Lab','ok']], status:'ok', note:'Negative — no adverse finding'},
+    {phase:'Results management', actor:'Awaiting second endorsement', time:'now', hash:'e0b2…7a3f', prev:'9d40…1c77', end:[['NADO','ok'],['Lab','wait']], status:'pending'}
+  ];
+
+  let cats = [
+    {id:'gps', name:'GPS & accelerometry', icon:'gps', granted:true, org:'Performance dept', purpose:'training-load monitoring', exp:'expires 12 Oct 2026'},
+    {id:'bio', name:'Biochemical markers', icon:'bio', granted:false, org:'—', purpose:'', exp:'no active grant'},
+    {id:'hema', name:'ABP — haematological', icon:'blood', granted:true, org:'Athlete passport unit', purpose:'passport module', exp:'expires 01 Jan 2027'},
+    {id:'ster', name:'ABP — steroidal', icon:'steroid', granted:false, org:'—', purpose:'', exp:'no active grant'},
+    {id:'psy', name:'Psychological assessments', icon:'brain', granted:false, org:'—', purpose:'', exp:'no active grant'},
+    {id:'gen', name:'Genetic data', icon:'dna', granted:true, org:'Sports-medicine research', purpose:'consented study', exp:'expires 20 Aug 2026'}
+  ];
+
+  let feed = [
+    {t:'ok', txt:'Custody event <b>#48,201</b> committed — analysis result', time:'16:27'},
+    {t:'ok', txt:'Consent granted to <b>Athlete passport unit</b>', time:'11:03'},
+    {t:'warn', txt:'Late endorsement flagged on transport leg — resolved', time:'19 Jul'},
+    {t:'ok', txt:'Access auto-denied · <b>genetic</b> outside study purpose', time:'18 Jul'}
+  ];
+
+  /* ---------- render custody ---------- */
+  function renderChain(){
+    const c = $('#chain'); c.innerHTML='';
+    custody.forEach(ev=>{
+      const nodeIc = ev.status==='pending'?ICON.clock : ev.status==='broken'?ICON.warn : ICON.seal;
+      const badges = ev.end.map(([n,s])=>{
+        const cls = s==='ok'?'ok':s==='wait'?'wait':'bad';
+        const lbl = s==='ok'?'endorsed':s==='wait'?'pending':'invalid';
+        return `<span class="badge ${cls}">${s==='ok'?ICON.check:s==='wait'?ICON.clock:ICON.warn}${n} · ${lbl}</span>`;
+      }).join('');
+      const noteHtml = ev.note?`<div class="cust-actor" style="color:var(--jade-deep);font-weight:600;margin-top:6px">${ev.note}</div>`:'';
+      c.insertAdjacentHTML('beforeend', `
+        <div class="cust ${ev.status==='pending'?'pending':''}" data-hash="${ev.hash}">
+          <div class="node">${nodeIc}</div>
+          <div class="cust-body">
+            <div class="cust-top"><span class="phase">${ev.phase}</span><span class="cust-time">${ev.time}</span></div>
+            <div class="cust-actor">${ev.actor}</div>
+            ${noteHtml}
+            <div class="hashrow">
+              <span class="hash-lbl">prev</span><span class="hash mono">${ev.prev}</span>
+              <span class="hash-lbl">hash</span><span class="hash mono self">${ev.hash}</span>
+            </div>
+            <div class="endorse">${badges}</div>
+          </div>
+        </div>`);
+    });
+    $('#evCount').textContent = custody.length;
+  }
+
+  /* ---------- render categories ---------- */
+  function renderCats(){
+    const c = $('#cats'); c.innerHTML='';
+    cats.forEach(cat=>{
+      const stateCls = cat.erased?'erased':cat.granted?'on':'off';
+      const stateTxt = cat.erased?'Erased':cat.granted?'Shared':'Private';
+      const meta = cat.erased ? 'key destroyed · unreadable'
+                 : cat.granted ? `${cat.org} · ${cat.exp}`
+                 : cat.exp;
+      c.insertAdjacentHTML('beforeend', `
+        <div class="cat ${cat.erased?'erased':''}" data-id="${cat.id}">
+          <div class="cat-ic">${ICON[cat.icon]}</div>
+          <div class="cat-info">
+            <div class="cat-name">${cat.name}</div>
+            <div class="cat-meta">${meta}</div>
+          </div>
+          <label class="switch" ${cat.erased?'style="opacity:.35;pointer-events:none"':''}>
+            <input type="checkbox" ${cat.granted?'checked':''} data-id="${cat.id}" aria-label="Share ${cat.name}">
+            <span class="track"></span><span class="knob"></span>
+          </label>
+          <span class="state ${stateCls}">${stateTxt}</span>
+        </div>`);
+    });
+    const g = cats.filter(c=>c.granted && !c.erased).length;
+    $('#grantSummary').textContent = `${g} of 6 categories shared · deny by default`;
+  }
+
+  /* ---------- render feed ---------- */
+  function renderFeed(){
+    const f = $('#feed'); f.innerHTML='';
+    feed.forEach(i=>{
+      f.insertAdjacentHTML('beforeend',
+        `<div class="fitem ${i.t}"><span class="fdot"></span><span class="ftxt">${i.txt}</span><span class="ftime">${i.time}</span></div>`);
+    });
+  }
+  function logFeed(txt, t='ok'){
+    feed.unshift({t, txt, time:'now'});
+    if(feed.length>7) feed.pop();
+    renderFeed();
+  }
+
+  /* ---------- toast ---------- */
+  let toT;
+  function toast(msg){
+    $('#toastMsg').textContent = msg;
+    $('#toast').classList.add('show');
+    clearTimeout(toT); toT=setTimeout(()=>$('#toast').classList.remove('show'),2600);
+  }
+
+  /* ---------- interactions ---------- */
+  let tampered = false;
+
+  $('#cats').addEventListener('change', e=>{
+    const id = e.target.getAttribute('data-id'); if(!id) return;
+    const cat = cats.find(c=>c.id===id);
+    cat.granted = e.target.checked;
+    if(cat.granted){ cat.org = cat.org==='—'?'Pending assignment':cat.org; cat.exp = cat.exp.startsWith('no active')?'grant active':cat.exp; }
+    else { cat.exp='no active grant'; }
+    renderCats();
+    logFeed(`Consent ${cat.granted?'granted':'revoked'} · <b>${cat.name}</b>`, cat.granted?'ok':'warn');
+    toast(`${cat.name} — ${cat.granted?'now shared':'now private'}`);
+  });
+
+  $('#grantReq').addEventListener('click', ()=>{
+    const hema = cats.find(c=>c.id==='hema'); const gps=cats.find(c=>c.id==='gps');
+    hema.granted=true; gps.granted=true;
+    renderCats();
+    $('#reqBlock').innerHTML = `<div class="req-note" style="color:var(--jade-deep)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg><span>Granted haematological + accelerometry for 90 days. The other three were never exposed.</span></div>`;
+    logFeed('Access granted to <b>Institute of Sport Research</b> · 2 categories');
+    toast('Request approved — purpose-limited to 2 categories');
+  });
+  $('#denyReq').addEventListener('click', ()=>{
+    $('#reqBlock').innerHTML = `<div class="req-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--rose)"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Request denied. No data was released.</span></div>`;
+    logFeed('Access request <b>denied</b> · Institute of Sport Research', 'warn');
+    toast('Request denied');
+  });
+
+  $('#eraseBtn').addEventListener('click', ()=>{
+    const target = cats.find(c=>c.id==='gen' && !c.erased) || cats.find(c=>!c.erased && c.granted);
+    if(!target){ toast('Nothing left to erase'); return; }
+    target.erased=true; target.granted=false;
+    renderCats();
+    logFeed(`Right to erasure executed · <b>${target.name}</b> key destroyed`, 'err');
+    toast(`${target.name} erased — key destroyed, data unreadable`);
+  });
+
+  /* verify + tamper: the signature interaction */
+  $('#verifyBtn').addEventListener('click', ()=>{
+    const banner=$('#verifyBanner'), nodes=[...document.querySelectorAll('.cust')];
+    banner.className='verify-banner'; $('#verifyText').textContent='Walking the chain…';
+    let i=0;
+    const step=()=>{
+      if(i>0) nodes[i-1].querySelector('.cust-body').style.boxShadow='';
+      if(i<nodes.length){
+        const broken = tampered && nodes[i].classList.contains('broken');
+        nodes[i].querySelector('.cust-body').style.boxShadow = broken?'0 0 0 2px var(--rose)':'0 0 0 2px var(--jade)';
+        i++; setTimeout(step,180);
+      } else {
+        if(tampered){
+          banner.className='verify-banner bad';
+          $('#verifyText').innerHTML='Integrity broken — event 3 was altered. Its hash no longer matches, and every later block is flagged.';
+        } else {
+          banner.className='verify-banner good';
+          $('#verifyText').innerHTML='Chain verified — 0 inconsistencies across 5 events.';
+        }
+      }
+    };
+    step();
+  });
+
+  $('#tamperBtn').addEventListener('click', ()=>{
+    tampered=!tampered;
+    const nodes=[...document.querySelectorAll('.cust')];
+    if(tampered){
+      // alter event 3's hash; break it and everything downstream
+      nodes[2].classList.add('broken');
+      nodes[2].querySelector('.hash.self').textContent='0000…ffff';
+      nodes[3].classList.add('broken'); nodes[4].classList.add('broken');
+      $('#tamperBtn').textContent='Undo tampering';
+      logFeed('⚠ Ledger inconsistency detected at event 3', 'err');
+      toast('A record was altered — the chain now shows a break');
+    } else {
+      renderChain(); $('#tamperBtn').textContent='Simulate tampering';
+      $('#verifyBanner').className='verify-banner';
+      $('#verifyText').textContent='Each event is cryptographically linked to the one before it. Run a check to confirm integrity.';
+      toast('Tampering reverted');
+    }
+  });
+
+  renderChain(); renderCats(); renderFeed();
+  /* ---------- exposed so app.js can drive this UI with live ledger data ----------
+     The design's rendering stays authoritative; only the data source changes. */
+  window.__ui = {
+    get custody(){return custody}, set custody(v){custody=v},
+    get cats(){return cats},       set cats(v){cats=v},
+    get feed(){return feed},       set feed(v){feed=v},
+    renderChain, renderCats, renderFeed, logFeed, toast, ICON
+  };
+
+})();
+</script>
+<script src="app.js"></script>
+</body>
+</html>

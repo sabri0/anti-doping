@@ -1,0 +1,58 @@
+---
+# Driver-saturation control.
+#
+# The main suite runs two local Caliper workers co-resident with the network.
+# At configured rates of 50 and 100 TPS those workers achieved less than the
+# configured rate, which leaves two readings of the same data: either the
+# network refused the offered load, or the driver never managed to offer it.
+# The measurement only supports the first reading if the driver can be shown
+# not to be the binding constraint.
+#
+# This configuration repeats the two highest sweep points with six workers
+# instead of two, and adds a point at 200 TPS. If the achieved send rate rises
+# with worker count while throughput does not, the ceiling belongs to the
+# network. If the achieved send rate rises and throughput rises with it, the
+# original figures measured the driver and must be withdrawn.
+#
+# Run:  CONFIG=benchmark/driver-control.yaml REPORT=benchmark/driver-control.html \
+#       LOG=benchmark/driver-control.log ./scripts/run-benchmark.sh
+
+test:
+  name: driver-saturation-control
+  description: >
+    The two highest offered-load points of the saturation sweep repeated with a
+    six-worker load driver, to establish whether the load driver or the network
+    bounded the measured write throughput.
+  workers:
+    type: local
+    number: 6
+  rounds:
+    - label: sweep-50tps-w6
+      description: Article 5.3 custody initiation at 50 TPS configured, six workers.
+      txNumber: 500
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 50 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
+
+    - label: sweep-100tps-w6
+      description: Article 5.3 custody initiation at 100 TPS configured, six workers.
+      txNumber: 600
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 100 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
+
+    - label: sweep-200tps-w6
+      description: >
+        Article 5.3 custody initiation at 200 TPS configured, six workers — far
+        above any rate the two-worker driver reached, so a driver bound would
+        show as an achieved send rate that does not move.
+      txNumber: 600
+      rateControl:
+        type: fixed-rate
+        opts: { tps: 200 }
+      workload:
+        module: benchmark/workloads/initiate-sample-custody.js
