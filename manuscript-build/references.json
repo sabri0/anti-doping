@@ -20,13 +20,13 @@
   "18": "Sottas, P. E., Robinson, N., Rabin, O. & Saugy, M. The athlete biological passport. *Clin. Chem.* **57**, 969–976 (2011).",
   "19": "Guelmami, N. et al. The ethical compass: establishing ethical guidelines for research practices in sports medicine and exercise science. *Int. J. Sport Stud. Health* **7**, 2 (2024).",
   "20": "World Anti-Doping Agency. *2022 Anti-Doping Testing Figures* (World Anti-Doping Agency, 2024).",
-  "21": "Nakamoto, S. Bitcoin: a peer-to-peer electronic cash system. Preprint at https://bitcoin.org/bitcoin.pdf (2008).",
+  "21": "Nakamoto, S. Bitcoin: a peer-to-peer electronic cash system. https://bitcoin.org/bitcoin.pdf (2008).",
   "22": "Androulaki, E. et al. Hyperledger Fabric: a distributed operating system for permissioned blockchains. In *Proc. Thirteenth EuroSys Conference* 1–15 (ACM, 2018).",
-  "23": "Osuna, A. P., Alzibak, M., Bole, A. D., Paya, A. S. & Mora, H. Addressing the challenges of biological passport through blockchain technology. In *Research and Innovation Forum 2022* (eds Visvizi, A., Troisi, O. & Grimaldi, M.) (Springer, 2023).",
+  "23": "Pastor Osuna, A., Alzibak, M., Dorado Bole, A., Soriano Payá, A. & Mora, H. Addressing the challenges of biological passport through blockchain technology. In *Research and Innovation Forum 2022* (eds Visvizi, A., Troisi, O. & Grimaldi, M.) 133–143 (Springer, 2023).",
   "24": "Wang, Q. & Qin, S. A Hyperledger Fabric-based system framework for healthcare data management. *Appl. Sci.* **11**, 11693 (2021).",
   "25": "Guggenberger, T., Sedlmeir, J., Fridgen, G. & Luckow, A. An in-depth investigation of the performance characteristics of Hyperledger Fabric. *Comput. Ind. Eng.* **173**, 108716 (2022).",
   "26": "Khatoon, A. A blockchain-based smart contract system for healthcare management. *Electronics* **9**, 94 (2020).",
-  "27": "Sharma, A., Tomar, R., Chilamkurti, N. & Kim, B.-G. Blockchain-based smart contracts for Internet of Medical Things in e-healthcare. *Electronics* **9**, 1609 (2020).",
+  "27": "Sharma, A., Sarishma, Tomar, R., Chilamkurti, N. & Kim, B.-G. Blockchain-based smart contracts for Internet of Medical Things in e-healthcare. *Electronics* **9**, 1609 (2020).",
   "28": "Benet, J. IPFS: content addressed, versioned, P2P file system. Preprint at https://arxiv.org/abs/1407.3561 (2014).",
   "29": "Stach, C., Gritti, C., Przytarski, D. & Mitschang, B. Assessment and treatment of privacy issues in blockchain systems. *SIGAPP Appl. Comput. Rev.* **22**, 5–24 (2022).",
   "30": "Haque, A. B., Islam, A. K. M. N., Hyrynsalmi, S., Naqvi, B. & Smolander, K. GDPR compliant blockchains — a systematic literature review. *IEEE Access* **9**, 50593–50606 (2021).",
@@ -50,5 +50,6 @@
   "50": "Musa, S., Dergaa, I., Al Shekh Yasin, R. & Singh, R. The impact of training on electronic health records-related knowledge, practical competencies, and staff satisfaction: a pre–post intervention study among wellness center providers in a primary healthcare facility. *J. Multidiscip. Healthc.* **16**, 1551–1563 (2023).",
   "53": "Abdaoui, H. et al. Accurate clinical entity recognition and code mapping of anatomopathological reports using BioClinicalBERT enhanced by retrieval-augmented generation: a hybrid deep learning approach. *Bioengineering* **13**, 30 (2026).",
   "54": "Hyperledger Caliper. *Caliper: a blockchain performance benchmark framework, v0.6.0* (Hyperledger Foundation, 2023). Available at https://hyperledger-caliper.github.io/caliper/",
-  "55": "Ongaro, D. & Ousterhout, J. In search of an understandable consensus algorithm. In *Proc. 2014 USENIX Annual Technical Conference* 305–319 (USENIX Association, 2014)."
+  "55": "Ongaro, D. & Ousterhout, J. In search of an understandable consensus algorithm. In *Proc. 2014 USENIX Annual Technical Conference* 305–319 (USENIX Association, 2014).",
+  "56": "World Anti-Doping Agency. *World Anti-Doping Code 2027* (World Anti-Doping Agency, 2025)."
 }

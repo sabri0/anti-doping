@@ -1,7 +1,7 @@
 {
   "PHASE1_FACTOR": "3.9",
   "PHASE1_VALUES": "54.3, 13.9, 15.5",
-  "STATE_N": "12",
+  "STATE_N": "twelve",
   "STATE_MIN": "15.7",
   "STATE_MAX": "36.3",
   "STATE_MEDIAN": "26.2",
@@ -58,6 +58,8 @@
   "DRIVER_POINTS": "50 configured: 25.1 offered, 9.8 committed; 100 configured: 43.0 offered, 10.9 committed; 200 configured: 38.1 offered, 10.3 committed",
   "DRIVER_MAX_OFFERED": "43.0",
   "DRIVER_MAX_TPUT": "10.9",
+  "DRIVER_100_SEND": "43.0",
+  "DRIVER_100_TPUT": "10.9",
   "DEMAND_HIGH": "27.5",
   "DEMAND_LOW": "5.5",
   "DEMAND_MEAN": "0.31",

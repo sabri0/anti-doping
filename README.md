@@ -224,6 +224,8 @@ Dependency audit: **no known vulnerabilities in production dependency trees.**
 
 ## 6. Measured performance
 
+Archived release: [10.5281/zenodo.21817176](https://doi.org/10.5281/zenodo.21817176)
+
 Six full passes of the 14-round suite, twelve identical rounds for between-round
 variation, a paired endorsement experiment, and three control arms. Full account
 in [docs/MEASUREMENT.md](docs/MEASUREMENT.md); raw output in

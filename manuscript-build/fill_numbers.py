@@ -29,7 +29,7 @@ OPERATION_LABELS = [
     ("getCustodyChain", "getCustodyChain (provenance query)", "Read"),
 ]
 
-WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
+WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 12: "twelve"}
 
 
 def rng(s, unit=""):
@@ -76,7 +76,7 @@ def main():
     # ---- between-round variation, and the rejected state hypothesis ---------
     state = controls.get("stateScaling")
     if state:
-        out["STATE_N"] = str(state["rounds"])
+        out["STATE_N"] = WORDS.get(state["rounds"], str(state["rounds"]))
         out["STATE_MIN"] = f"{state['minTps']:.1f}"
         out["STATE_MAX"] = f"{state['maxTps']:.1f}"
         out["STATE_MEDIAN"] = f"{state['medianTps']:.1f}"
@@ -177,6 +177,11 @@ def main():
         best = max(d.values(), key=lambda r: r["sendRateTps"])
         out["DRIVER_MAX_OFFERED"] = f"{best['sendRateTps']:.1f}"
         out["DRIVER_MAX_TPUT"] = f"{max(r['throughputTps'] for r in d.values()):.1f}"
+        # The comparison the text makes must be at a matched configured rate,
+        # not between whichever rounds happened to be fastest.
+        if "sweep-100tps-w6" in d:
+            out["DRIVER_100_SEND"] = f"{d['sweep-100tps-w6']['sendRateTps']:.1f}"
+            out["DRIVER_100_TPUT"] = f"{d['sweep-100tps-w6']['throughputTps']:.1f}"
 
     # ---- operational demand reference ---------------------------------------
     samples, hours = 330_000, 8_760

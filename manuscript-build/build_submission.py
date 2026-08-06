@@ -279,6 +279,7 @@ def build_main(cfg, out_path):
 
     for name, title in (("DATA AVAILABILITY", "Data availability"),
                         ("CODE AVAILABILITY", "Code availability"),
+                        ("ACKNOWLEDGEMENTS", "Acknowledgements"),
                         ("AUTHOR CONTRIBUTIONS", "Author contributions"),
                         ("ADDITIONAL INFORMATION", "Additional information")):
         heading(doc, title)
