@@ -1,0 +1,259 @@
+{
+ "n": 20,
+ "intervalS": 3.0,
+ "networkProcessors": 6,
+ "networkUtilisationPct": 60.52458333333333,
+ "components": {
+  "CAs and tools": {
+   "meanPctOfOneCpu": 0.0335,
+   "sd": 0.14981655449248593,
+   "shareOfNetworkPct": 0.009224901727259585
+  },
+  "IPFS": {
+   "meanPctOfOneCpu": 5.64,
+   "sd": 8.393287418181895,
+   "shareOfNetworkPct": 1.553087932589375
+  },
+  "chaincode": {
+   "meanPctOfOneCpu": 47.0205,
+   "sd": 26.49010847666093,
+   "shareOfNetworkPct": 12.948044527361473
+  },
+  "load driver": {
+   "meanPctOfOneCpu": 80.673,
+   "sd": 33.05637482910225
+  },
+  "ordering nodes": {
+   "meanPctOfOneCpu": 84.6365,
+   "sd": 36.915839172936394,
+   "shareOfNetworkPct": 23.306370001170325
+  },
+  "peers": {
+   "meanPctOfOneCpu": 225.817,
+   "sd": 47.87922064396708,
+   "shareOfNetworkPct": 62.183272637151575
+  }
+ },
+ "samples": [
+  {
+   "t": 1793035553.4,
+   "components": {
+    "load driver": 99.38,
+    "chaincode": 0.0,
+    "peers": 192.4,
+    "IPFS": 14.469999999999999,
+    "CAs and tools": 0.0,
+    "ordering nodes": 71.47
+   }
+  },
+  {
+   "t": 1793035556.4,
+   "components": {
+    "load driver": 123.57,
+    "chaincode": 31.79,
+    "peers": 174.42000000000002,
+    "IPFS": 4.6899999999999995,
+    "CAs and tools": 0.0,
+    "ordering nodes": 131.42
+   }
+  },
+  {
+   "t": 1793035559.5,
+   "components": {
+    "load driver": 66.33,
+    "chaincode": 71.54,
+    "peers": 304.09,
+    "IPFS": 3.12,
+    "CAs and tools": 0.0,
+    "ordering nodes": 25.439999999999998
+   }
+  },
+  {
+   "t": 1793035562.5,
+   "components": {
+    "load driver": 130.2,
+    "chaincode": 34.38,
+    "peers": 236.35999999999996,
+    "IPFS": 1.6600000000000001,
+    "CAs and tools": 0.0,
+    "ordering nodes": 124.77999999999999
+   }
+  },
+  {
+   "t": 1793035565.5,
+   "components": {
+    "load driver": 121.04,
+    "chaincode": 53.03,
+    "peers": 182.32999999999998,
+    "IPFS": 2.37,
+    "CAs and tools": 0.0,
+    "ordering nodes": 158.63
+   }
+  },
+  {
+   "t": 1793035568.5,
+   "components": {
+    "load driver": 56.65,
+    "chaincode": 79.29,
+    "peers": 163.14999999999998,
+    "IPFS": 1.66,
+    "CAs and tools": 0.0,
+    "ordering nodes": 52.129999999999995
+   }
+  },
+  {
+   "t": 1793035572.0,
+   "components": {
+    "load driver": 71.46,
+    "chaincode": 77.06,
+    "peers": 238.32,
+    "IPFS": 1.05,
+    "CAs and tools": 0.0,
+    "ordering nodes": 30.17
+   }
+  },
+  {
+   "t": 1793035575.0,
+   "components": {
+    "load driver": 103.72,
+    "chaincode": 42.69,
+    "peers": 206.07000000000002,
+    "IPFS": 12.33,
+    "CAs and tools": 0.0,
+    "ordering nodes": 117.73
+   }
+  },
+  {
+   "t": 1793035578.1,
+   "components": {
+    "load driver": 62.54,
+    "chaincode": 47.59,
+    "peers": 209.78,
+    "IPFS": 0.5900000000000001,
+    "CAs and tools": 0.0,
+    "ordering nodes": 78.32
+   }
+  },
+  {
+   "t": 1793035581.3,
+   "components": {
+    "load driver": 71.76,
+    "chaincode": 47.31,
+    "peers": 246.51999999999998,
+    "IPFS": 0.66,
+    "CAs and tools": 0.0,
+    "ordering nodes": 75.42
+   }
+  },
+  {
+   "t": 1793035584.3,
+   "components": {
+    "load driver": 6.44,
+    "chaincode": 3.43,
+    "peers": 287.31,
+    "IPFS": 19.02,
+    "CAs and tools": 0.0,
+    "ordering nodes": 53.61
+   }
+  },
+  {
+   "t": 1793035587.3,
+   "components": {
+    "load driver": 38.39,
+    "chaincode": 19.720000000000002,
+    "peers": 319.15,
+    "IPFS": 1.73,
+    "CAs and tools": 0.0,
+    "ordering nodes": 93.06
+   }
+  },
+  {
+   "t": 1793035590.3,
+   "components": {
+    "load driver": 58.08,
+    "chaincode": 40.44,
+    "peers": 287.56,
+    "IPFS": 0.69,
+    "CAs and tools": 0.0,
+    "ordering nodes": 74.69999999999999
+   }
+  },
+  {
+   "t": 1793035593.3,
+   "components": {
+    "load driver": 50.38,
+    "chaincode": 9.37,
+    "peers": 261.31,
+    "IPFS": 1.72,
+    "CAs and tools": 0.0,
+    "ordering nodes": 74.37
+   }
+  },
+  {
+   "t": 1793035596.3,
+   "components": {
+    "load driver": 70.56,
+    "chaincode": 63.63,
+    "peers": 226.33,
+    "IPFS": 8.950000000000001,
+    "CAs and tools": 0.67,
+    "ordering nodes": 52.089999999999996
+   }
+  },
+  {
+   "t": 1793035599.3,
+   "components": {
+    "load driver": 126.72,
+    "chaincode": 58.91,
+    "peers": 248.60999999999999,
+    "IPFS": 1.31,
+    "CAs and tools": 0.0,
+    "ordering nodes": 130.55
+   }
+  },
+  {
+   "t": 1793035602.3,
+   "components": {
+    "load driver": 84.98,
+    "chaincode": 56.96,
+    "peers": 207.01000000000002,
+    "IPFS": 1.68,
+    "CAs and tools": 0.0,
+    "ordering nodes": 91.44
+   }
+  },
+  {
+   "t": 1793035605.3,
+   "components": {
+    "load driver": 72.51,
+    "chaincode": 87.86,
+    "peers": 164.58,
+    "IPFS": 33.379999999999995,
+    "CAs and tools": 0.0,
+    "ordering nodes": 86.68
+   }
+  },
+  {
+   "t": 1793035608.3,
+   "components": {
+    "load driver": 121.15,
+    "chaincode": 29.32,
+    "peers": 170.07999999999998,
+    "IPFS": 0.8200000000000001,
+    "CAs and tools": 0.0,
+    "ordering nodes": 125.61
+   }
+  },
+  {
+   "t": 1793035611.3,
+   "components": {
+    "load driver": 77.6,
+    "chaincode": 86.09,
+    "peers": 190.96,
+    "IPFS": 0.9,
+    "CAs and tools": 0.0,
+    "ordering nodes": 45.11
+   }
+  }
+ ]
+}

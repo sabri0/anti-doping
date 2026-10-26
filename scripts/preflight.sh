@@ -43,7 +43,8 @@ echo
 echo "Pinned image versions"
 grep -oE 'hyperledger/fabric-(peer|orderer|tools|ca):[0-9.]+' docker-compose.yaml | sort -u | sed 's/^/  /'
 grep -oE 'couchdb:[0-9.]+|ipfs/kubo:v[0-9.]+' docker-compose.yaml | sort -u | sed 's/^/  /'
-echo "  hyperledger/caliper:0.6.0 (benchmark/Dockerfile)"
+echo "  Fabric 3.1.5 command-line tools: network/tools (fetched by scripts/fetch-fabric-binaries.sh)"
+echo "  load driver: node:20-bookworm-slim (driver/Dockerfile)"
 
 echo
 echo "Locally available images"

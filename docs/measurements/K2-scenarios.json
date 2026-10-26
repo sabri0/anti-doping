@@ -1,0 +1,293 @@
+{
+  "executedAt": "2026-10-26T14:35:42.409Z",
+  "channel": "antidopingchannel",
+  "passed": 14,
+  "failed": 0,
+  "scenarios": [
+    {
+      "id": "S1",
+      "title": "Adverse analytical finding confirmed on an attested custody chain",
+      "regulation": "WADA Code Art. 2.1, 5.4.1 (ISTI), 7.1, 7.2, 14.1.1",
+      "rule": "R1_AAF_CONFIRMED",
+      "steps": [
+        "NADO initiateSampleCustody; athlete acknowledgeSampleCollection",
+        "NADO proposeCustodyTransfer; laboratory acceptCustodyTransfer",
+        "laboratory recordSampleAnalysisResult (private, transient input)",
+        "NADO triggerResultsManagement; NADO notifyAthleteOfAAF"
+      ],
+      "outcome": "AAF_CONFIRMED (R1_AAF_CONFIRMED); notified within deadline: true; athlete reads the notice: true",
+      "expected": "AAF_CONFIRMED via R1 with a notification deadline; the athlete reads the notice from its own peer",
+      "passed": true
+    },
+    {
+      "id": "S2",
+      "title": "Dispatch never accepted by the laboratory invalidates the process before any finding",
+      "regulation": "ISTI chain of custody (guard on Code Art. 7.1)",
+      "rule": "R5_PROCESS_INVALIDATED",
+      "steps": [
+        "custody opened and acknowledged",
+        "NADO dispatches; no receipt is ever recorded",
+        "adverse analysis",
+        "results management"
+      ],
+      "outcome": "PROCESS_INVALIDATED (R5_PROCESS_INVALIDATED); sample INVALIDATED; alert to NADOMSP, WADA; suppressed: R1_AAF_CONFIRMED",
+      "expected": "PROCESS_INVALIDATED; sample INVALIDATED; the adverse finding is retained as a concurrent match",
+      "passed": true
+    },
+    {
+      "id": "S3",
+      "title": "Pending laboratory accreditation suspends automation",
+      "regulation": "WADA Code Art. 7.1; GDPR Art. 22",
+      "rule": "R2_AAF_PENDING_REVIEW",
+      "steps": [
+        "attested custody chain",
+        "adverse analysis, accreditation PENDING",
+        "results management"
+      ],
+      "outcome": "AAF_PENDING_REVIEW (R2_AAF_PENDING_REVIEW); human oversight required: true",
+      "expected": "AAF_PENDING_REVIEW via R2",
+      "passed": true
+    },
+    {
+      "id": "S4",
+      "title": "Result from a non-accredited laboratory is rejected and audited",
+      "regulation": "WADA Code Art. 6.1 (case absent from the table as first specified)",
+      "rule": "R2B_ANALYSIS_REJECTED",
+      "steps": [
+        "attested custody chain",
+        "adverse analysis, accreditation UNVERIFIED",
+        "results management"
+      ],
+      "outcome": "ANALYSIS_REJECTED (R2B_ANALYSIS_REJECTED); human oversight required: true",
+      "expected": "ANALYSIS_REJECTED via R2b",
+      "passed": true
+    },
+    {
+      "id": "S5",
+      "title": "Third ledger-verified whereabouts failure inside 12 months",
+      "regulation": "WADA Code Art. 2.4, 7.1",
+      "rule": "R4_WHEREABOUTS_ADRV",
+      "steps": [
+        "three verified whereabouts failures (private)",
+        "attested custody chain",
+        "negative analysis",
+        "results management"
+      ],
+      "outcome": "WHEREABOUTS_ADRV (R4_WHEREABOUTS_ADRV) with a negative analysis: the violation is procedural, not analytical",
+      "expected": "WHEREABOUTS_ADRV via R4",
+      "passed": true
+    },
+    {
+      "id": "S6",
+      "title": "ABP anomaly escalates to the expert panel",
+      "regulation": "ABP guidelines; GDPR Art. 22",
+      "rule": "R3_ABP_ALERT_INITIATED",
+      "steps": [
+        "passport evaluation (private)",
+        "attested custody chain",
+        "negative analysis",
+        "results management"
+      ],
+      "outcome": "ABP_ALERT_INITIATED (R3_ABP_ALERT_INITIATED); human oversight required: true",
+      "expected": "ABP_ALERT_INITIATED via R3 with oversight required",
+      "passed": true
+    },
+    {
+      "id": "S7",
+      "title": "An insider holding both endorsements still cannot act for the other organisation",
+      "regulation": "Threat model: NADO acting unilaterally (reviewer scenario)",
+      "steps": [
+        "(a) NADO re-triggers results management, endorsed by NADO and laboratory peers",
+        "(b) NADO submits the laboratory acceptance of its own dispatch, both endorsing",
+        "(c) NADO approves its own amendment, both endorsing",
+        "(d) NADO-only endorsement of a write to a key bound to NADO and laboratory",
+        "(e) laboratory-only endorsement of a results-collection write",
+        "laboratory approves the amendment (legitimate two-party path)"
+      ],
+      "outcome": "(a) refused by chaincode; (b) refused by chaincode; (c) refused by chaincode; (d) ENDORSEMENT_POLICY_FAILURE; (e) ENDORSEMENT_POLICY_FAILURE; record unchanged: true; after laboratory approval: NO_ACTION_REQUIRED",
+      "expected": "(a)-(c) refused by both peers; (d)-(e) ENDORSEMENT_POLICY_FAILURE; record unchanged until the laboratory approves",
+      "passed": true,
+      "detail": {
+        "a": {
+          "ok": false,
+          "refused": "chaincode response 500, a results-management record for sample S7-80c61fa7 is already committed and is not overwritten; a change requires proposeResultsAmendment() by one organisation and approveResultsAmendment() by the other; chaincode response 500, a results-management record for sample S7-80c61fa7 is already committed and is not overwritten; a change requires proposeResultsAmendment() by one organisation and approveResultsAmendment() by the other; chaincode response 500, a results-management record for sample S7-80c61fa7 is already committed and is not overwritten; a change requires proposeResultsAmendment() by one organisation and approveResultsAmendment() by the other; chaincode response 500, a results-management record for sample S7-80c61fa7 is already committed and is not overwritten; a change requires proposeResultsAmendment() by one organisation and approveResultsAmendment() by the other"
+        },
+        "b": {
+          "ok": false,
+          "refused": "chaincode response 500, only LabMSP may accept transfer 1 of sample S7b-6f7fe080; submitter is NADOMSP; chaincode response 500, only LabMSP may accept transfer 1 of sample S7b-6f7fe080; submitter is NADOMSP; chaincode response 500, only LabMSP may accept transfer 1 of sample S7b-6f7fe080; submitter is NADOMSP; chaincode response 500, only LabMSP may accept transfer 1 of sample S7b-6f7fe080; submitter is NADOMSP"
+        },
+        "c": {
+          "ok": false,
+          "refused": "chaincode response 500, an amendment proposed by NADOMSP must be approved by the other organisation, not by NADOMSP; chaincode response 500, an amendment proposed by NADOMSP must be approved by the other organisation, not by NADOMSP; chaincode response 500, an amendment proposed by NADOMSP must be approved by the other organisation, not by NADOMSP; chaincode response 500, an amendment proposed by NADOMSP must be approved by the other organisation, not by NADOMSP"
+        },
+        "d": {
+          "ok": false,
+          "validation": "ENDORSEMENT_POLICY_FAILURE",
+          "txId": "ad06fc3195b4a55a67a2b340b5b84b9adfcfd32f0d8571a69d41ef93469167ff"
+        },
+        "e": {
+          "ok": false,
+          "validation": "ENDORSEMENT_POLICY_FAILURE",
+          "txId": "58e8a8bc520d931bdf2458fdbd6803355657b969b804894a07a820cee279d0de"
+        }
+      }
+    },
+    {
+      "id": "S8",
+      "title": "Career-affecting decision blocked until a named human upholds it",
+      "regulation": "WADA Code Art. 7.4; GDPR Art. 22",
+      "steps": [
+        "confirmed AAF",
+        "suspension attempted",
+        "oversight: further analysis",
+        "suspension attempted",
+        "oversight: uphold",
+        "suspension"
+      ],
+      "outcome": "refused without oversight: true; refused after REQUEST_FURTHER_ANALYSIS: true; permitted after UPHOLD: true",
+      "expected": "refused twice, then permitted only after an UPHOLD by a named reviewer",
+      "passed": true
+    },
+    {
+      "id": "S9",
+      "title": "Purpose limitation releases two of six categories",
+      "regulation": "GDPR Art. 5(1)(c), 7, 9, 25",
+      "steps": [
+        "athlete consents to all six categories for the study",
+        "research organisation requests all six"
+      ],
+      "outcome": "granted: gps_accelerometry, abp_haematological; denied: biochemical_markers, abp_steroidal, psychological, genetic",
+      "expected": "granted abp_haematological and gps_accelerometry only, each refusal with a reason",
+      "passed": true,
+      "detail": {
+        "outcomes": [
+          {
+            "category": "gps_accelerometry",
+            "decision": "GRANTED",
+            "reason": "consented, in date, and necessary for the declared purpose",
+            "gdprArticle": "Article 6(1)(a) / Article 9(2)(a)"
+          },
+          {
+            "category": "biochemical_markers",
+            "decision": "DENIED",
+            "reason": "category is not necessary for the declared purpose \"cardiovascular_research\" (data minimisation)",
+            "gdprArticle": "Article 5(1)(c) / Article 25"
+          },
+          {
+            "category": "abp_haematological",
+            "decision": "GRANTED",
+            "reason": "consented, in date, and necessary for the declared purpose",
+            "gdprArticle": "Article 6(1)(a) / Article 9(2)(a)"
+          },
+          {
+            "category": "abp_steroidal",
+            "decision": "DENIED",
+            "reason": "category is not necessary for the declared purpose \"cardiovascular_research\" (data minimisation)",
+            "gdprArticle": "Article 5(1)(c) / Article 25"
+          },
+          {
+            "category": "psychological",
+            "decision": "DENIED",
+            "reason": "category is not necessary for the declared purpose \"cardiovascular_research\" (data minimisation)",
+            "gdprArticle": "Article 5(1)(c) / Article 25"
+          },
+          {
+            "category": "genetic",
+            "decision": "DENIED",
+            "reason": "category is not necessary for the declared purpose \"cardiovascular_research\" (data minimisation)",
+            "gdprArticle": "Article 5(1)(c) / Article 25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "S10",
+      "title": "Consent withdrawal takes effect at the next evaluation",
+      "regulation": "GDPR Art. 7(3)",
+      "steps": [
+        "consent granted",
+        "request",
+        "withdrawal",
+        "request"
+      ],
+      "outcome": "released before withdrawal: 2; after: 0",
+      "expected": "two categories before, none after",
+      "passed": true
+    },
+    {
+      "id": "S11",
+      "title": "Off-chain storage; revocation with athlete-mandatory recovery; irreversible erasure with Article 17(2) notice",
+      "regulation": "GDPR Art. 17(1), 17(2)",
+      "steps": [
+        "ciphertext stored on three nodes; pointer and keyed commitment registered (private)",
+        "research organisation granted the category",
+        "key revoked; access denied",
+        "physician + federation official attempt recovery; athlete + physician recover",
+        "erasure: key and every share destroyed, unpinned and garbage-collected on every node"
+      ],
+      "outcome": "ciphertext only: true; denied after revocation: true; custodians without athlete refused: true; athlete + physician restored: true; erasure complete: true; unrecoverable: true; Article 17(2) notice to: ResearchMSP",
+      "expected": "every check true; the research organisation notified",
+      "passed": true
+    },
+    {
+      "id": "S12",
+      "title": "Results confidential to the NADO and laboratory until notice; notice reaches athlete and federation together",
+      "regulation": "WADA Code Art. 14.1.1, 14.1.2, 14.1.5",
+      "steps": [
+        "attested chain, adverse analysis, results management",
+        "each class asks its own peer for the result",
+        "NADO notifies the athlete",
+        "each class asks again; federation peer asked for the internal record; block holding the analysis inspected"
+      ],
+      "outcome": "before notice granted: nado, lab; after notice granted: nado, lab, athlete, federation; federation peer holds no internal record: true; analysis content absent from the shared block: true",
+      "expected": "before notice NADO and laboratory only; after notice also athlete and federation; research never; no analysis content in the shared block",
+      "passed": true,
+      "detail": {
+        "beforeNotice": {
+          "nado": true,
+          "lab": true,
+          "athlete": false,
+          "federation": false,
+          "research": false
+        },
+        "afterNotice": {
+          "nado": true,
+          "lab": true,
+          "athlete": true,
+          "federation": true,
+          "research": false
+        }
+      }
+    },
+    {
+      "id": "S13",
+      "title": "Late custody receipt raises an exception and invalidates the process",
+      "regulation": "ISTI chain of custody",
+      "rule": "R5_PROCESS_INVALIDATED",
+      "steps": [
+        "dispatch with a zero-hour window",
+        "receipt after the window",
+        "adverse analysis",
+        "results management"
+      ],
+      "outcome": "exceptions: TRANSFER_WINDOW_EXCEEDED; PROCESS_INVALIDATED (R5_PROCESS_INVALIDATED)",
+      "expected": "TRANSFER_WINDOW_EXCEEDED, then PROCESS_INVALIDATED",
+      "passed": true
+    },
+    {
+      "id": "S14",
+      "title": "A seal at receipt that differs from the seal the athlete acknowledged invalidates the process",
+      "regulation": "ISTI chain of custody and sample integrity",
+      "rule": "R5_PROCESS_INVALIDATED",
+      "steps": [
+        "athlete acknowledges seal A",
+        "laboratory reports seal B at receipt",
+        "adverse analysis",
+        "results management"
+      ],
+      "outcome": "exceptions: CONTAINER_SEAL_MISMATCH; PROCESS_INVALIDATED (R5_PROCESS_INVALIDATED)",
+      "expected": "CONTAINER_SEAL_MISMATCH, then PROCESS_INVALIDATED",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+[12:17:52] waiting for K1 to finish
+[13:45:02] K1 finished: exit 0
+[13:45:02] starting K2 (raft, goleveldb)
+[13:53:04] K2 finished with exit 1
+[13:53:04] starting K3 (bft, goleveldb)
+[13:54:52] K3 finished with exit 1
+[13:54:52] test suites
+[tests] chaincode/custody: 67 passing, 0 pending, 0 failing
+[tests] chaincode/consent: 34 passing, 0 pending, 0 failing
+[tests] offchain: 23 passing, 0 pending, 0 failing
+[tests] fhir-adapter: 15 passing, 0 pending, 0 failing
+<stdin>:7: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+{"custody": 67, "consent": 34, "offchain": 23, "fhir": 15, "pending": {"offchain": 0}, "failing": {"custody": 0, "consent": 0, "offchain": 0, "fhir": 0}, "recordedAt": "2026-10-26T13:56:01.945418Z"}
+[13:56:02] insider comparison against the first-cycle contract
+[0;34m[v1-reference][0m building the previously reported custody chaincode
+[0;34m[v1-reference][0m package id custodyv1_1.0:467ca5ce8edd91ee2acb96d0e2e671b0fdf4df0e738bb8e58c83b738c5ea74b3
+14 UNAVAILABLE: failed to find any endorsing peers for org(s): NADOMSP
+[13:56:21] insider comparison exit 1
+[13:56:21] baselines
+[14:24:57] baselines exit 0
+[14:24:57] all done
+[14:28:15] K2: bringing up (raft, goleveldb)
+[14:31:43] K2: probe
+[1/3] p64 initiateSampleCustody @concurrency 64: provisioning... 0s; running... offered 32.9, committed 32.9 tps; p50 1981 p95 2630 ms; phases {"endorse":801,"order":160,"commit":1057}; failures {}
+[2/3] p128 initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 47.6, committed 47.6 tps; p50 2456 p95 3213 ms; phases {"endorse":1083,"order":172,"commit":1076}; failures {}
+[3/3] p256 initiateSampleCustody @concurrency 256: provisioning... 0s; running... offered 53.6, committed 53.6 tps; p50 4833 p95 6597 ms; phases {"endorse":2286,"order":372,"commit":2001}; failures {}
+wrote /out/K2-probe.json
+[14:33:32] K2: probe maximum 53.6 tx/s
+driver/plans/K2.json: 102 rounds, about 94 min plus provisioning
+[17:17:18] K2 finished with exit 0
+[17:17:18] K3: bringing up (bft, goleveldb)
+[17:21:50] K3: probe
+[1/3] p64 initiateSampleCustody @concurrency 64: provisioning... 0s; running... offered 24.9, committed 24.9 tps; p50 2379 p95 3529 ms; phases {"endorse":817,"order":204,"commit":1387}; failures {}
+[2/3] p128 initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 30.0, committed 30.0 tps; p50 4135 p95 5649 ms; phases {"endorse":1593,"order":233,"commit":2143}; failures {}
+[3/3] p256 initiateSampleCustody @concurrency 256: provisioning... 0s; running... offered 37.5, committed 37.5 tps; p50 5789 p95 7218 ms; phases {"endorse":2390,"order":387,"commit":2688}; failures {}
+wrote /out/K3-probe.json
+[17:23:38] K3: probe maximum 37.5 tx/s
+driver/plans/K3.json: 102 rounds, about 94 min plus provisioning
+[19:55:19] K3 finished with exit 0
+[19:55:19] insider comparison against the first-cycle contract (K3 network)
+[0;34m[v1-reference][0m building the previously reported custody chaincode
+[0;34m[v1-reference][0m package id custodyv1_1.0:467ca5ce8edd91ee2acb96d0e2e671b0fdf4df0e738bb8e58c83b738c5ea74b3
+[0;34m[v1-reference][0m custodyv1 committed
+{
+  "executedAt": "2026-10-26T19:56:29.800Z",
+  "previouslyReported": {
+    "pinned": {
+      "overwriteResultsManagement": "ENDORSEMENT_POLICY_FAILURE",
+      "resultsRecordReplaced": false,
+      "recordLaboratoryReceiptAsNado": "COMMITTED",
+      "receiptOnLedgerSubmittedBy": "NADOMSP"
+    },
+    "both": {
+      "overwriteResultsManagement": "COMMITTED",
+      "resultsRecordReplaced": true,
+      "recordLaboratoryReceiptAsNado": "COMMITTED",
+      "receiptOnLedgerSubmittedBy": "NADOMSP"
+    }
+  },
+  "revised": {
+    "pinned": {
+      "overwriteResultsManagement": "REFUSED BY CHAINCODE: a results-management record for sample V2-1abe2f65 is already committed and is not overwritten",
+      "resultsRecordReplaced": false,
+      "recordLaboratoryReceiptAsNado": "REFUSED BY CHAINCODE: only LabMSP may accept transfer 1 of sample V2b-6e1ae00b",
+      "receiptOnLedgerSubmittedBy": null
+    },
+    "both": {
+      "overwriteResultsManagement": "REFUSED BY CHAINCODE: a results-management record for sample V2-3e38c854 is already committed and is not overwritten",
+      "resultsRecordReplaced": false,
+      "recordLaboratoryReceiptAsNado": "REFUSED BY CHAINCODE: only LabMSP may accept transfer 1 of sample V2b-c87ddeb0",
+      "receiptOnLedgerSubmittedBy": null
+    }
+  }
+}
+[19:57:11] insider comparison exit 0
+[19:57:11] K2/K3 chain done

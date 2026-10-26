@@ -1,0 +1,9 @@
+driver/node_modules
+**/node_modules
+network/bin-cache
+network/tools/bin
+docs
+benchmark
+screenCapture
+manuscript-build
+.git

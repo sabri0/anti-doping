@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-10-26T11:10:54Z",
+  "peers": {
+    "peer0.athlete": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_consent$$pconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection"],
+    "peer1.athlete": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_consent$$pconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection"],
+    "peer0.federation": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection"],
+    "peer1.federation": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection"],
+    "peer0.nado": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection","antidopingchannel_custody$$presults$collection"],
+    "peer1.nado": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection","antidopingchannel_custody$$presults$collection"],
+    "peer0.lab": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection","antidopingchannel_custody$$presults$collection"],
+    "peer1.lab": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection","antidopingchannel_custody$$pnotice$collection","antidopingchannel_custody$$presults$collection"],
+    "peer0.research": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection"],
+    "peer1.research": ["antidopingchannel_consent$$hconsent$collection","antidopingchannel_custody","antidopingchannel_custody$$hnotice$collection","antidopingchannel_custody$$hresults$collection"]
+  }
+}

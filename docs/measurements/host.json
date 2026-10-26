@@ -1,0 +1,42 @@
+{
+ "os": {
+  "Caption": "Microsoft Windows 11 Professionnel",
+  "Version": "10.0.26300"
+ },
+ "processor": {
+  "Name": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz",
+  "NumberOfCores": 4,
+  "NumberOfLogicalProcessors": 8
+ },
+ "disks": [
+  {
+   "FriendlyName": "SSD 512G",
+   "MediaType": "SSD",
+   "BusType": "SATA",
+   "Size": 512110190592
+  },
+  {
+   "FriendlyName": "KINGSTON OM8PCP3512F-AI1",
+   "MediaType": "SSD",
+   "BusType": "NVMe",
+   "Size": 512110190592
+  }
+ ],
+ "docker": {
+  "serverVersion": "29.6.2",
+  "kernel": "5.15.167.4-microsoft-standard-WSL2",
+  "os": "Docker Desktop",
+  "cpus": 8,
+  "memBytes": 12450811904,
+  "storageDriver": "overlayfs"
+ },
+ "composeVersion": "5.3.1",
+ "virtualisation": "Docker Desktop on WSL 2 (Hyper-V lightweight utility VM); container volumes on the VM's ext4 virtual disk",
+ "networkProcessors": "0-5 (cpuset)",
+ "driverProcessors": "6-7 (cpuset)",
+ "storage": {
+  "syncWrite4KiB": "8192000 bytes (8.2 MB, 7.8 MiB) copied, 10.9743 s, 746 kB/s",
+  "meanSyncWriteMs": 5.48715,
+  "sequential512MiBFdatasync": "536870912 bytes (537 MB, 512 MiB) copied, 2.00265 s, 268 MB/s"
+ }
+}

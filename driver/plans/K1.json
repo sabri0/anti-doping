@@ -1,0 +1,940 @@
+{
+ "name": "K1",
+ "configuration": {
+  "id": "K1",
+  "description": "Raft (4 nodes, 4 organisations), CouchDB state databases, Fabric 3.1.5",
+  "seed": 11,
+  "warmupS": 15,
+  "durationS": 30,
+  "openLoopTps": 2
+ },
+ "rounds": [
+  {
+   "id": "b1-sentinel-open",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sentinel",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-cap-getCustodyChain",
+   "workload": "getCustodyChain",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b1-cap-triggerResultsManagement",
+   "workload": "triggerResultsManagement",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-cap-validateConsent",
+   "workload": "validateConsent",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-cap-recordWhereaboutsStatus",
+   "workload": "recordWhereaboutsStatus",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-cap-evaluateDecisionTable",
+   "workload": "evaluateDecisionTable",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b1-lat-getCustodyChain",
+   "workload": "getCustodyChain",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-sweep-c32",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-lat-recordSampleAnalysisResult",
+   "workload": "recordSampleAnalysisResult",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-sweep-c4",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 4,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-cap-recordSampleAnalysisResult",
+   "workload": "recordSampleAnalysisResult",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-lat-validateConsent",
+   "workload": "validateConsent",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-sweep-c16",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 16,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-sweep-c64",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-cap-acceptCustodyTransfer",
+   "workload": "acceptCustodyTransfer",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-sweep-c8",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 8,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-lat-triggerResultsManagement",
+   "workload": "triggerResultsManagement",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-lat-initiateSampleCustody",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-lat-recordWhereaboutsStatus",
+   "workload": "recordWhereaboutsStatus",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-cap-acknowledgeSampleCollection",
+   "workload": "acknowledgeSampleCollection",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-cap-proposeCustodyTransfer",
+   "workload": "proposeCustodyTransfer",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b1-lat-acceptCustodyTransfer",
+   "workload": "acceptCustodyTransfer",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-lat-acknowledgeSampleCollection",
+   "workload": "acknowledgeSampleCollection",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-lat-evaluateDecisionTable",
+   "workload": "evaluateDecisionTable",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-lat-previewConsentDecision",
+   "workload": "previewConsentDecision",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-lat-proposeCustodyTransfer",
+   "workload": "proposeCustodyTransfer",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b1-cap-previewConsentDecision",
+   "workload": "previewConsentDecision",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b1-sentinel-close",
+   "workload": "initiateSampleCustody",
+   "block": 1,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sentinel",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-sentinel-open",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sentinel",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-lat-initiateSampleCustody",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-lat-recordWhereaboutsStatus",
+   "workload": "recordWhereaboutsStatus",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-lat-validateConsent",
+   "workload": "validateConsent",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-lat-getCustodyChain",
+   "workload": "getCustodyChain",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-lat-previewConsentDecision",
+   "workload": "previewConsentDecision",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-cap-validateConsent",
+   "workload": "validateConsent",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-cap-acknowledgeSampleCollection",
+   "workload": "acknowledgeSampleCollection",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-lat-acceptCustodyTransfer",
+   "workload": "acceptCustodyTransfer",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-lat-triggerResultsManagement",
+   "workload": "triggerResultsManagement",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-sweep-c64",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-cap-evaluateDecisionTable",
+   "workload": "evaluateDecisionTable",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b2-cap-recordSampleAnalysisResult",
+   "workload": "recordSampleAnalysisResult",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-sweep-c32",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-cap-getCustodyChain",
+   "workload": "getCustodyChain",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b2-cap-triggerResultsManagement",
+   "workload": "triggerResultsManagement",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-lat-proposeCustodyTransfer",
+   "workload": "proposeCustodyTransfer",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-cap-recordWhereaboutsStatus",
+   "workload": "recordWhereaboutsStatus",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-cap-previewConsentDecision",
+   "workload": "previewConsentDecision",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b2-sweep-c4",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 4,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-lat-recordSampleAnalysisResult",
+   "workload": "recordSampleAnalysisResult",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-cap-acceptCustodyTransfer",
+   "workload": "acceptCustodyTransfer",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-cap-proposeCustodyTransfer",
+   "workload": "proposeCustodyTransfer",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-lat-evaluateDecisionTable",
+   "workload": "evaluateDecisionTable",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-sweep-c8",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 8,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-sweep-c16",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 16,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b2-lat-acknowledgeSampleCollection",
+   "workload": "acknowledgeSampleCollection",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b2-sentinel-close",
+   "workload": "initiateSampleCustody",
+   "block": 2,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sentinel",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-sentinel-open",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sentinel",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-lat-acceptCustodyTransfer",
+   "workload": "acceptCustodyTransfer",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-lat-recordWhereaboutsStatus",
+   "workload": "recordWhereaboutsStatus",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-cap-validateConsent",
+   "workload": "validateConsent",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-cap-previewConsentDecision",
+   "workload": "previewConsentDecision",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b3-cap-acknowledgeSampleCollection",
+   "workload": "acknowledgeSampleCollection",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-lat-previewConsentDecision",
+   "workload": "previewConsentDecision",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-lat-triggerResultsManagement",
+   "workload": "triggerResultsManagement",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-lat-getCustodyChain",
+   "workload": "getCustodyChain",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-lat-initiateSampleCustody",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-lat-evaluateDecisionTable",
+   "workload": "evaluateDecisionTable",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-lat-recordSampleAnalysisResult",
+   "workload": "recordSampleAnalysisResult",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-sweep-c8",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 8,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-cap-proposeCustodyTransfer",
+   "workload": "proposeCustodyTransfer",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-sweep-c64",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-cap-getCustodyChain",
+   "workload": "getCustodyChain",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b3-lat-proposeCustodyTransfer",
+   "workload": "proposeCustodyTransfer",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-cap-evaluateDecisionTable",
+   "workload": "evaluateDecisionTable",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 64,
+   "kind": "capacity",
+   "expectTps": 36.0
+  },
+  {
+   "id": "b3-sweep-c32",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-sweep-c16",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 16,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-sweep-c4",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 4,
+   "kind": "sweep",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-cap-triggerResultsManagement",
+   "workload": "triggerResultsManagement",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-lat-acknowledgeSampleCollection",
+   "workload": "acknowledgeSampleCollection",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-cap-acceptCustodyTransfer",
+   "workload": "acceptCustodyTransfer",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-cap-recordWhereaboutsStatus",
+   "workload": "recordWhereaboutsStatus",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-cap-recordSampleAnalysisResult",
+   "workload": "recordSampleAnalysisResult",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "capacity",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "b3-lat-validateConsent",
+   "workload": "validateConsent",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "tps": 2,
+   "kind": "latency"
+  },
+  {
+   "id": "b3-sentinel-close",
+   "workload": "initiateSampleCustody",
+   "block": 3,
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "sentinel",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair1-1-A",
+   "workload": "initiateOr1",
+   "block": "pair1",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair1-2-B",
+   "workload": "initiateOr2",
+   "block": "pair1",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair1-3-B",
+   "workload": "initiateOr2",
+   "block": "pair1",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair1-4-A",
+   "workload": "initiateOr1",
+   "block": "pair1",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair2-1-B",
+   "workload": "initiateOr2",
+   "block": "pair2",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair2-2-A",
+   "workload": "initiateOr1",
+   "block": "pair2",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair2-3-A",
+   "workload": "initiateOr1",
+   "block": "pair2",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair2-4-B",
+   "workload": "initiateOr2",
+   "block": "pair2",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair3-1-A",
+   "workload": "initiateOr1",
+   "block": "pair3",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair3-2-B",
+   "workload": "initiateOr2",
+   "block": "pair3",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair3-3-B",
+   "workload": "initiateOr2",
+   "block": "pair3",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  },
+  {
+   "id": "pair3-4-A",
+   "workload": "initiateOr1",
+   "block": "pair3",
+   "warmup": 15,
+   "duration": 30,
+   "concurrency": 32,
+   "kind": "endorsement",
+   "expectTps": 7.800000000000001
+  }
+ ]
+}

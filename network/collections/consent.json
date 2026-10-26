@@ -1,0 +1,14 @@
+[
+  {
+    "name": "consentCollection",
+    "policy": "OR('AthleteMSP.member')",
+    "requiredPeerCount": 1,
+    "maxPeerCount": 1,
+    "blockToLive": 0,
+    "memberOnlyRead": false,
+    "memberOnlyWrite": false,
+    "endorsementPolicy": {
+      "signaturePolicy": "OR('AthleteMSP.peer')"
+    }
+  }
+]

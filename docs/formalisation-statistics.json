@@ -1,0 +1,42 @@
+{
+  "vectors": 192,
+  "firstSpecification": {
+    "unmatched": 36,
+    "multiplyMatched": 78,
+    "conflicting": 78,
+    "overlapPatterns": {
+      "R1+R3+R4": 1,
+      "R1+R3+R4+R5": 1,
+      "R1+R3": 3,
+      "R1+R3+R5": 3,
+      "R1+R4": 3,
+      "R1+R4+R5": 3,
+      "R1+R5": 9,
+      "R2+R3+R4": 1,
+      "R2+R3+R4+R5": 1,
+      "R2+R3": 3,
+      "R2+R3+R5": 3,
+      "R2+R4": 3,
+      "R2+R4+R5": 3,
+      "R2+R5": 9,
+      "R3+R4": 4,
+      "R3+R4+R5": 4,
+      "R3+R5": 12,
+      "R4+R5": 12
+    },
+    "positiveUnverified": 32,
+    "positiveUnverifiedUnmatched": 9
+  },
+  "implemented": {
+    "outcomes": {
+      "R1_AAF_CONFIRMED": 16,
+      "R5_PROCESS_INVALIDATED": 96,
+      "R2_AAF_PENDING_REVIEW": 16,
+      "R2B_ANALYSIS_REJECTED": 16,
+      "R3_ABP_ALERT_INITIATED": 12,
+      "R4_WHEREABOUTS_ADRV": 9,
+      "R0_NO_ACTION": 27
+    },
+    "vectorsWithRetainedConcurrentMatches": 93
+  }
+}

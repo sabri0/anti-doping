@@ -1,0 +1,3 @@
+{ "name": "probe-cpu", "rounds": [
+  {"id":"c32","workload":"initiateSampleCustody","concurrency":32,"warmup":10,"duration":60}
+]}

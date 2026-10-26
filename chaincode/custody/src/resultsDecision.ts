@@ -1,5 +1,5 @@
 /**
- * Table 2 of the manuscript, as an executing decision engine.
+ * Table 1 of the manuscript, as an executing decision engine.
  *
  * `decideResultsAction` is pure, total and deterministic over the Q001-Q007
  * condition space. Purity is what makes the regulatory logic exhaustively
@@ -7,37 +7,32 @@
  * test suite enumerates every one of them.
  *
  * ---------------------------------------------------------------------------
- * TWO SPECIFICATION GAPS SURFACED BY IMPLEMENTATION
+ * FORMALISATION LOG (Table 2 of the manuscript; docs/FORMALISATION-LOG.md)
  *
- * The manuscript's Table 2 lists five rows without stating (a) what happens
- * when several rows match the same fact vector, or (b) what happens when
- * laboratory accreditation is affirmatively UNVERIFIED rather than PENDING.
- * Prose decision tables can leave this implicit; executable code cannot.
+ * The decision table as first specified had five rows and stated neither a
+ * hit policy nor a default. In decision-table terms (DMN) it was neither
+ * single-hit nor complete. Encoding it as a function that must return exactly
+ * one outcome for every input made both visible:
  *
- * Gap 1 - rule precedence. Rows 1 (AAF Confirmed) and 4 (Whereabouts ADRV) can
- *   both match, as can rows 3 and 4. We resolve precedence as:
+ * F1 - hit policy. Several rows match the same fact vector (for example an
+ *   adverse finding concurrent with a third whereabouts failure). Resolved as
+ *   a PRIORITY policy:
  *
  *       R5 Process Invalidated  (guard, evaluated first)
  *     > R1 AAF Confirmed / R2 AAF Pending / R2b Analysis Rejected
  *     > R3 ABP Alert Initiated
  *     > R4 Whereabouts ADRV
  *
- *   R5 is promoted to a precondition guard because an adverse analytical
- *   finding asserted on an unverified chain of custody is exactly the
- *   Sochi-type failure the framework exists to prevent: no downstream
- *   regulatory consequence may be derived from an invalid custody chain.
- *   The remaining order follows statutory urgency — Article 7.3 imposes the
- *   tightest clock, so an AAF outranks a passport alert, which outranks a
- *   whereabouts violation. Lower-precedence matches are not discarded: they
- *   are reported in `concurrentMatches` so results management retains them.
+ *   R5 is a guard because no regulatory consequence may be derived from an
+ *   unverified chain of custody. The remaining order follows statutory
+ *   urgency. Lower-precedence matches are returned in `concurrentMatches`.
  *
- * Gap 2 - Q002 = UNVERIFIED. Table 2 covers YES and PENDING only. An analysis
- *   returned by a laboratory whose accreditation is affirmatively unverified
- *   cannot support an AAF and must not merely wait for human review; it is
- *   rejected and audited (R2b).
+ * F2 - completeness. Q002 = UNVERIFIED with a positive analysis matched no
+ *   row (R2b added: rejected and audited, WADA Code Art. 6.1), and vectors
+ *   matching no row at all had no outcome (R0 added: no action, recorded).
  *
- * Both refinements are reported in the Implementation section of the revised
- * manuscript as findings, not silently absorbed.
+ * F3-F9 are interpretation decisions taken where the fact vector is assembled
+ * from ledger state (custodyContract.ts, assembleFacts) rather than here.
  * ---------------------------------------------------------------------------
  */
 
@@ -86,13 +81,13 @@ const accreditation = (f: DecisionFacts): AccreditationState => f.laboratoryAccr
  */
 const RULES: Rule[] = [
   {
-    // Table 2, row 5 — promoted to a guard (see Gap 1 above).
+    // Table 1, row 5 — promoted to a guard (F1).
     id: 'R5_PROCESS_INVALIDATED',
     matches: (f) => !f.mandatoryCustodyStepVerified,
     decide: () => ({
       action: ResultsAction.ProcessInvalidated,
       ruleId: 'R5_PROCESS_INVALIDATED',
-      wadaArticle: 'Article 5.4',
+      wadaArticle: 'ISTI chain of custody (Code Art. 5.4.1)',
       invokedFunctions: ['invalidateSampleRecord', 'raiseAuditAlert'],
       humanOversightRequired: true,
       auditAlertRecipients: ['NADOMSP', 'WADA'],
@@ -104,25 +99,25 @@ const RULES: Rule[] = [
     }),
   },
   {
-    // Table 2, row 1.
+    // Table 1, row 1.
     id: 'R1_AAF_CONFIRMED',
     matches: (f) => f.sampleAnalysisPositive && accreditation(f) === 'VERIFIED',
     decide: () => ({
       action: ResultsAction.AafConfirmed,
       ruleId: 'R1_AAF_CONFIRMED',
-      wadaArticle: 'Article 2.1 / 7.1 / 7.3',
-      invokedFunctions: ['notifyAthleteOfAAF', 'startArticle73Timeline'],
+      wadaArticle: 'Article 2.1 / 7.1 / 7.2',
+      invokedFunctions: ['notifyAthleteOfAAF', 'startNotificationDeadline'],
       humanOversightRequired: false,
       auditAlertRecipients: [],
       confidential: true,
       rationale:
         'Sample analysis positive (Q001 = YES) at an accredited laboratory ' +
         '(Q002 = YES). The adverse analytical finding is confirmed and the ' +
-        'Article 7.3 statutory notification timeline starts.',
+        'deadline for notifying the athlete (Article 7.2) starts.',
     }),
   },
   {
-    // Table 2, row 2.
+    // Table 1, row 2.
     id: 'R2_AAF_PENDING_REVIEW',
     matches: (f) => f.sampleAnalysisPositive && accreditation(f) === 'PENDING',
     decide: () => ({
@@ -140,7 +135,7 @@ const RULES: Rule[] = [
     }),
   },
   {
-    // Gap 2 — not present in Table 2 as published.
+    // F2 — absent from the table as first specified.
     id: 'R2B_ANALYSIS_REJECTED',
     matches: (f) => f.sampleAnalysisPositive && accreditation(f) === 'UNVERIFIED',
     decide: () => ({
@@ -159,7 +154,7 @@ const RULES: Rule[] = [
     }),
   },
   {
-    // Table 2, row 3.
+    // Table 1, row 3.
     id: 'R3_ABP_ALERT_INITIATED',
     matches: (f) => f.longitudinalProfileAnomaly && f.expertPanelReviewRequired,
     decide: () => ({
@@ -177,7 +172,7 @@ const RULES: Rule[] = [
     }),
   },
   {
-    // Table 2, row 4.
+    // Table 1, row 4.
     id: 'R4_WHEREABOUTS_ADRV',
     matches: (f) => f.thirdWhereaboutsFailure && f.allFailuresLedgerVerified,
     decide: () => ({
@@ -204,11 +199,11 @@ const NO_ACTION: Omit<ResultsDecision, 'concurrentMatches'> = {
   humanOversightRequired: false,
   auditAlertRecipients: [],
   confidential: true,
-  rationale: 'No Table 2 condition is satisfied; no results-management action is due.',
+  rationale: 'No Table 1 condition is satisfied; no results-management action is due.',
 };
 
 /**
- * Evaluate the Table 2 decision logic.
+ * Evaluate the Table 1 decision logic.
  *
  * Total: returns a decision for every point in the Q001-Q007 space.
  * Deterministic: depends on `facts` alone — no clock, no ledger, no randomness.

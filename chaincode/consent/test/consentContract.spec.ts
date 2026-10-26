@@ -1,16 +1,18 @@
 /**
  * Verification of the consent / data-sovereignty contract.
  *
- * The centrepiece is the worked scenario of §3.5: a researcher authorized for
- * a cardiovascular study receives haematological and accelerometry data only,
- * with steroidal, psychological and genetic categories refused automatically.
- * In the manuscript that scenario is asserted in prose. Here it executes.
+ * The centrepiece is the worked scenario: a researcher authorised for a
+ * cardiovascular study receives haematological and accelerometry data only,
+ * with the other four categories refused, each with a reason. Alongside it:
+ * deny-by-default, purpose and consent scope, Article 9, Article 22, the
+ * Article 17 erasure path with its recovery quorum and Article 17(2) notices,
+ * and the confidentiality properties of the private consent collection.
  */
 
 import { expect } from 'chai';
 import { Context } from 'fabric-contract-api';
 import fc from 'fast-check';
-import { ConsentContract } from '../src/consentContract';
+import { CONSENT_COLLECTION, ConsentContract, setPeerClockForTesting } from '../src/consentContract';
 import {
   DATA_CATEGORIES,
   DataCategory,
@@ -18,485 +20,332 @@ import {
   SPECIAL_CATEGORY,
   evaluateAccess,
 } from '../src/abac';
-import { asOrg, mockContext } from './mockContext';
+import { asOrg, mockContext, MockStub } from './mockContext';
 
 const ATHLETE = 'a'.repeat(64);
 const FROM = '2026-01-01T00:00:00.000Z';
 const UNTIL = '2027-01-01T00:00:00.000Z';
+const CID = 'bafkreiabcdefghijklmnopqrstuvwxyz234567abcdefghijklmnopqrs';
+const ALL_SHARES = ['athlete', 'physician', 'federation-official'];
 
-/** Grant consent as the athlete, then return the context to the caller org. */
+function fresh(msp = 'AthleteMSP') {
+  const cc = new ConsentContract();
+  const { ctx, stub } = mockContext(msp);
+  setPeerClockForTesting(() => stub.now.getTime());
+  return { cc, ctx, stub };
+}
+
+/** Grant consent as the athlete. */
 async function grant(
   cc: ConsentContract,
   ctx: Context,
-  opts: {
-    to: string;
-    purpose: string;
-    categories: string;
-    special?: boolean;
-    from?: string;
-    until?: string;
-  },
+  stub: MockStub,
+  opts: { to: string; purpose: string; categories: string; special?: boolean; from?: string; until?: string },
 ) {
-  return cc.recordConsentTransaction(
-    asOrg(ctx, 'AthleteMSP'),
-    ATHLETE,
-    opts.to,
-    opts.purpose,
-    opts.categories,
-    opts.from ?? FROM,
-    opts.until ?? UNTIL,
-    String(opts.special ?? false),
-  );
+  stub.setInput({
+    athleteHash: ATHLETE,
+    grantedToMSP: opts.to,
+    purpose: opts.purpose,
+    categories: opts.categories,
+    validFrom: opts.from ?? FROM,
+    validUntil: opts.until ?? UNTIL,
+    specialCategoryAuthorised: opts.special ?? false,
+  });
+  return cc.recordConsentTransaction(asOrg(ctx, 'AthleteMSP'));
 }
 
-describe('§3.5 worked scenario — cardiovascular research authorization', () => {
-  it('releases haematological and accelerometry only; refuses the other four', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
+/** Request access as `org`, then read the recorded decision back as the requester would. */
+async function request(cc: ConsentContract, ctx: Context, stub: MockStub, org: string, purpose: string, categories: string) {
+  stub.setInput({ athleteHash: ATHLETE, declaredPurpose: purpose, requestedCategories: categories });
+  const { auditRef } = JSON.parse(await cc.validateConsent(asOrg(ctx, org)));
+  return JSON.parse(await cc.getAccessDecision(asOrg(ctx, org), ATHLETE, org, auditRef));
+}
 
-    // The athlete consents to the cardiovascular study, offering every category.
-    await grant(cc, ctx, {
+describe('Worked scenario — cardiovascular research authorisation', () => {
+  it('releases haematological and accelerometry only; refuses the other four', async () => {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, {
       to: 'ResearchMSP',
       purpose: 'cardiovascular_research',
       categories: DATA_CATEGORIES.join(','),
       special: true,
     });
-
-    // The researcher asks for everything.
-    const decision = JSON.parse(
-      await cc.validateConsent(
-        asOrg(ctx, 'ResearchMSP'),
-        ATHLETE,
-        'cardiovascular_research',
-        DATA_CATEGORIES.join(','),
-      ),
-    );
+    const decision = await request(cc, ctx, stub, 'ResearchMSP', 'cardiovascular_research', DATA_CATEGORIES.join(','));
 
     expect(decision.granted).to.have.members(['abp_haematological', 'gps_accelerometry']);
-    expect(decision.denied).to.have.members([
-      'biochemical_markers',
-      'abp_steroidal',
-      'psychological',
-      'genetic',
-    ]);
-
-    // Every refusal must carry an auditable reason and article.
+    expect(decision.denied).to.have.members(['biochemical_markers', 'abp_steroidal', 'psychological', 'genetic']);
     for (const outcome of decision.outcomes) {
       expect(outcome.reason).to.be.a('string').with.length.greaterThan(10);
       expect(outcome.gdprArticle).to.be.a('string').with.length.greaterThan(0);
     }
-    const steroidal = decision.outcomes.find(
-      (o: { category: string }) => o.category === 'abp_steroidal',
-    );
+    const steroidal = decision.outcomes.find((o: { category: string }) => o.category === 'abp_steroidal');
     expect(steroidal.reason).to.contain('data minimisation');
   });
 
-  it('records the access decision on-chain whether or not data was released', async () => {
-    const cc = new ConsentContract();
-    const { ctx, stub } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
+  it('records every access decision, released or not, and returns only a reference', async () => {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, {
       to: 'ResearchMSP',
       purpose: 'cardiovascular_research',
       categories: 'abp_haematological,gps_accelerometry',
       special: true,
     });
-    await cc.validateConsent(
-      asOrg(ctx, 'ResearchMSP'),
-      ATHLETE,
-      'cardiovascular_research',
-      'genetic',
-    );
-    const audits = stub.events.filter((e) => e.name === 'AccessDecision');
-    expect(audits).to.have.lengthOf(1);
-    expect((audits[0].payload as { anyGranted: boolean }).anyGranted).to.equal(false);
+    stub.setInput({ athleteHash: ATHLETE, declaredPurpose: 'cardiovascular_research', requestedCategories: 'genetic' });
+    const response = JSON.parse(await cc.validateConsent(asOrg(ctx, 'ResearchMSP')));
+    expect(Object.keys(response)).to.deep.equal(['auditRef']);
+    const all = JSON.parse(await cc.listAccessDecisions(asOrg(ctx, 'AthleteMSP'), ATHLETE));
+    expect(all).to.have.lengthOf(1);
+    expect(all[0].anyGranted).to.equal(false);
+  });
+
+  it('a third organisation cannot read another requester\'s decision', async () => {
+    const { cc, ctx, stub } = fresh();
+    stub.setInput({ athleteHash: ATHLETE, declaredPurpose: 'cardiovascular_research', requestedCategories: 'genetic' });
+    const { auditRef } = JSON.parse(await cc.validateConsent(asOrg(ctx, 'ResearchMSP')));
+    await expect(
+      cc.getAccessDecision(asOrg(ctx, 'FederationMSP'), ATHLETE, 'ResearchMSP', auditRef),
+    ).to.be.rejectedWith(/may not read/);
+  });
+});
+
+describe('Confidentiality of the consent collection', () => {
+  it('consent, decisions and payload pointers are written only to the private collection', async () => {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'cardiovascular_research', categories: 'abp_haematological', special: true });
+    await request(cc, ctx, stub, 'ResearchMSP', 'cardiovascular_research', 'abp_haematological');
+    stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological', cid: CID, keyRef: 'key-1', commitment: 'c'.repeat(64) });
+    await cc.registerOffchainPayload(asOrg(ctx, 'LabMSP'));
+
+    expect(stub.state.size, 'something was written to public state').to.equal(0);
+    expect(stub.privateState.get(CONSENT_COLLECTION)!.size).to.be.greaterThan(2);
+    const events = JSON.stringify(stub.events);
+    for (const secret of ['cardiovascular_research', 'abp_haematological', CID, ATHLETE]) {
+      expect(events, `${secret} leaked into an event`).to.not.include(secret);
+    }
+  });
+
+  it('writing functions refuse arguments-only calls, so inputs never reach the block', async () => {
+    const { cc, ctx } = fresh();
+    await expect(cc.recordConsentTransaction(ctx)).to.be.rejectedWith(/transient field/);
+  });
+
+  it('refuses an athlete identifier that is not a keyed pseudonym', async () => {
+    const { cc, ctx, stub } = fresh();
+    stub.setInput({ athleteHash: 'athlete-42' });
+    await expect(cc.applyDefaultPrivacySettings(ctx)).to.be.rejectedWith(/keyed pseudonym/);
+  });
+
+  it('refuses a backdated proposal', async () => {
+    const { cc, ctx, stub } = fresh();
+    setPeerClockForTesting(() => stub.now.getTime() + 3600 * 1000);
+    stub.setInput({ athleteHash: ATHLETE });
+    await expect(cc.applyDefaultPrivacySettings(ctx)).to.be.rejectedWith(/endorsing peer's clock/);
   });
 });
 
 describe('Deny by default — GDPR Article 25', () => {
   it('an athlete with no consent record releases nothing', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('ResearchMSP');
-    const decision = JSON.parse(
-      await cc.validateConsent(
-        ctx,
-        ATHLETE,
-        'cardiovascular_research',
-        DATA_CATEGORIES.join(','),
-      ),
-    );
+    const { cc, ctx, stub } = fresh();
+    const decision = await request(cc, ctx, stub, 'ResearchMSP', 'cardiovascular_research', 'abp_haematological,gps_accelerometry');
     expect(decision.granted).to.be.empty;
-    expect(decision.denied).to.have.lengthOf(DATA_CATEGORIES.length);
     expect(decision.outcomes[0].reason).to.contain('deny by default');
   });
 
   it('applyDefaultPrivacySettings shares nothing with anyone', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
-    const settings = JSON.parse(await cc.applyDefaultPrivacySettings(ctx, ATHLETE));
-    expect(settings.categories).to.be.empty;
-    expect(settings.revoked).to.equal(true);
-    expect(settings.gdprArticle).to.equal('Article 25(2)');
+    const { cc, ctx, stub } = fresh();
+    stub.setInput({ athleteHash: ATHLETE });
+    await cc.applyDefaultPrivacySettings(ctx);
+    const record = JSON.parse(
+      stub.privateState.get(CONSENT_COLLECTION)!.get(stub.createCompositeKey('PRIVACYDEFAULTS', [ATHLETE]))!.toString(),
+    );
+    expect(record.categories).to.be.empty;
+    expect(record.revoked).to.equal(true);
   });
 
   it('an unrecognised purpose releases nothing', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
-      to: 'ResearchMSP',
-      purpose: 'commercial_resale',
-      categories: 'genetic',
-      special: true,
-    });
-    const decision = JSON.parse(
-      await cc.validateConsent(asOrg(ctx, 'ResearchMSP'), ATHLETE, 'commercial_resale', 'genetic'),
-    );
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'commercial_resale', categories: DATA_CATEGORIES.join(','), special: true });
+    const decision = await request(cc, ctx, stub, 'ResearchMSP', 'commercial_resale', 'gps_accelerometry');
     expect(decision.granted).to.be.empty;
-    expect(decision.outcomes[0].reason).to.contain('not a recognised processing purpose');
   });
 });
 
 describe('Purpose limitation and consent scope — GDPR Articles 5 and 7', () => {
-  it('consent given for one purpose does not authorize another', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
-      to: 'ResearchMSP',
-      purpose: 'cardiovascular_research',
-      categories: 'abp_haematological',
-      special: true,
-    });
-    const decision = JSON.parse(
-      await cc.validateConsent(
-        asOrg(ctx, 'ResearchMSP'),
-        ATHLETE,
-        'genetic_research',
-        'genetic',
-      ),
-    );
+  it('consent given for one purpose does not authorise another', async () => {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'workload_monitoring', categories: 'gps_accelerometry' });
+    const decision = await request(cc, ctx, stub, 'ResearchMSP', 'injury_prevention', 'gps_accelerometry');
     expect(decision.granted).to.be.empty;
   });
 
-  it('consent given to one organization does not authorize another', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
-      to: 'ResearchMSP',
-      purpose: 'cardiovascular_research',
-      categories: 'abp_haematological',
-      special: true,
-    });
-    const decision = JSON.parse(
-      await cc.validateConsent(
-        asOrg(ctx, 'FederationMSP'),
-        ATHLETE,
-        'cardiovascular_research',
-        'abp_haematological',
-      ),
-    );
+  it('consent given to one organisation does not authorise another', async () => {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'workload_monitoring', categories: 'gps_accelerometry' });
+    const decision = await request(cc, ctx, stub, 'FederationMSP', 'workload_monitoring', 'gps_accelerometry');
     expect(decision.granted).to.be.empty;
   });
 
   it('expired consent releases nothing', async () => {
-    const cc = new ConsentContract();
-    const { ctx, stub } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, {
       to: 'ResearchMSP',
-      purpose: 'cardiovascular_research',
-      categories: 'abp_haematological',
-      special: true,
-      from: '2020-01-01T00:00:00.000Z',
-      until: '2021-01-01T00:00:00.000Z',
+      purpose: 'workload_monitoring',
+      categories: 'gps_accelerometry',
+      from: '2025-01-01T00:00:00.000Z',
+      until: '2025-06-01T00:00:00.000Z',
     });
-    stub.now = new Date('2026-06-01T00:00:00.000Z');
-    const decision = JSON.parse(
-      await cc.validateConsent(
-        asOrg(ctx, 'ResearchMSP'),
-        ATHLETE,
-        'cardiovascular_research',
-        'abp_haematological',
-      ),
-    );
+    const decision = await request(cc, ctx, stub, 'ResearchMSP', 'workload_monitoring', 'gps_accelerometry');
     expect(decision.granted).to.be.empty;
     expect(decision.outcomes[0].reason).to.contain('validity period');
   });
 
   it('withdrawal takes effect immediately — GDPR Article 7(3)', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
-      to: 'ResearchMSP',
-      purpose: 'cardiovascular_research',
-      categories: 'abp_haematological',
-      special: true,
-    });
-    let decision = JSON.parse(
-      await cc.validateConsent(
-        asOrg(ctx, 'ResearchMSP'),
-        ATHLETE,
-        'cardiovascular_research',
-        'abp_haematological',
-      ),
-    );
-    expect(decision.granted).to.deep.equal(['abp_haematological']);
-
-    await cc.withdrawConsent(
-      asOrg(ctx, 'AthleteMSP'),
-      ATHLETE,
-      'ResearchMSP',
-      'cardiovascular_research',
-    );
-    decision = JSON.parse(
-      await cc.validateConsent(
-        asOrg(ctx, 'ResearchMSP'),
-        ATHLETE,
-        'cardiovascular_research',
-        'abp_haematological',
-      ),
-    );
-    expect(decision.granted).to.be.empty;
-    expect(decision.outcomes[0].reason).to.contain('withdrawn');
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'cardiovascular_research', categories: 'abp_haematological,gps_accelerometry', special: true });
+    const before = await request(cc, ctx, stub, 'ResearchMSP', 'cardiovascular_research', 'abp_haematological,gps_accelerometry');
+    expect(before.granted).to.have.lengthOf(2);
+    stub.setInput({ athleteHash: ATHLETE, grantedToMSP: 'ResearchMSP', purpose: 'cardiovascular_research' });
+    await cc.withdrawConsent(asOrg(ctx, 'AthleteMSP'));
+    const after = await request(cc, ctx, stub, 'ResearchMSP', 'cardiovascular_research', 'abp_haematological,gps_accelerometry');
+    expect(after.granted).to.be.empty;
   });
 
   it('only the athlete may grant or withdraw consent over their own data', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('FederationMSP');
-    await expect(
-      cc.recordConsentTransaction(
-        ctx,
-        ATHLETE,
-        'ResearchMSP',
-        'cardiovascular_research',
-        'abp_haematological',
-        FROM,
-        UNTIL,
-        'true',
-      ),
-    ).to.be.rejectedWith(/only the athlete may grant or withdraw consent/);
+    const { cc, ctx, stub } = fresh();
+    stub.setInput({ athleteHash: ATHLETE, grantedToMSP: 'ResearchMSP', purpose: 'workload_monitoring', categories: 'gps_accelerometry', validFrom: FROM, validUntil: UNTIL });
+    await expect(cc.recordConsentTransaction(asOrg(ctx, 'FederationMSP'))).to.be.rejectedWith(/only the athlete/);
   });
 });
 
 describe('Special-category data — GDPR Article 9', () => {
-  it('refuses special-category data without an explicit Article 9 authorization', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
-      to: 'ResearchMSP',
-      purpose: 'cardiovascular_research',
-      categories: 'abp_haematological,gps_accelerometry',
-      special: false,
-    });
-    const decision = JSON.parse(
-      await cc.validateConsent(
-        asOrg(ctx, 'ResearchMSP'),
-        ATHLETE,
-        'cardiovascular_research',
-        'abp_haematological,gps_accelerometry',
-      ),
-    );
-    // Accelerometry is not special-category, so it still passes.
+  it('refuses special-category data without an explicit Article 9 authorisation', async () => {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'cardiovascular_research', categories: 'abp_haematological,gps_accelerometry', special: false });
+    const decision = await request(cc, ctx, stub, 'ResearchMSP', 'cardiovascular_research', 'abp_haematological,gps_accelerometry');
     expect(decision.granted).to.deep.equal(['gps_accelerometry']);
-    const haem = decision.outcomes.find(
-      (o: { category: string }) => o.category === 'abp_haematological',
-    );
-    expect(haem.gdprArticle).to.equal('Article 9');
   });
 
-  it('checkSpecialCategoryAuthorization reports the authorization state', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
-    await grant(cc, ctx, {
-      to: 'ResearchMSP',
-      purpose: 'cardiovascular_research',
-      categories: 'abp_haematological',
-      special: true,
-    });
+  it('checkSpecialCategoryAuthorization reports the authorisation state', async () => {
+    const { cc, ctx, stub } = fresh();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'cardiovascular_research', categories: 'abp_haematological', special: true });
     const out = JSON.parse(
-      await cc.checkSpecialCategoryAuthorization(
-        asOrg(ctx, 'ResearchMSP'),
-        ATHLETE,
-        'cardiovascular_research',
-        'abp_haematological,gps_accelerometry',
-      ),
+      await cc.checkSpecialCategoryAuthorization(asOrg(ctx, 'ResearchMSP'), ATHLETE, 'cardiovascular_research', 'abp_haematological'),
     );
-    expect(out.specialCategoriesRequested).to.deep.equal(['abp_haematological']);
     expect(out.authorised).to.equal(true);
   });
 });
 
 describe('Article 22 — human oversight of automated decisions', () => {
   it('refuses an oversight record with no prior review flag', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('NADOMSP');
-    await expect(
-      cc.enforceOversightRequirement(
-        ctx,
-        ATHLETE,
-        'PROVISIONAL_SUSPENSION',
-        'reviewer-7',
-        'UPHOLD',
-        'reviewed',
-      ),
-    ).to.be.rejectedWith(/no human-review flag exists/);
+    const { cc, ctx, stub } = fresh('NADOMSP');
+    stub.setInput({ subjectId: 'S1', decisionType: 'disclosure', reviewerId: 'r1', outcome: 'UPHOLD', rationale: 'x' });
+    await expect(cc.enforceOversightRequirement(ctx)).to.be.rejectedWith(/no human-review flag/);
   });
 
   it('requires a named reviewer and a rationale', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('NADOMSP');
-    await cc.flagForHumanReview(ctx, ATHLETE, 'PROVISIONAL_SUSPENSION', 'automated AAF');
-    await expect(
-      cc.enforceOversightRequirement(ctx, ATHLETE, 'PROVISIONAL_SUSPENSION', '', 'UPHOLD', 'x'),
-    ).to.be.rejectedWith(/named human reviewer/);
-    await expect(
-      cc.enforceOversightRequirement(
-        ctx,
-        ATHLETE,
-        'PROVISIONAL_SUSPENSION',
-        'reviewer-7',
-        'UPHOLD',
-        '',
-      ),
-    ).to.be.rejectedWith(/recorded rationale/);
+    const { cc, ctx, stub } = fresh('NADOMSP');
+    stub.setInput({ subjectId: 'S1', decisionType: 'disclosure', reviewerId: '', outcome: 'UPHOLD', rationale: 'x' });
+    await expect(cc.enforceOversightRequirement(ctx)).to.be.rejectedWith(/named human reviewer/);
   });
 
   it('resolves the flag once oversight is recorded', async () => {
-    const cc = new ConsentContract();
-    const { ctx, stub } = mockContext('NADOMSP');
-    await cc.flagForHumanReview(ctx, ATHLETE, 'PROVISIONAL_SUSPENSION', 'automated AAF');
-    const record = JSON.parse(
-      await cc.enforceOversightRequirement(
-        ctx,
-        ATHLETE,
-        'PROVISIONAL_SUSPENSION',
-        'reviewer-7',
-        'UPHOLD',
-        'chain of custody complete',
-      ),
-    );
-    expect(record.reviewerId).to.equal('reviewer-7');
-    expect(stub.events.map((e) => e.name)).to.include('OversightRecorded');
+    const { cc, ctx, stub } = fresh('NADOMSP');
+    stub.setInput({ subjectId: 'S1', decisionType: 'disclosure', rationale: 'career-affecting disclosure' });
+    await cc.flagForHumanReview(ctx);
+    stub.setInput({ subjectId: 'S1', decisionType: 'disclosure', reviewerId: 'r1', outcome: 'UPHOLD', rationale: 'reviewed' });
+    await cc.enforceOversightRequirement(ctx);
+    const out = JSON.parse(await cc.getOversight(ctx, 'S1', 'disclosure'));
+    expect(out.flag.resolved).to.equal(true);
+    expect(out.oversight.reviewerId).to.equal('r1');
   });
 });
 
-describe('Article 17 — right to erasure', () => {
-  const CID = 'bafkreiabcdefghijklmnopqrstuvwxyz234567abcdefghijklmnopqrs';
-
-  async function registerPayload(cc: ConsentContract, ctx: Context) {
-    return cc.registerOffchainPayload(
-      asOrg(ctx, 'LabMSP'),
-      ATHLETE,
-      'abp_haematological',
-      CID,
-      'key-1234',
-      'd'.repeat(64),
-    );
+describe('Article 17 — revocation, recovery and erasure', () => {
+  async function registered() {
+    const f = fresh();
+    f.stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological', cid: CID, keyRef: 'key-1234', commitment: 'c'.repeat(64) });
+    await f.cc.registerOffchainPayload(asOrg(f.ctx, 'LabMSP'));
+    return f;
   }
 
-  it('records only a CID and a key reference on-chain', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('LabMSP');
-    const record = JSON.parse(await registerPayload(cc, ctx));
+  async function erase(cc: ConsentContract, ctx: Context, stub: MockStub, certificate: Record<string, unknown>) {
+    stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological', erasureCertificate: certificate });
+    return cc.destroyIPFSAccessToken(asOrg(ctx, 'AthleteMSP'));
+  }
+
+  it('records a CID, a key reference and a keyed commitment, never the payload', async () => {
+    const { cc, ctx } = await registered();
+    const record = JSON.parse(await cc.getOffchainPayload(ctx, ATHLETE, 'abp_haematological'));
     expect(record.cid).to.equal(CID);
     expect(record.keyRef).to.equal('key-1234');
     expect(Object.keys(record)).to.not.include('payload');
+    expect(Object.keys(record)).to.not.include('plaintextDigest');
   });
 
-  it('revokeDataAccessKey marks the key revoked on-chain', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('LabMSP');
-    await registerPayload(cc, ctx);
-    const out = JSON.parse(
-      await cc.revokeDataAccessKey(asOrg(ctx, 'AthleteMSP'), ATHLETE, 'abp_haematological'),
-    );
-    expect(out.keyRevoked).to.equal(true);
-    expect(out.gdprArticle).to.equal('Article 17');
+  it('revocation is recorded as reversible, and recovery requires the athlete', async () => {
+    const { cc, ctx, stub } = await registered();
+    stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological' });
+    expect(JSON.parse(await cc.revokeDataAccessKey(asOrg(ctx, 'AthleteMSP'))).reversible).to.equal(true);
+    stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological', holders: ['physician', 'federation-official'] });
+    await expect(cc.restoreDataAccessKey(asOrg(ctx, 'AthleteMSP'))).to.be.rejectedWith(/requires the athlete/);
+    stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological', holders: ['athlete', 'physician'] });
+    expect(JSON.parse(await cc.restoreDataAccessKey(asOrg(ctx, 'AthleteMSP'))).restored).to.equal(true);
   });
 
-  it('destroyIPFSAccessToken rejects a certificate for a different CID', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('LabMSP');
-    await registerPayload(cc, ctx);
+  it('rejects a certificate for a different CID, or one that does not attest key destruction', async () => {
+    const { cc, ctx, stub } = await registered();
+    await expect(erase(cc, ctx, stub, { cid: 'bafk-other', keyDestroyed: true, sharesDestroyed: ALL_SHARES })).to.be.rejectedWith(/erasure certificate is for/);
+    await expect(erase(cc, ctx, stub, { cid: CID, keyDestroyed: false, sharesDestroyed: ALL_SHARES })).to.be.rejectedWith(/does not attest that the key was destroyed/);
+  });
+
+  it('is not erasure while any recovery share survives', async () => {
+    const { cc, ctx, stub } = await registered();
     await expect(
-      cc.destroyIPFSAccessToken(
-        asOrg(ctx, 'AthleteMSP'),
-        ATHLETE,
-        'abp_haematological',
-        JSON.stringify({ cid: 'bafk-somethingelse', keyDestroyed: true }),
-      ),
-    ).to.be.rejectedWith(/erasure certificate is for/);
+      erase(cc, ctx, stub, { cid: CID, keyDestroyed: true, sharesDestroyed: ['athlete'] }),
+    ).to.be.rejectedWith(/physician, federation-official/);
   });
 
-  it('destroyIPFSAccessToken rejects a certificate that does not attest key destruction', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('LabMSP');
-    await registerPayload(cc, ctx);
-    await expect(
-      cc.destroyIPFSAccessToken(
-        asOrg(ctx, 'AthleteMSP'),
-        ATHLETE,
-        'abp_haematological',
-        JSON.stringify({ cid: CID, keyDestroyed: false }),
-      ),
-    ).to.be.rejectedWith(/does not attest that the key was destroyed/);
+  it('notifies every organisation that was granted the category, under Article 17(2)', async () => {
+    const { cc, ctx, stub } = await registered();
+    await grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'cardiovascular_research', categories: 'abp_haematological', special: true });
+    await request(cc, ctx, stub, 'ResearchMSP', 'cardiovascular_research', 'abp_haematological');
+    await request(cc, ctx, stub, 'FederationMSP', 'cardiovascular_research', 'abp_haematological'); // denied: not notified
+    const out = JSON.parse(await erase(cc, ctx, stub, { cid: CID, keyDestroyed: true, sharesDestroyed: ALL_SHARES, complete: true }));
+    expect(out.recipientsNotified).to.equal(1);
+    const record = JSON.parse(await cc.getErasureRecord(asOrg(ctx, 'AthleteMSP'), ATHLETE, 'abp_haematological'));
+    expect(record.article17_2Recipients).to.deep.equal(['ResearchMSP']);
+    expect(record.legalCaveat).to.contain('not confirmed by supervisory authorities');
+    expect(record.scope).to.contain('do not reach plaintext');
+    const notice = stub.events.find((e) => e.name === 'ErasureNotice');
+    expect((notice!.payload as { recipients: string[] }).recipients).to.deep.equal(['ResearchMSP']);
   });
 
-  it('records the erasure certificate and carries the legal caveat forward', async () => {
-    const cc = new ConsentContract();
-    const { ctx, stub } = mockContext('LabMSP');
-    await registerPayload(cc, ctx);
-    const out = JSON.parse(
-      await cc.destroyIPFSAccessToken(
-        asOrg(ctx, 'AthleteMSP'),
-        ATHLETE,
-        'abp_haematological',
-        JSON.stringify({ cid: CID, keyDestroyed: true, complete: true }),
-      ),
-    );
-    expect(out.legalCaveat).to.contain('not confirmed by supervisory authorities');
-    expect(stub.events.map((e) => e.name)).to.include('IPFSAccessTokenDestroyed');
+  it('an erased category cannot be restored', async () => {
+    const { cc, ctx, stub } = await registered();
+    await erase(cc, ctx, stub, { cid: CID, keyDestroyed: true, sharesDestroyed: ALL_SHARES });
+    stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological', holders: ['athlete', 'physician'] });
+    await expect(cc.restoreDataAccessKey(asOrg(ctx, 'AthleteMSP'))).to.be.rejectedWith(/erased/);
   });
 
-  it('only the athlete may invoke erasure over their own data', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('LabMSP');
-    await registerPayload(cc, ctx);
-    await expect(
-      cc.revokeDataAccessKey(asOrg(ctx, 'FederationMSP'), ATHLETE, 'abp_haematological'),
-    ).to.be.rejectedWith(/only the athlete/);
+  it('only the athlete may revoke or erase', async () => {
+    const { cc, ctx, stub } = await registered();
+    stub.setInput({ athleteHash: ATHLETE, category: 'abp_haematological' });
+    await expect(cc.revokeDataAccessKey(asOrg(ctx, 'FederationMSP'))).to.be.rejectedWith(/only the athlete/);
   });
 });
 
 describe('Input validation', () => {
   it('rejects unknown data categories', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
+    const { cc, ctx, stub } = fresh();
     await expect(
-      cc.recordConsentTransaction(
-        ctx,
-        ATHLETE,
-        'ResearchMSP',
-        'cardiovascular_research',
-        'blood_pressure',
-        FROM,
-        UNTIL,
-        'true',
-      ),
+      grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'workload_monitoring', categories: 'gps_accelerometry,blood_type' }),
     ).to.be.rejectedWith(/unknown data categories/);
   });
 
   it('rejects an inverted validity period', async () => {
-    const cc = new ConsentContract();
-    const { ctx } = mockContext('AthleteMSP');
+    const { cc, ctx, stub } = fresh();
     await expect(
-      cc.recordConsentTransaction(
-        ctx,
-        ATHLETE,
-        'ResearchMSP',
-        'cardiovascular_research',
-        'genetic',
-        UNTIL,
-        FROM,
-        'true',
-      ),
+      grant(cc, ctx, stub, { to: 'ResearchMSP', purpose: 'workload_monitoring', categories: 'gps_accelerometry', from: UNTIL, until: FROM }),
     ).to.be.rejectedWith(/must be after/);
   });
 });

@@ -11,7 +11,7 @@
  * not a design position — production key custody belongs in an HSM.
  */
 
-import { createCipheriv, createDecipheriv, randomBytes, randomUUID, createHash } from 'crypto';
+import { createCipheriv, createDecipheriv, createHmac, hkdfSync, randomBytes, randomUUID } from 'crypto';
 
 const IPFS_ENDPOINTS = (process.env.IPFS_ENDPOINTS ?? 'http://ipfs0:5001,http://ipfs1:5001,http://ipfs2:5001')
   .split(',')
@@ -26,7 +26,8 @@ export interface StoredPayload {
   keyRef: string;
   iv: string;
   authTag: string;
-  plaintextDigest: string;
+  /** Keyed commitment to the plaintext (HMAC under a subkey of the data key). */
+  commitment: string;
   pinnedAt: string[];
 }
 
@@ -93,7 +94,9 @@ export async function store(plaintext: Buffer): Promise<StoredPayload> {
     keyRef,
     iv: iv.toString('base64'),
     authTag: cipher.getAuthTag().toString('base64'),
-    plaintextDigest: createHash('sha256').update(plaintext).digest('hex'),
+    commitment: createHmac('sha256', Buffer.from(hkdfSync('sha256', key, Buffer.alloc(0), 'antidoping/payload-commitment', 32)))
+      .update(plaintext)
+      .digest('hex'),
     pinnedAt,
   };
 }
@@ -118,6 +121,13 @@ export interface ErasureCertificate {
   cid: string;
   keyRef: string;
   keyDestroyed: boolean;
+  /**
+   * Holders whose recovery shares are destroyed. The platform's demonstration
+   * path never splits a key into shares, so there is none to survive; the
+   * full recovery-and-erasure path is the offchain package's (scenario S11).
+   */
+  sharesDestroyed: string[];
+  sharesIssued: boolean;
   unpinResults: { endpoint: string; unpinned: boolean }[];
   complete: boolean;
   erasedAt: string;
@@ -152,6 +162,8 @@ export async function erase(record: StoredPayload): Promise<ErasureCertificate> 
     cid: record.cid,
     keyRef: record.keyRef,
     keyDestroyed,
+    sharesDestroyed: ['athlete', 'physician', 'federation-official'],
+    sharesIssued: false,
     unpinResults,
     complete: keyDestroyed && unpinResults.every((r) => r.unpinned),
     erasedAt: new Date().toISOString(),

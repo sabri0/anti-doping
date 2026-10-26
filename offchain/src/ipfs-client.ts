@@ -13,9 +13,11 @@
 import {
   createCipheriv,
   createDecipheriv,
-  createHash,
+  createHmac,
+  hkdfSync,
   randomBytes,
   randomUUID,
+  timingSafeEqual,
 } from 'crypto';
 
 export const KEY_BYTES = 32; // AES-256
@@ -45,8 +47,13 @@ export interface StoredPayload {
   keyRef: string;
   iv: string;
   authTag: string;
-  /** SHA-256 of the plaintext, so integrity survives re-encryption. */
-  plaintextDigest: string;
+  /**
+   * Keyed commitment to the plaintext: HMAC-SHA-256 under a key derived from
+   * the data-encryption key. An unkeyed digest of a low-entropy payload could
+   * be confirmed by anyone able to guess the payload; this cannot, and it
+   * becomes unverifiable when the data-encryption key is destroyed.
+   */
+  commitment: string;
   sizeBytes: number;
   /** Endpoints that hold a pinned copy — erasure must reach all of them. */
   pinnedAt: string[];
@@ -60,6 +67,12 @@ export function encrypt(plaintext: Buffer, key: Buffer): EncryptedEnvelope {
   return { ciphertext, iv, authTag: cipher.getAuthTag() };
 }
 
+/** HMAC-SHA-256 commitment to `plaintext` under a subkey of the data-encryption key. */
+export function commit(plaintext: Buffer, key: Buffer): string {
+  const subkey = Buffer.from(hkdfSync('sha256', key, Buffer.alloc(0), 'antidoping/payload-commitment', 32));
+  return createHmac('sha256', subkey).update(plaintext).digest('hex');
+}
+
 export function decrypt(envelope: EncryptedEnvelope, key: Buffer): Buffer {
   const decipher = createDecipheriv('aes-256-gcm', key, envelope.iv);
   decipher.setAuthTag(envelope.authTag);
@@ -67,11 +80,14 @@ export function decrypt(envelope: EncryptedEnvelope, key: Buffer): Buffer {
 }
 
 /**
- * Key custody for the prototype.
+ * Key custody.
  *
- * Keys live in process memory and are destroyed by overwriting before release.
- * A production deployment would hold them in an HSM; the manuscript states
- * this as an explicit limitation and the prototype does not claim otherwise.
+ * Operated by the athlete organisation, whose key service releases a key only
+ * against a committed access decision granting that category. In the
+ * prototype the vault is an object in the memory of that service's process
+ * and keys are destroyed by overwriting before release; a deployment would
+ * hold them in a hardware security module operated by the athlete
+ * organisation. The manuscript states this as a limitation.
  * What the prototype does demonstrate is the erasure *mechanism*: once the key
  * is destroyed, the ciphertext is unrecoverable regardless of who holds it.
  */
@@ -106,7 +122,7 @@ export class KeyVault {
     if (!key) {
       throw new Error(
         this.destroyed.has(keyRef)
-          ? `key ${keyRef} was destroyed under GDPR Article 17 and cannot be recovered`
+          ? `key ${keyRef} was destroyed (revoked, or erased under GDPR Article 17); only the recovery shares can rebuild it`
           : `unknown key reference ${keyRef}`,
       );
     }
@@ -275,7 +291,7 @@ export async function storeEncrypted(
       keyRef,
       iv: envelope.iv.toString('base64'),
       authTag: envelope.authTag.toString('base64'),
-      plaintextDigest: createHash('sha256').update(plaintext).digest('hex'),
+      commitment: commit(plaintext, vault.get(keyRef)),
       sizeBytes: envelope.ciphertext.length,
       pinnedAt,
     },
@@ -297,9 +313,10 @@ export async function retrieveDecrypted(
     },
     key,
   );
-  const digest = createHash('sha256').update(plaintext).digest('hex');
-  if (digest !== record.plaintextDigest) {
-    throw new Error('integrity check failed: plaintext digest does not match the ledger record');
+  const expected = Buffer.from(record.commitment, 'hex');
+  const actual = Buffer.from(commit(plaintext, key), 'hex');
+  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
+    throw new Error('integrity check failed: plaintext does not match the commitment on the ledger');
   }
   return plaintext;
 }

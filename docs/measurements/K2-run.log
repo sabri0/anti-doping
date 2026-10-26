@@ -1,0 +1,118 @@
+[0;34m[evaluation K2][0m building the driver image
+[0;34m[evaluation K2][0m regulatory scenarios
+        outcome: exceptions: CONTAINER_SEAL_MISMATCH; PROCESS_INVALIDATED (R5_PROCESS_INVALIDATED)
+
+14/14 scenarios passed -> /out/K2-scenarios.json
+[0;34m[evaluation K2][0m processor attribution during a saturating round
+docs/measurements/K2-cpu.json: n=20, network utilisation 56% of 6 processors
+  CAs and tools                  0.0%
+  IPFS                           1.7%
+  chaincode                     12.8%
+  ordering nodes                 8.2%
+  peers                         77.3%
+[0;34m[evaluation K2][0m measurement plan
+[1/102] b1-sentinel-open initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 40.5, committed 40.5 tps; p50 2970 p95 3911 ms; phases {"endorse":1473,"order":226,"commit":1216}; failures {}
+[2/102] b1-lat-getCustodyChain getCustodyChain @2 tps: provisioning... 22s; running... offered 2.0, committed 2.0 tps; p50 18 p95 95 ms; phases null; failures {}
+[3/102] b1-cap-acceptCustodyTransfer acceptCustodyTransfer @concurrency 128: provisioning... 303s; running... offered 28.6, committed 28.6 tps; p50 4332 p95 5757 ms; phases {"endorse":1753,"order":229,"commit":2089}; failures {}
+[4/102] b1-cap-recordWhereaboutsStatus recordWhereaboutsStatus @concurrency 128: provisioning... 0s; running... offered 33.2, committed 33.2 tps; p50 3745 p95 4869 ms; phases {"endorse":2024,"order":166,"commit":1492}; failures {}
+[5/102] b1-cap-triggerResultsManagement triggerResultsManagement @concurrency 128: provisioning... 432s; running... offered 23.7, committed 23.7 tps; p50 5316 p95 6943 ms; phases {"endorse":2969,"order":189,"commit":2100}; failures {}
+[6/102] b1-cap-validateConsent validateConsent @concurrency 128: provisioning... 1s; running... offered 51.4, committed 52.1 tps; p50 2335 p95 3475 ms; phases {"endorse":1070,"order":181,"commit":1255}; failures {}
+[7/102] b1-cap-recordSampleAnalysisResult recordSampleAnalysisResult @concurrency 128: provisioning... 417s; running... offered 27.4, committed 27.2 tps; p50 4370 p95 5713 ms; phases {"endorse":2230,"order":188,"commit":2064}; failures {}
+[8/102] b1-lat-recordSampleAnalysisResult recordSampleAnalysisResult @2 tps: provisioning... 22s; running... offered 2.0, committed 2.1 tps; p50 686 p95 1200 ms; phases {"endorse":46,"order":7,"commit":611}; failures {}
+[9/102] b1-lat-recordWhereaboutsStatus recordWhereaboutsStatus @2 tps: provisioning... 0s; running... offered 2.0, committed 1.9 tps; p50 718 p95 1338 ms; phases {"endorse":44,"order":8,"commit":665}; failures {}
+[10/102] b1-lat-acceptCustodyTransfer acceptCustodyTransfer @2 tps: provisioning... 17s; running... offered 2.0, committed 2.0 tps; p50 684 p95 1883 ms; phases {"endorse":23,"order":8,"commit":645}; failures {}
+[11/102] b1-sweep-c4 initiateSampleCustody @concurrency 4: provisioning... 0s; running... offered 3.3, committed 3.3 tps; p50 1192 p95 1334 ms; phases {"endorse":63,"order":16,"commit":1099}; failures {}
+[12/102] b1-cap-proposeCustodyTransfer proposeCustodyTransfer @concurrency 128: provisioning... 181s; running... offered 36.8, committed 36.0 tps; p50 3304 p95 4640 ms; phases {"endorse":1424,"order":164,"commit":1616}; failures {}
+[13/102] b1-sweep-c8 initiateSampleCustody @concurrency 8: provisioning... 0s; running... offered 6.4, committed 6.4 tps; p50 1246 p95 1337 ms; phases {"endorse":99,"order":20,"commit":1108}; failures {}
+[14/102] b1-sweep-c16 initiateSampleCustody @concurrency 16: provisioning... 0s; running... offered 11.7, committed 11.7 tps; p50 1353 p95 1443 ms; phases {"endorse":190,"order":37,"commit":1107}; failures {}
+[15/102] b1-sweep-c64 initiateSampleCustody @concurrency 64: provisioning... 0s; running... offered 32.1, committed 32.1 tps; p50 1913 p95 2613 ms; phases {"endorse":672,"order":131,"commit":1041}; failures {}
+[16/102] b1-cap-acknowledgeSampleCollection acknowledgeSampleCollection @concurrency 128: provisioning... 103s; running... offered 46.7, committed 46.7 tps; p50 2555 p95 3981 ms; phases {"endorse":1118,"order":201,"commit":1268}; failures {}
+[17/102] b1-sweep-c32 initiateSampleCustody @concurrency 32: provisioning... 0s; running... offered 17.6, committed 17.6 tps; p50 1585 p95 2612 ms; phases {"endorse":364,"order":70,"commit":1154}; failures {}
+[18/102] b1-lat-proposeCustodyTransfer proposeCustodyTransfer @2 tps: provisioning... 8s; running... offered 2.0, committed 2.0 tps; p50 680 p95 1218 ms; phases {"endorse":24,"order":8,"commit":629}; failures {}
+[19/102] b1-cap-getCustodyChain getCustodyChain @concurrency 128: provisioning... 18s; running... offered 168.9, committed 168.9 tps; p50 722 p95 1041 ms; phases null; failures {}
+[20/102] b1-lat-triggerResultsManagement triggerResultsManagement @2 tps: provisioning... 24s; running... offered 2.0, committed 1.9 tps; p50 723 p95 1903 ms; phases {"endorse":57,"order":7,"commit":641}; failures {}
+[21/102] b1-sweep-c128 initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 41.7, committed 41.7 tps; p50 3038 p95 4515 ms; phases {"endorse":1224,"order":202,"commit":1732}; failures {}
+[22/102] b1-sweep-c256 initiateSampleCustody @concurrency 256: provisioning... 0s; running... offered 47.4, committed 47.4 tps; p50 5274 p95 5997 ms; phases {"endorse":2466,"order":412,"commit":2113}; failures {}
+[23/102] b1-lat-acknowledgeSampleCollection acknowledgeSampleCollection @2 tps: provisioning... 6s; running... offered 2.0, committed 2.1 tps; p50 1196 p95 2196 ms; phases {"endorse":20,"order":8,"commit":1098}; failures {}
+[24/102] b1-cap-previewConsentDecision previewConsentDecision @concurrency 128: provisioning... 0s; running... offered 218.1, committed 218.1 tps; p50 546 p95 1013 ms; phases null; failures {}
+[25/102] b1-lat-evaluateDecisionTable evaluateDecisionTable @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 12 p95 24 ms; phases null; failures {}
+[26/102] b1-lat-previewConsentDecision previewConsentDecision @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 16 p95 26 ms; phases null; failures {}
+[27/102] b1-lat-validateConsent validateConsent @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 706 p95 1275 ms; phases {"endorse":41,"order":10,"commit":632}; failures {}
+[28/102] b1-lat-initiateSampleCustody initiateSampleCustody @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 642 p95 1178 ms; phases {"endorse":24,"order":8,"commit":607}; failures {}
+[29/102] b1-cap-evaluateDecisionTable evaluateDecisionTable @concurrency 128: provisioning... 0s; running... offered 287.3, committed 287.3 tps; p50 408 p95 697 ms; phases null; failures {}
+[30/102] b1-sentinel-close initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 41.6, committed 41.6 tps; p50 3103 p95 3911 ms; phases {"endorse":1374,"order":247,"commit":1494}; failures {}
+[31/102] b2-sentinel-open initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 38.3, committed 38.3 tps; p50 3087 p95 4691 ms; phases {"endorse":1342,"order":192,"commit":1505}; failures {}
+[32/102] b2-cap-triggerResultsManagement triggerResultsManagement @concurrency 128: provisioning... 549s; running... offered 23.5, committed 23.5 tps; p50 5589 p95 7001 ms; phases {"endorse":3573,"order":168,"commit":1908}; failures {}
+[33/102] b2-lat-previewConsentDecision previewConsentDecision @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 16 p95 36 ms; phases null; failures {}
+[34/102] b2-cap-getCustodyChain getCustodyChain @concurrency 128: provisioning... 18s; running... offered 148.7, committed 148.7 tps; p50 802 p95 1255 ms; phases null; failures {}
+[35/102] b2-cap-acceptCustodyTransfer acceptCustodyTransfer @concurrency 128: provisioning... 302s; running... offered 34.9, committed 34.9 tps; p50 3623 p95 5670 ms; phases {"endorse":1658,"order":221,"commit":1813}; failures {}
+[36/102] b2-cap-validateConsent validateConsent @concurrency 128: provisioning... 0s; running... offered 49.9, committed 49.9 tps; p50 2475 p95 3975 ms; phases {"endorse":974,"order":185,"commit":1308}; failures {}
+[37/102] b2-lat-evaluateDecisionTable evaluateDecisionTable @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 11 p95 21 ms; phases null; failures {}
+[38/102] b2-sweep-c128 initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 43.8, committed 43.8 tps; p50 2803 p95 4162 ms; phases {"endorse":1271,"order":209,"commit":1301}; failures {}
+[39/102] b2-cap-recordWhereaboutsStatus recordWhereaboutsStatus @concurrency 128: provisioning... 0s; running... offered 44.6, committed 44.6 tps; p50 3156 p95 4369 ms; phases {"endorse":1287,"order":119,"commit":1432}; failures {}
+[40/102] b2-lat-recordWhereaboutsStatus recordWhereaboutsStatus @2 tps: provisioning... 0s; running... offered 2.0, committed 2.1 tps; p50 637 p95 1204 ms; phases {"endorse":35,"order":6,"commit":596}; failures {}
+[41/102] b2-lat-acceptCustodyTransfer acceptCustodyTransfer @2 tps: provisioning... 11s; running... offered 2.0, committed 2.1 tps; p50 1013 p95 1720 ms; phases {"endorse":17,"order":6,"commit":990}; failures {}
+[42/102] b2-lat-recordSampleAnalysisResult recordSampleAnalysisResult @2 tps: provisioning... 15s; running... offered 2.0, committed 2.0 tps; p50 636 p95 1172 ms; phases {"endorse":37,"order":6,"commit":586}; failures {}
+[43/102] b2-sweep-c64 initiateSampleCustody @concurrency 64: provisioning... 0s; running... offered 34.1, committed 34.1 tps; p50 1736 p95 2576 ms; phases {"endorse":449,"order":94,"commit":1157}; failures {}
+[44/102] b2-lat-initiateSampleCustody initiateSampleCustody @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 1078 p95 1902 ms; phases {"endorse":16,"order":6,"commit":1013}; failures {}
+[45/102] b2-sweep-c32 initiateSampleCustody @concurrency 32: provisioning... 0s; running... offered 20.3, committed 20.3 tps; p50 1541 p95 1883 ms; phases {"endorse":326,"order":68,"commit":1127}; failures {}
+[46/102] b2-cap-proposeCustodyTransfer proposeCustodyTransfer @concurrency 128: provisioning... 187s; running... offered 32.4, committed 32.4 tps; p50 3380 p95 5411 ms; phases {"endorse":1639,"order":191,"commit":1803}; failures {}
+[47/102] b2-lat-triggerResultsManagement triggerResultsManagement @2 tps: provisioning... 30s; running... offered 2.0, committed 2.0 tps; p50 711 p95 1255 ms; phases {"endorse":58,"order":8,"commit":629}; failures {}
+[48/102] b2-lat-acknowledgeSampleCollection acknowledgeSampleCollection @2 tps: provisioning... 5s; running... offered 2.0, committed 2.0 tps; p50 645 p95 1196 ms; phases {"endorse":20,"order":8,"commit":612}; failures {}
+[49/102] b2-cap-recordSampleAnalysisResult recordSampleAnalysisResult @concurrency 128: provisioning... 405s; running... offered 27.9, committed 27.9 tps; p50 4315 p95 5962 ms; phases {"endorse":2296,"order":160,"commit":1786}; failures {}
+[50/102] b2-cap-evaluateDecisionTable evaluateDecisionTable @concurrency 128: provisioning... 0s; running... offered 277.1, committed 277.3 tps; p50 407 p95 773 ms; phases null; failures {}
+[51/102] b2-sweep-c4 initiateSampleCustody @concurrency 4: provisioning... 0s; running... offered 3.5, committed 3.5 tps; p50 1156 p95 1249 ms; phases {"endorse":49,"order":12,"commit":1087}; failures {}
+[52/102] b2-lat-proposeCustodyTransfer proposeCustodyTransfer @2 tps: provisioning... 9s; running... offered 2.0, committed 2.1 tps; p50 655 p95 1167 ms; phases {"endorse":21,"order":7,"commit":619}; failures {}
+[53/102] b2-cap-acknowledgeSampleCollection acknowledgeSampleCollection @concurrency 128: provisioning... 90s; running... offered 44.5, committed 44.5 tps; p50 2721 p95 3638 ms; phases {"endorse":1070,"order":226,"commit":1427}; failures {}
+[54/102] b2-sweep-c256 initiateSampleCustody @concurrency 256: provisioning... 0s; running... offered 48.5, committed 48.5 tps; p50 5012 p95 6875 ms; phases {"endorse":2640,"order":373,"commit":1493}; failures {}
+[55/102] b2-lat-validateConsent validateConsent @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 1192 p95 2288 ms; phases {"endorse":51,"order":8,"commit":1067}; failures {}
+[56/102] b2-sweep-c8 initiateSampleCustody @concurrency 8: provisioning... 0s; running... offered 6.4, committed 6.4 tps; p50 1235 p95 1385 ms; phases {"endorse":104,"order":21,"commit":1099}; failures {}
+[57/102] b2-sweep-c16 initiateSampleCustody @concurrency 16: provisioning... 0s; running... offered 11.7, committed 11.7 tps; p50 1339 p95 1567 ms; phases {"endorse":190,"order":37,"commit":1106}; failures {}
+[58/102] b2-cap-previewConsentDecision previewConsentDecision @concurrency 128: provisioning... 0s; running... offered 230.0, committed 230.0 tps; p50 523 p95 885 ms; phases null; failures {}
+[59/102] b2-lat-getCustodyChain getCustodyChain @2 tps: provisioning... 19s; running... offered 2.0, committed 2.0 tps; p50 17 p95 28 ms; phases null; failures {}
+[60/102] b2-sentinel-close initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 38.8, committed 38.8 tps; p50 3016 p95 4427 ms; phases {"endorse":1323,"order":217,"commit":1436}; failures {}
+[61/102] b3-sentinel-open initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 41.8, committed 41.8 tps; p50 3037 p95 4147 ms; phases {"endorse":1303,"order":242,"commit":1401}; failures {}
+[62/102] b3-cap-evaluateDecisionTable evaluateDecisionTable @concurrency 128: provisioning... 0s; running... offered 285.0, committed 285.1 tps; p50 395 p95 747 ms; phases null; failures {}
+[63/102] b3-lat-recordSampleAnalysisResult recordSampleAnalysisResult @2 tps: provisioning... 19s; running... offered 2.0, committed 2.0 tps; p50 709 p95 1228 ms; phases {"endorse":46,"order":8,"commit":633}; failures {}
+[64/102] b3-cap-proposeCustodyTransfer proposeCustodyTransfer @concurrency 128: provisioning... 187s; running... offered 37.1, committed 37.5 tps; p50 3379 p95 5077 ms; phases {"endorse":1340,"order":202,"commit":1508}; failures {}
+[65/102] b3-sweep-c64 initiateSampleCustody @concurrency 64: provisioning... 0s; running... offered 27.9, committed 27.9 tps; p50 1988 p95 3201 ms; phases {"endorse":635,"order":124,"commit":1209}; failures {}
+[66/102] b3-sweep-c256 initiateSampleCustody @concurrency 256: provisioning... 0s; running... offered 42.7, committed 42.7 tps; p50 5745 p95 7356 ms; phases {"endorse":2980,"order":460,"commit":2076}; failures {}
+[67/102] b3-sweep-c128 initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 42.0, committed 42.0 tps; p50 3037 p95 4405 ms; phases {"endorse":1408,"order":200,"commit":1504}; failures {}
+[68/102] b3-lat-getCustodyChain getCustodyChain @2 tps: provisioning... 18s; running... offered 2.0, committed 2.0 tps; p50 18 p95 28 ms; phases null; failures {}
+[69/102] b3-lat-evaluateDecisionTable evaluateDecisionTable @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 12 p95 28 ms; phases null; failures {}
+[70/102] b3-cap-triggerResultsManagement triggerResultsManagement @concurrency 128: provisioning... 479s; running... offered 26.4, committed 26.4 tps; p50 4788 p95 6997 ms; phases {"endorse":2793,"order":147,"commit":1738}; failures {}
+[71/102] b3-cap-getCustodyChain getCustodyChain @concurrency 128: provisioning... 23s; running... offered 151.1, committed 151.1 tps; p50 758 p95 1476 ms; phases null; failures {}
+[72/102] b3-lat-initiateSampleCustody initiateSampleCustody @2 tps: provisioning... 0s; running... offered 2.0, committed 2.1 tps; p50 673 p95 1216 ms; phases {"endorse":19,"order":8,"commit":642}; failures {}
+[73/102] b3-cap-validateConsent validateConsent @concurrency 128: provisioning... 0s; running... offered 49.0, committed 49.0 tps; p50 2401 p95 3629 ms; phases {"endorse":1077,"order":164,"commit":1157}; failures {}
+[74/102] b3-lat-previewConsentDecision previewConsentDecision @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 15 p95 28 ms; phases null; failures {}
+[75/102] b3-lat-triggerResultsManagement triggerResultsManagement @2 tps: provisioning... 29s; running... offered 2.0, committed 2.0 tps; p50 735 p95 1311 ms; phases {"endorse":57,"order":7,"commit":643}; failures {}
+[76/102] b3-sweep-c8 initiateSampleCustody @concurrency 8: provisioning... 0s; running... offered 6.4, committed 6.4 tps; p50 1255 p95 1403 ms; phases {"endorse":103,"order":21,"commit":1113}; failures {}
+[77/102] b3-lat-acceptCustodyTransfer acceptCustodyTransfer @2 tps: provisioning... 15s; running... offered 2.0, committed 2.0 tps; p50 696 p95 1278 ms; phases {"endorse":29,"order":9,"commit":652}; failures {}
+[78/102] b3-lat-recordWhereaboutsStatus recordWhereaboutsStatus @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 704 p95 1285 ms; phases {"endorse":44,"order":7,"commit":648}; failures {}
+[79/102] b3-lat-proposeCustodyTransfer proposeCustodyTransfer @2 tps: provisioning... 10s; running... offered 2.0, committed 2.1 tps; p50 1101 p95 1928 ms; phases {"endorse":22,"order":8,"commit":1069}; failures {}
+[80/102] b3-cap-recordWhereaboutsStatus recordWhereaboutsStatus @concurrency 128: provisioning... 0s; running... offered 32.7, committed 32.7 tps; p50 4015 p95 5842 ms; phases {"endorse":2261,"order":258,"commit":1505}; failures {}
+[81/102] b3-sweep-c32 initiateSampleCustody @concurrency 32: provisioning... 0s; running... offered 19.2, committed 19.2 tps; p50 1619 p95 2267 ms; phases {"endorse":369,"order":69,"commit":1131}; failures {}
+[82/102] b3-lat-acknowledgeSampleCollection acknowledgeSampleCollection @2 tps: provisioning... 6s; running... offered 2.0, committed 2.0 tps; p50 631 p95 1149 ms; phases {"endorse":19,"order":8,"commit":595}; failures {}
+[83/102] b3-sweep-c16 initiateSampleCustody @concurrency 16: provisioning... 0s; running... offered 11.7, committed 11.7 tps; p50 1332 p95 1514 ms; phases {"endorse":184,"order":38,"commit":1110}; failures {}
+[84/102] b3-sweep-c4 initiateSampleCustody @concurrency 4: provisioning... 0s; running... offered 3.2, committed 3.2 tps; p50 1172 p95 1414 ms; phases {"endorse":52,"order":12,"commit":1096}; failures {}
+[85/102] b3-cap-acceptCustodyTransfer acceptCustodyTransfer @concurrency 128: provisioning... 288s; running... offered 31.0, committed 31.0 tps; p50 3769 p95 4955 ms; phases {"endorse":1816,"order":223,"commit":1804}; failures {}
+[86/102] b3-cap-previewConsentDecision previewConsentDecision @concurrency 128: provisioning... 0s; running... offered 223.8, committed 223.8 tps; p50 529 p95 941 ms; phases null; failures {}
+[87/102] b3-cap-acknowledgeSampleCollection acknowledgeSampleCollection @concurrency 128: provisioning... 97s; running... offered 36.1, committed 36.1 tps; p50 3334 p95 5403 ms; phases {"endorse":1120,"order":181,"commit":2051}; failures {}
+[88/102] b3-lat-validateConsent validateConsent @2 tps: provisioning... 0s; running... offered 2.0, committed 1.9 tps; p50 663 p95 1206 ms; phases {"endorse":32,"order":9,"commit":612}; failures {}
+[89/102] b3-cap-recordSampleAnalysisResult recordSampleAnalysisResult @concurrency 128: provisioning... 422s; running... offered 29.1, committed 29.1 tps; p50 4336 p95 5663 ms; phases {"endorse":2503,"order":226,"commit":1603}; failures {}
+[90/102] b3-sentinel-close initiateSampleCustody @concurrency 128: provisioning... 0s; running... offered 41.9, committed 41.9 tps; p50 3205 p95 4297 ms; phases {"endorse":1420,"order":230,"commit":1431}; failures {}
+[91/102] pair1-1-A initiateOr1 @concurrency 128: provisioning... 0s; running... offered 44.6, committed 44.6 tps; p50 2801 p95 3658 ms; phases {"endorse":705,"order":177,"commit":1856}; failures {}
+[92/102] pair1-2-B initiateOr2 @concurrency 128: provisioning... 0s; running... offered 31.9, committed 31.9 tps; p50 3539 p95 5631 ms; phases {"endorse":1693,"order":378,"commit":1405}; failures {}
+[93/102] pair1-3-B initiateOr2 @concurrency 128: provisioning... 0s; running... offered 41.1, committed 41.1 tps; p50 3327 p95 4539 ms; phases {"endorse":1354,"order":191,"commit":1517}; failures {}
+[94/102] pair1-4-A initiateOr1 @concurrency 128: provisioning... 0s; running... offered 54.8, committed 54.8 tps; p50 2258 p95 3395 ms; phases {"endorse":634,"order":174,"commit":1411}; failures {}
+[95/102] pair2-1-B initiateOr2 @concurrency 128: provisioning... 0s; running... offered 37.8, committed 37.6 tps; p50 3120 p95 4801 ms; phases {"endorse":1412,"order":200,"commit":1530}; failures {}
+[96/102] pair2-2-A initiateOr1 @concurrency 128: provisioning... 0s; running... offered 53.2, committed 54.2 tps; p50 2343 p95 3789 ms; phases {"endorse":705,"order":197,"commit":1367}; failures {}
+[97/102] pair2-3-A initiateOr1 @concurrency 128: provisioning... 0s; running... offered 55.9, committed 55.9 tps; p50 2338 p95 3114 ms; phases {"endorse":729,"order":197,"commit":1338}; failures {}
+[98/102] pair2-4-B initiateOr2 @concurrency 128: provisioning... 0s; running... offered 42.2, committed 42.2 tps; p50 3099 p95 3918 ms; phases {"endorse":1409,"order":256,"commit":1344}; failures {}
+[99/102] pair3-1-A initiateOr1 @concurrency 128: provisioning... 0s; running... offered 50.3, committed 50.3 tps; p50 2412 p95 3548 ms; phases {"endorse":726,"order":196,"commit":1558}; failures {}
+[100/102] pair3-2-B initiateOr2 @concurrency 128: provisioning... 0s; running... offered 41.3, committed 41.3 tps; p50 3153 p95 3957 ms; phases {"endorse":1437,"order":229,"commit":1332}; failures {}
+[101/102] pair3-3-B initiateOr2 @concurrency 128: provisioning... 0s; running... offered 36.5, committed 36.5 tps; p50 3735 p95 4466 ms; phases {"endorse":1441,"order":257,"commit":2015}; failures {}
+[102/102] pair3-4-A initiateOr1 @concurrency 128: provisioning... 0s; running... offered 56.9, committed 56.8 tps; p50 2138 p95 2937 ms; phases {"endorse":770,"order":191,"commit":1118}; failures {}
+wrote /out/K2.json
+[0;34m[evaluation K2][0m done: docs/measurements/K2.json
+exit 0

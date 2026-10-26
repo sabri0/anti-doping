@@ -1,0 +1,16 @@
+{
+ "custody": 67,
+ "consent": 34,
+ "offchain": 23,
+ "fhir": 15,
+ "pending": {
+  "offchain": 0
+ },
+ "failing": {
+  "custody": 0,
+  "consent": 0,
+  "offchain": 0,
+  "fhir": 0
+ },
+ "recordedAt": "2026-10-26T13:56:01.945418Z"
+}

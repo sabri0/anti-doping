@@ -1,0 +1,5 @@
+{ "name": "K2-probe", "rounds": [
+  {"id":"p64","workload":"initiateSampleCustody","concurrency":64,"warmup":10,"duration":20},
+  {"id":"p128","workload":"initiateSampleCustody","concurrency":128,"warmup":10,"duration":20},
+  {"id":"p256","workload":"initiateSampleCustody","concurrency":256,"warmup":10,"duration":20}
+]}

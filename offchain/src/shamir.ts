@@ -1,7 +1,14 @@
 /**
- * Shamir secret sharing over GF(2^8), used for 2-of-3 recovery of an athlete's
- * data-encryption key among the athlete, their physician and a federation
- * official (§6 of the implementation plan, §3.5 of the manuscript).
+ * Shamir secret sharing over GF(2^8), used to recover an athlete's
+ * data-encryption key after the working copy has been revoked.
+ *
+ * The access structure is "the athlete AND (the physician OR the federation
+ * official)", realised as a weighted threshold scheme: four shares, threshold
+ * three, of which the athlete holds two. The athlete plus either custodian
+ * reaches the threshold; the two custodians together hold two shares and do
+ * not, so no institutional pair can reconstruct the key without the athlete.
+ * A plain two-of-three split among the same three holders would have let the
+ * physician and the federation official do exactly that.
  *
  * Each byte of the secret is shared independently: for a threshold t, a random
  * polynomial of degree t-1 is drawn with the secret byte as constant term, and
@@ -114,15 +121,27 @@ export function combine(shares: Share[]): Buffer {
   return secret;
 }
 
-/**
- * The manuscript's recovery arrangement: three holders, any two of whom can
- * restore the athlete's data-encryption key.
- */
+/** The three holders of recovery shares. */
 export const RECOVERY_HOLDERS = ['athlete', 'physician', 'federation-official'] as const;
 export type RecoveryHolder = (typeof RECOVERY_HOLDERS)[number];
 
+/** Shares per holder. The athlete's weight is what makes the athlete necessary. */
+export const SHARE_ALLOCATION: Record<RecoveryHolder, number> = {
+  athlete: 2,
+  physician: 1,
+  'federation-official': 1,
+};
+export const RECOVERY_THRESHOLD = 3;
+
+/** Split a key into the four weighted recovery shares, labelled by holder. */
 export function splitForRecovery(key: Buffer): Share[] {
-  return split(key, 3, 2).map((s, i) => ({ ...s, holder: RECOVERY_HOLDERS[i] }));
+  const holders = RECOVERY_HOLDERS.flatMap((h) => Array<RecoveryHolder>(SHARE_ALLOCATION[h]).fill(h));
+  return split(key, holders.length, RECOVERY_THRESHOLD).map((s, i) => ({ ...s, holder: holders[i] }));
+}
+
+/** Whether a set of holders, pooling their shares, reaches the recovery threshold. */
+export function holdersCanRecover(holders: RecoveryHolder[]): boolean {
+  return [...new Set(holders)].reduce((n, h) => n + SHARE_ALLOCATION[h], 0) >= RECOVERY_THRESHOLD;
 }
 
 /** Constant-time equality, so recovery checks do not leak by timing. */

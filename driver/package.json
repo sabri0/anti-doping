@@ -1,0 +1,16 @@
+{
+  "name": "antidoping-driver",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Open-loop load driver, regulatory scenarios and baselines for the anti-doping governance network",
+  "main": "bench.js",
+  "scripts": {
+    "bench": "node bench.js",
+    "scenarios": "node scenarios.js",
+    "telog": "node telog/server.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "1.14.6",
+    "@hyperledger/fabric-gateway": "1.13.0"
+  }
+}

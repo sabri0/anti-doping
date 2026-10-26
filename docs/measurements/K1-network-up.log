@@ -1,0 +1,1530 @@
+[0;34m[network-up][0m consensus=raft state-db=couchdb network-cpus=0-5
+wrote docker-compose.yaml (1014 lines, state database couchdb, network processors 0-5)
+[0;34m[network-up][0m clearing previous cryptographic material
+[0;34m[network-up][0m starting certification authorities
+ Network antidoping_v2 Creating 
+ Network antidoping_v2 Created 
+ Container ca-athlete Creating 
+ Container ca-tools Creating 
+ Container ca-federation Creating 
+ Container ca-lab Creating 
+ Container ca-nado Creating 
+ Container ca-research Creating 
+ Container ca-nado Created 
+ Container ca-tools Created 
+ Container ca-athlete Created 
+ Container ca-research Created 
+ Container ca-federation Created 
+ Container ca-lab Created 
+ Container ca-federation Starting 
+ Container ca-athlete Starting 
+ Container ca-research Starting 
+ Container ca-tools Starting 
+ Container ca-nado Starting 
+ Container ca-lab Starting 
+ Container ca-tools Started 
+ Container ca-athlete Started 
+ Container ca-research Started 
+ Container ca-lab Started 
+ Container ca-federation Started 
+ Container ca-nado Started 
+[0;34m[network-up][0m waiting for CA signing certificates
+[0;34m[network-up][0m enrolling identities (5 CAs, 4 ordering nodes, 10 peers)
+[0;34m[enroll][0m org athlete -> ca-athlete:7054
+2026/10/26 10:57:36 [INFO] Created a default configuration file at /work/network/organizations/peerOrganizations/athlete.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:36 [INFO] TLS Enabled
+2026/10/26 10:57:36 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:36 [INFO] encoded CSR
+2026/10/26 10:57:36 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:36 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/msp/cacerts/ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:36 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:36 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:36 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/athlete.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:37 [INFO] TLS Enabled
+2026/10/26 10:57:37 [INFO] TLS Enabled
+2026/10/26 10:57:37 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/athlete.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:37 [INFO] TLS Enabled
+2026/10/26 10:57:37 [INFO] TLS Enabled
+2026/10/26 10:57:37 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/athlete.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:37 [INFO] TLS Enabled
+2026/10/26 10:57:37 [INFO] TLS Enabled
+2026/10/26 10:57:37 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/athlete.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:38 [INFO] TLS Enabled
+2026/10/26 10:57:38 [INFO] TLS Enabled
+2026/10/26 10:57:38 [INFO] TLS Enabled
+2026/10/26 10:57:38 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:38 [INFO] encoded CSR
+2026/10/26 10:57:38 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:38 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/msp/cacerts/ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:38 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:38 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:38 [INFO] TLS Enabled
+2026/10/26 10:57:38 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:38 [INFO] encoded CSR
+2026/10/26 10:57:39 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:39 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/tls/tlscacerts/tls-ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:39 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:39 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer0.athlete.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:39 [INFO] TLS Enabled
+2026/10/26 10:57:39 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:39 [INFO] encoded CSR
+2026/10/26 10:57:39 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:39 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/msp/cacerts/ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:39 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:39 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:39 [INFO] TLS Enabled
+2026/10/26 10:57:39 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:39 [INFO] encoded CSR
+2026/10/26 10:57:40 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:40 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/tls/tlscacerts/tls-ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:40 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:40 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/peers/peer1.athlete.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:40 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/athlete.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:40 [INFO] TLS Enabled
+2026/10/26 10:57:40 [INFO] TLS Enabled
+2026/10/26 10:57:40 [INFO] TLS Enabled
+2026/10/26 10:57:40 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:40 [INFO] encoded CSR
+2026/10/26 10:57:40 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:40 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/msp/cacerts/ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:40 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:40 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:41 [INFO] TLS Enabled
+2026/10/26 10:57:41 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:41 [INFO] encoded CSR
+2026/10/26 10:57:41 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:41 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/tlscacerts/tls-ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:41 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:41 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:41 [INFO] TLS Enabled
+2026/10/26 10:57:41 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:41 [INFO] encoded CSR
+2026/10/26 10:57:41 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/Admin@athlete.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:41 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/Admin@athlete.antidoping.org/msp/cacerts/ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:41 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/Admin@athlete.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:42 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/Admin@athlete.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:42 [INFO] TLS Enabled
+2026/10/26 10:57:42 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:42 [INFO] encoded CSR
+2026/10/26 10:57:42 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/User1@athlete.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:43 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/User1@athlete.antidoping.org/msp/cacerts/ca-athlete-7054-ca-athlete.pem
+2026/10/26 10:57:43 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/User1@athlete.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:43 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/athlete.antidoping.org/users/User1@athlete.antidoping.org/msp/IssuerRevocationPublicKey
+[0;34m[enroll][0m org federation -> ca-federation:8054
+2026/10/26 10:57:43 [INFO] Created a default configuration file at /work/network/organizations/peerOrganizations/federation.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:43 [INFO] TLS Enabled
+2026/10/26 10:57:43 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:43 [INFO] encoded CSR
+2026/10/26 10:57:44 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:44 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/msp/cacerts/ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:44 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:44 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:44 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/federation.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:44 [INFO] TLS Enabled
+2026/10/26 10:57:44 [INFO] TLS Enabled
+2026/10/26 10:57:44 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/federation.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:44 [INFO] TLS Enabled
+2026/10/26 10:57:44 [INFO] TLS Enabled
+2026/10/26 10:57:45 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/federation.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:45 [INFO] TLS Enabled
+2026/10/26 10:57:45 [INFO] TLS Enabled
+2026/10/26 10:57:45 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/federation.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:45 [INFO] TLS Enabled
+2026/10/26 10:57:45 [INFO] TLS Enabled
+2026/10/26 10:57:45 [INFO] TLS Enabled
+2026/10/26 10:57:45 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:45 [INFO] encoded CSR
+2026/10/26 10:57:46 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:46 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/msp/cacerts/ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:46 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:46 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:46 [INFO] TLS Enabled
+2026/10/26 10:57:46 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:46 [INFO] encoded CSR
+2026/10/26 10:57:46 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:46 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/tls/tlscacerts/tls-ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:46 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:46 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer0.federation.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:46 [INFO] TLS Enabled
+2026/10/26 10:57:46 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:46 [INFO] encoded CSR
+2026/10/26 10:57:46 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:46 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/msp/cacerts/ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:47 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:47 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:47 [INFO] TLS Enabled
+2026/10/26 10:57:47 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:47 [INFO] encoded CSR
+2026/10/26 10:57:47 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:47 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/tls/tlscacerts/tls-ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:47 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:47 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/peers/peer1.federation.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:47 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/federation.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:47 [INFO] TLS Enabled
+2026/10/26 10:57:47 [INFO] TLS Enabled
+2026/10/26 10:57:48 [INFO] TLS Enabled
+2026/10/26 10:57:48 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:48 [INFO] encoded CSR
+2026/10/26 10:57:48 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:48 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/msp/cacerts/ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:48 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:48 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:48 [INFO] TLS Enabled
+2026/10/26 10:57:48 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:48 [INFO] encoded CSR
+2026/10/26 10:57:48 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:48 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/tlscacerts/tls-ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:48 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:48 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:49 [INFO] TLS Enabled
+2026/10/26 10:57:49 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:49 [INFO] encoded CSR
+2026/10/26 10:57:49 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/Admin@federation.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:49 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/Admin@federation.antidoping.org/msp/cacerts/ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:49 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/Admin@federation.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:49 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/Admin@federation.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:49 [INFO] TLS Enabled
+2026/10/26 10:57:49 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:49 [INFO] encoded CSR
+2026/10/26 10:57:49 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/User1@federation.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:49 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/User1@federation.antidoping.org/msp/cacerts/ca-federation-8054-ca-federation.pem
+2026/10/26 10:57:49 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/User1@federation.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:49 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/federation.antidoping.org/users/User1@federation.antidoping.org/msp/IssuerRevocationPublicKey
+[0;34m[enroll][0m org nado -> ca-nado:9054
+2026/10/26 10:57:49 [INFO] Created a default configuration file at /work/network/organizations/peerOrganizations/nado.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:50 [INFO] TLS Enabled
+2026/10/26 10:57:50 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:50 [INFO] encoded CSR
+2026/10/26 10:57:50 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:50 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/msp/cacerts/ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:50 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:50 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:50 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/nado.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:50 [INFO] TLS Enabled
+2026/10/26 10:57:50 [INFO] TLS Enabled
+2026/10/26 10:57:50 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/nado.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:50 [INFO] TLS Enabled
+2026/10/26 10:57:50 [INFO] TLS Enabled
+2026/10/26 10:57:51 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/nado.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:51 [INFO] TLS Enabled
+2026/10/26 10:57:51 [INFO] TLS Enabled
+2026/10/26 10:57:51 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/nado.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:51 [INFO] TLS Enabled
+2026/10/26 10:57:51 [INFO] TLS Enabled
+2026/10/26 10:57:52 [INFO] TLS Enabled
+2026/10/26 10:57:52 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:52 [INFO] encoded CSR
+2026/10/26 10:57:52 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:52 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/msp/cacerts/ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:52 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:52 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:53 [INFO] TLS Enabled
+2026/10/26 10:57:53 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:53 [INFO] encoded CSR
+2026/10/26 10:57:53 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:53 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/tls/tlscacerts/tls-ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:53 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:53 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer0.nado.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:53 [INFO] TLS Enabled
+2026/10/26 10:57:53 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:53 [INFO] encoded CSR
+2026/10/26 10:57:53 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:53 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/msp/cacerts/ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:53 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:53 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:54 [INFO] TLS Enabled
+2026/10/26 10:57:54 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:54 [INFO] encoded CSR
+2026/10/26 10:57:54 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:54 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/tls/tlscacerts/tls-ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:54 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:54 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/peers/peer1.nado.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:54 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/nado.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:54 [INFO] TLS Enabled
+2026/10/26 10:57:54 [INFO] TLS Enabled
+2026/10/26 10:57:54 [INFO] TLS Enabled
+2026/10/26 10:57:54 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:54 [INFO] encoded CSR
+2026/10/26 10:57:55 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:55 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/msp/cacerts/ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:55 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:55 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:55 [INFO] TLS Enabled
+2026/10/26 10:57:55 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:55 [INFO] encoded CSR
+2026/10/26 10:57:55 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:55 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/tlscacerts/tls-ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:55 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:55 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:56 [INFO] TLS Enabled
+2026/10/26 10:57:56 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:56 [INFO] encoded CSR
+2026/10/26 10:57:56 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/Admin@nado.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:56 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/Admin@nado.antidoping.org/msp/cacerts/ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:56 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/Admin@nado.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:56 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/Admin@nado.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:56 [INFO] TLS Enabled
+2026/10/26 10:57:56 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:56 [INFO] encoded CSR
+2026/10/26 10:57:56 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/User1@nado.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:56 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/User1@nado.antidoping.org/msp/cacerts/ca-nado-9054-ca-nado.pem
+2026/10/26 10:57:56 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/User1@nado.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:56 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/nado.antidoping.org/users/User1@nado.antidoping.org/msp/IssuerRevocationPublicKey
+[0;34m[enroll][0m org lab -> ca-lab:10054
+2026/10/26 10:57:56 [INFO] Created a default configuration file at /work/network/organizations/peerOrganizations/lab.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:56 [INFO] TLS Enabled
+2026/10/26 10:57:56 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:56 [INFO] encoded CSR
+2026/10/26 10:57:57 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:57 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/msp/cacerts/ca-lab-10054-ca-lab.pem
+2026/10/26 10:57:57 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:57 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:57 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/lab.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:57 [INFO] TLS Enabled
+2026/10/26 10:57:57 [INFO] TLS Enabled
+2026/10/26 10:57:57 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/lab.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:57 [INFO] TLS Enabled
+2026/10/26 10:57:57 [INFO] TLS Enabled
+2026/10/26 10:57:57 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/lab.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:57 [INFO] TLS Enabled
+2026/10/26 10:57:57 [INFO] TLS Enabled
+2026/10/26 10:57:58 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/lab.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:57:58 [INFO] TLS Enabled
+2026/10/26 10:57:58 [INFO] TLS Enabled
+2026/10/26 10:57:58 [INFO] TLS Enabled
+2026/10/26 10:57:58 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:58 [INFO] encoded CSR
+2026/10/26 10:57:58 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:58 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/msp/cacerts/ca-lab-10054-ca-lab.pem
+2026/10/26 10:57:58 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:58 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:57:59 [INFO] TLS Enabled
+2026/10/26 10:57:59 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:59 [INFO] encoded CSR
+2026/10/26 10:57:59 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:57:59 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/tls/tlscacerts/tls-ca-lab-10054-ca-lab.pem
+2026/10/26 10:57:59 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:57:59 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer0.lab.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:57:59 [INFO] TLS Enabled
+2026/10/26 10:57:59 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:57:59 [INFO] encoded CSR
+2026/10/26 10:57:59 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:57:59 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/msp/cacerts/ca-lab-10054-ca-lab.pem
+2026/10/26 10:57:59 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:57:59 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:58:00 [INFO] TLS Enabled
+2026/10/26 10:58:00 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:00 [INFO] encoded CSR
+2026/10/26 10:58:00 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:58:00 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/tls/tlscacerts/tls-ca-lab-10054-ca-lab.pem
+2026/10/26 10:58:00 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:58:00 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/peers/peer1.lab.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:58:00 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/lab.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:58:00 [INFO] TLS Enabled
+2026/10/26 10:58:00 [INFO] TLS Enabled
+2026/10/26 10:58:01 [INFO] TLS Enabled
+2026/10/26 10:58:01 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:01 [INFO] encoded CSR
+2026/10/26 10:58:01 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:01 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/msp/cacerts/ca-lab-10054-ca-lab.pem
+2026/10/26 10:58:01 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:01 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:58:01 [INFO] TLS Enabled
+2026/10/26 10:58:01 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:01 [INFO] encoded CSR
+2026/10/26 10:58:02 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:58:02 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/tlscacerts/tls-ca-lab-10054-ca-lab.pem
+2026/10/26 10:58:02 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:58:02 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:58:02 [INFO] TLS Enabled
+2026/10/26 10:58:02 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:02 [INFO] encoded CSR
+2026/10/26 10:58:02 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/Admin@lab.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:02 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/Admin@lab.antidoping.org/msp/cacerts/ca-lab-10054-ca-lab.pem
+2026/10/26 10:58:02 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/Admin@lab.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:02 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/Admin@lab.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:58:02 [INFO] TLS Enabled
+2026/10/26 10:58:02 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:02 [INFO] encoded CSR
+2026/10/26 10:58:03 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/User1@lab.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:03 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/User1@lab.antidoping.org/msp/cacerts/ca-lab-10054-ca-lab.pem
+2026/10/26 10:58:03 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/User1@lab.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:03 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/lab.antidoping.org/users/User1@lab.antidoping.org/msp/IssuerRevocationPublicKey
+[0;34m[enroll][0m org research -> ca-research:11054
+2026/10/26 10:58:03 [INFO] Created a default configuration file at /work/network/organizations/peerOrganizations/research.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:58:03 [INFO] TLS Enabled
+2026/10/26 10:58:03 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:03 [INFO] encoded CSR
+2026/10/26 10:58:03 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:03 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/msp/cacerts/ca-research-11054-ca-research.pem
+2026/10/26 10:58:03 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/research.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:03 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/research.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:58:03 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/research.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:58:03 [INFO] TLS Enabled
+2026/10/26 10:58:04 [INFO] TLS Enabled
+2026/10/26 10:58:04 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/research.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:58:04 [INFO] TLS Enabled
+2026/10/26 10:58:04 [INFO] TLS Enabled
+2026/10/26 10:58:05 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/research.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:58:05 [INFO] TLS Enabled
+2026/10/26 10:58:05 [INFO] TLS Enabled
+2026/10/26 10:58:06 [INFO] Configuration file location: /work/network/organizations/peerOrganizations/research.antidoping.org/fabric-ca-client-config.yaml
+2026/10/26 10:58:06 [INFO] TLS Enabled
+2026/10/26 10:58:06 [INFO] TLS Enabled
+2026/10/26 10:58:06 [INFO] TLS Enabled
+2026/10/26 10:58:06 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:06 [INFO] encoded CSR
+2026/10/26 10:58:06 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:06 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/msp/cacerts/ca-research-11054-ca-research.pem
+2026/10/26 10:58:06 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:06 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:58:07 [INFO] TLS Enabled
+2026/10/26 10:58:07 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:07 [INFO] encoded CSR
+2026/10/26 10:58:07 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:58:07 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/tls/tlscacerts/tls-ca-research-11054-ca-research.pem
+2026/10/26 10:58:07 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:58:07 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer0.research.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:58:07 [INFO] TLS Enabled
+2026/10/26 10:58:07 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:07 [INFO] encoded CSR
+2026/10/26 10:58:07 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:07 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/msp/cacerts/ca-research-11054-ca-research.pem
+2026/10/26 10:58:07 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:07 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:58:08 [INFO] TLS Enabled
+2026/10/26 10:58:08 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:08 [INFO] encoded CSR
+2026/10/26 10:58:08 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/tls/signcerts/cert.pem
+2026/10/26 10:58:08 [INFO] Stored TLS root CA certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/tls/tlscacerts/tls-ca-research-11054-ca-research.pem
+2026/10/26 10:58:08 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/tls/IssuerPublicKey
+2026/10/26 10:58:08 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/research.antidoping.org/peers/peer1.research.antidoping.org/tls/IssuerRevocationPublicKey
+2026/10/26 10:58:08 [INFO] TLS Enabled
+2026/10/26 10:58:08 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:08 [INFO] encoded CSR
+2026/10/26 10:58:08 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/users/Admin@research.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:08 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/users/Admin@research.antidoping.org/msp/cacerts/ca-research-11054-ca-research.pem
+2026/10/26 10:58:08 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/research.antidoping.org/users/Admin@research.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:08 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/research.antidoping.org/users/Admin@research.antidoping.org/msp/IssuerRevocationPublicKey
+2026/10/26 10:58:09 [INFO] TLS Enabled
+2026/10/26 10:58:09 [INFO] generating key: &{A:ecdsa S:256}
+2026/10/26 10:58:09 [INFO] encoded CSR
+2026/10/26 10:58:09 [INFO] Stored client certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/users/User1@research.antidoping.org/msp/signcerts/cert.pem
+2026/10/26 10:58:09 [INFO] Stored root CA certificate at /work/network/organizations/peerOrganizations/research.antidoping.org/users/User1@research.antidoping.org/msp/cacerts/ca-research-11054-ca-research.pem
+2026/10/26 10:58:09 [INFO] Stored Issuer public key at /work/network/organizations/peerOrganizations/research.antidoping.org/users/User1@research.antidoping.org/msp/IssuerPublicKey
+2026/10/26 10:58:09 [INFO] Stored Issuer revocation public key at /work/network/organizations/peerOrganizations/research.antidoping.org/users/User1@research.antidoping.org/msp/IssuerRevocationPublicKey
+[0;34m[enroll][0m all identities enrolled across 5 certification authorities
+[0;34m[network-up][0m starting ordering nodes, peers, state databases and IPFS
+ Volume antidoping-v2_orderer.athlete.antidoping.org Creating 
+ Volume antidoping-v2_orderer.athlete.antidoping.org Created 
+ Container orderer.athlete.antidoping.org Creating 
+ Container orderer.athlete.antidoping.org Created 
+ Container orderer.athlete.antidoping.org Starting 
+ Container orderer.athlete.antidoping.org Started 
+ Volume antidoping-v2_orderer.federation.antidoping.org Creating 
+ Volume antidoping-v2_orderer.federation.antidoping.org Created 
+ Container orderer.federation.antidoping.org Creating 
+ Container orderer.federation.antidoping.org Created 
+ Container orderer.federation.antidoping.org Starting 
+ Container orderer.federation.antidoping.org Started 
+ Volume antidoping-v2_orderer.nado.antidoping.org Creating 
+ Volume antidoping-v2_orderer.nado.antidoping.org Created 
+ Container orderer.nado.antidoping.org Creating 
+ Container orderer.nado.antidoping.org Created 
+ Container orderer.nado.antidoping.org Starting 
+ Container orderer.nado.antidoping.org Started 
+ Volume antidoping-v2_orderer.lab.antidoping.org Creating 
+ Volume antidoping-v2_orderer.lab.antidoping.org Created 
+ Container orderer.lab.antidoping.org Creating 
+ Container orderer.lab.antidoping.org Created 
+ Container orderer.lab.antidoping.org Starting 
+ Container orderer.lab.antidoping.org Started 
+ Image antidoping/fabric-tools:3.1.5 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 573B 0.1s done
+#1 DONE 0.1s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 499B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/hyperledger/fabric-tools:2.5.16
+#3 DONE 0.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B 0.0s done
+#4 DONE 0.1s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [1/3] FROM docker.io/hyperledger/fabric-tools:2.5.16@sha256:1d163b2513453637c2eb8ffe00bfb367f6edb2fb824604818f30646f552c9f42
+#6 resolve docker.io/hyperledger/fabric-tools:2.5.16@sha256:1d163b2513453637c2eb8ffe00bfb367f6edb2fb824604818f30646f552c9f42 0.0s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 303B done
+#5 DONE 0.0s
+
+#7 [2/3] COPY bin/ /usr/local/bin/
+#7 CACHED
+
+#8 [3/3] RUN peer version | head -3 && configtxgen --version
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers 0.0s done
+#9 exporting manifest sha256:4dde22606c3030c6b54595825495e7b4cd89e99c920fe7f5f07759f2e08f3cce
+#9 exporting manifest sha256:4dde22606c3030c6b54595825495e7b4cd89e99c920fe7f5f07759f2e08f3cce done
+#9 exporting config sha256:e760f0d181c235ca0f412a66f3269b1d3a719e4217561489314e03fe68e0df4d done
+#9 exporting attestation manifest sha256:2288d25a658a98839ede1ec63630517a05a86a85b4ca8047d18adeb09758db66 0.1s done
+#9 exporting manifest list sha256:551db2e587742c7b248d22a33d7767f0d419b136fca04d589771d326d03182ba
+#9 exporting manifest list sha256:551db2e587742c7b248d22a33d7767f0d419b136fca04d589771d326d03182ba 0.0s done
+#9 naming to docker.io/antidoping/fabric-tools:3.1.5 done
+#9 unpacking to docker.io/antidoping/fabric-tools:3.1.5 0.0s done
+#9 DONE 0.3s
+
+#10 resolving provenance for metadata file
+#10 DONE 0.0s
+ Image antidoping/fabric-tools:3.1.5 Built 
+ Container cli Creating 
+ Container cli Created 
+ Container cli Starting 
+ Container cli Started 
+ Volume antidoping-v2_ipfs1-data Creating 
+ Volume antidoping-v2_ipfs1-data Created 
+ Volume antidoping-v2_ipfs2-data Creating 
+ Volume antidoping-v2_ipfs2-data Created 
+ Volume antidoping-v2_ipfs0-data Creating 
+ Volume antidoping-v2_ipfs0-data Created 
+ Container ipfs2 Creating 
+ Container ipfs0 Creating 
+ Container ipfs1 Creating 
+ Container ipfs1 Created 
+ Container ipfs2 Created 
+ Container ipfs0 Created 
+ Container ipfs0 Starting 
+ Container ipfs1 Starting 
+ Container ipfs2 Starting 
+ Container ipfs2 Started 
+ Container ipfs0 Started 
+ Container ipfs1 Started 
+ Volume antidoping-v2_peer0.athlete.antidoping.org Creating 
+ Volume antidoping-v2_peer0.athlete.antidoping.org Created 
+ Volume antidoping-v2_peer1.athlete.antidoping.org Creating 
+ Volume antidoping-v2_peer1.athlete.antidoping.org Created 
+ Volume antidoping-v2_couchdb1-athlete Creating 
+ Volume antidoping-v2_couchdb1-athlete Created 
+ Volume antidoping-v2_couchdb0-athlete Creating 
+ Volume antidoping-v2_couchdb0-athlete Created 
+ Container couchdb0-athlete Creating 
+ Container couchdb1-athlete Creating 
+ Container couchdb1-athlete Created 
+ Container peer1.athlete.antidoping.org Creating 
+ Container couchdb0-athlete Created 
+ Container peer0.athlete.antidoping.org Creating 
+ Container peer1.athlete.antidoping.org Created 
+ Container peer0.athlete.antidoping.org Created 
+ Container couchdb1-athlete Starting 
+ Container couchdb0-athlete Starting 
+ Container couchdb0-athlete Started 
+ Container couchdb0-athlete Waiting 
+ Container couchdb1-athlete Started 
+ Container couchdb1-athlete Waiting 
+ Container couchdb0-athlete Healthy 
+ Container peer0.athlete.antidoping.org Starting 
+ Container couchdb1-athlete Healthy 
+ Container peer1.athlete.antidoping.org Starting 
+ Container peer0.athlete.antidoping.org Started 
+ Container peer1.athlete.antidoping.org Started 
+ Volume antidoping-v2_couchdb1-federation Creating 
+ Volume antidoping-v2_couchdb1-federation Created 
+ Volume antidoping-v2_couchdb0-federation Creating 
+ Volume antidoping-v2_couchdb0-federation Created 
+ Volume antidoping-v2_peer1.federation.antidoping.org Creating 
+ Volume antidoping-v2_peer1.federation.antidoping.org Created 
+ Volume antidoping-v2_peer0.federation.antidoping.org Creating 
+ Volume antidoping-v2_peer0.federation.antidoping.org Created 
+ Container couchdb0-federation Creating 
+ Container couchdb1-federation Creating 
+ Container couchdb1-federation Created 
+ Container peer1.federation.antidoping.org Creating 
+ Container couchdb0-federation Created 
+ Container peer0.federation.antidoping.org Creating 
+ Container peer1.federation.antidoping.org Created 
+ Container peer0.federation.antidoping.org Created 
+ Container couchdb1-federation Starting 
+ Container couchdb0-federation Starting 
+ Container couchdb0-federation Started 
+ Container couchdb0-federation Waiting 
+ Container couchdb1-federation Started 
+ Container couchdb1-federation Waiting 
+ Container couchdb0-federation Healthy 
+ Container peer0.federation.antidoping.org Starting 
+ Container couchdb1-federation Healthy 
+ Container peer1.federation.antidoping.org Starting 
+ Container peer0.federation.antidoping.org Started 
+ Container peer1.federation.antidoping.org Started 
+ Volume antidoping-v2_couchdb1-nado Creating 
+ Volume antidoping-v2_couchdb1-nado Created 
+ Volume antidoping-v2_peer1.nado.antidoping.org Creating 
+ Volume antidoping-v2_peer1.nado.antidoping.org Created 
+ Volume antidoping-v2_peer0.nado.antidoping.org Creating 
+ Volume antidoping-v2_peer0.nado.antidoping.org Created 
+ Volume antidoping-v2_couchdb0-nado Creating 
+ Volume antidoping-v2_couchdb0-nado Created 
+ Container couchdb0-nado Creating 
+ Container couchdb1-nado Creating 
+ Container couchdb0-nado Created 
+ Container peer0.nado.antidoping.org Creating 
+ Container couchdb1-nado Created 
+ Container peer1.nado.antidoping.org Creating 
+ Container peer1.nado.antidoping.org Created 
+ Container peer0.nado.antidoping.org Created 
+ Container couchdb1-nado Starting 
+ Container couchdb0-nado Starting 
+ Container couchdb1-nado Started 
+ Container couchdb1-nado Waiting 
+ Container couchdb0-nado Started 
+ Container couchdb0-nado Waiting 
+ Container couchdb1-nado Healthy 
+ Container peer1.nado.antidoping.org Starting 
+ Container couchdb0-nado Healthy 
+ Container peer0.nado.antidoping.org Starting 
+ Container peer1.nado.antidoping.org Started 
+ Container peer0.nado.antidoping.org Started 
+ Volume antidoping-v2_peer0.lab.antidoping.org Creating 
+ Volume antidoping-v2_peer0.lab.antidoping.org Created 
+ Volume antidoping-v2_couchdb1-lab Creating 
+ Volume antidoping-v2_couchdb1-lab Created 
+ Volume antidoping-v2_couchdb0-lab Creating 
+ Volume antidoping-v2_couchdb0-lab Created 
+ Volume antidoping-v2_peer1.lab.antidoping.org Creating 
+ Volume antidoping-v2_peer1.lab.antidoping.org Created 
+ Container couchdb0-lab Creating 
+ Container couchdb1-lab Creating 
+ Container couchdb0-lab Created 
+ Container peer0.lab.antidoping.org Creating 
+ Container couchdb1-lab Created 
+ Container peer1.lab.antidoping.org Creating 
+ Container peer0.lab.antidoping.org Created 
+ Container peer1.lab.antidoping.org Created 
+ Container couchdb0-lab Starting 
+ Container couchdb1-lab Starting 
+ Container couchdb1-lab Started 
+ Container couchdb1-lab Waiting 
+ Container couchdb0-lab Started 
+ Container couchdb0-lab Waiting 
+ Container couchdb1-lab Healthy 
+ Container peer1.lab.antidoping.org Starting 
+ Container couchdb0-lab Healthy 
+ Container peer0.lab.antidoping.org Starting 
+ Container peer1.lab.antidoping.org Started 
+ Container peer0.lab.antidoping.org Started 
+ Volume antidoping-v2_peer0.research.antidoping.org Creating 
+ Volume antidoping-v2_peer0.research.antidoping.org Created 
+ Volume antidoping-v2_couchdb1-research Creating 
+ Volume antidoping-v2_couchdb1-research Created 
+ Volume antidoping-v2_couchdb0-research Creating 
+ Volume antidoping-v2_couchdb0-research Created 
+ Volume antidoping-v2_peer1.research.antidoping.org Creating 
+ Volume antidoping-v2_peer1.research.antidoping.org Created 
+ Container couchdb1-research Creating 
+ Container couchdb0-research Creating 
+ Container couchdb0-research Created 
+ Container peer0.research.antidoping.org Creating 
+ Container couchdb1-research Created 
+ Container peer1.research.antidoping.org Creating 
+ Container peer0.research.antidoping.org Created 
+ Container peer1.research.antidoping.org Created 
+ Container couchdb0-research Starting 
+ Container couchdb1-research Starting 
+ Container couchdb0-research Started 
+ Container couchdb0-research Waiting 
+ Container couchdb1-research Started 
+ Container couchdb1-research Waiting 
+ Container couchdb0-research Healthy 
+ Container peer0.research.antidoping.org Starting 
+ Container peer0.research.antidoping.org Started 
+ Container couchdb1-research Healthy 
+ Container peer1.research.antidoping.org Starting 
+ Container peer1.research.antidoping.org Started 
+[0;34m[network-up][0m waiting for the ordering nodes
+[0;34m[channel][0m generating raft genesis block for antidopingchannel (profile AntidopingRaft)
+[34m2026-10-26 10:59:46.774 UTC 0001 INFO[0m [common.tools.configtxgen] [34;1mmain[0m -> Loading configuration
+[34m2026-10-26 10:59:46.850 UTC 0002 INFO[0m [common.tools.configtxgen.localconfig] [34;1mcompleteInitialization[0m -> orderer type: etcdraft
+[34m2026-10-26 10:59:46.851 UTC 0003 INFO[0m [common.tools.configtxgen.localconfig] [34;1mcompleteInitialization[0m -> Orderer.EtcdRaft.Options unset, setting to tick_interval:"500ms" election_tick:10 heartbeat_tick:1 max_inflight_blocks:5 snapshot_interval_size:16777216
+[34m2026-10-26 10:59:46.851 UTC 0004 INFO[0m [common.tools.configtxgen.localconfig] [34;1mLoad[0m -> Loaded configuration: /work/network/configtx/configtx.yaml
+[34m2026-10-26 10:59:47.452 UTC 0005 INFO[0m [common.tools.configtxgen] [34;1mdoOutputBlock[0m -> Generating genesis block
+[34m2026-10-26 10:59:47.452 UTC 0006 INFO[0m [common.tools.configtxgen] [34;1mdoOutputBlock[0m -> Creating application channel genesis block
+[34m2026-10-26 10:59:47.453 UTC 0007 INFO[0m [common.tools.configtxgen] [34;1mdoOutputBlock[0m -> Writing genesis block
+[0;34m[channel][0m joining orderer.athlete.antidoping.org
+Status: 201
+{
+	"name": "antidopingchannel",
+	"url": "/participation/v1/channels/antidopingchannel",
+	"consensusRelation": "consenter",
+	"status": "active",
+	"height": 1
+}
+
+[0;34m[channel][0m joining orderer.federation.antidoping.org
+Status: 201
+{
+	"name": "antidopingchannel",
+	"url": "/participation/v1/channels/antidopingchannel",
+	"consensusRelation": "consenter",
+	"status": "active",
+	"height": 1
+}
+
+[0;34m[channel][0m joining orderer.nado.antidoping.org
+Status: 201
+{
+	"name": "antidopingchannel",
+	"url": "/participation/v1/channels/antidopingchannel",
+	"consensusRelation": "consenter",
+	"status": "active",
+	"height": 1
+}
+
+[0;34m[channel][0m joining orderer.lab.antidoping.org
+Status: 201
+{
+	"name": "antidopingchannel",
+	"url": "/participation/v1/channels/antidopingchannel",
+	"consensusRelation": "consenter",
+	"status": "active",
+	"height": 1
+}
+
+[0;34m[channel][0m waiting for the ordering service to elect a leader
+[0;34m[channel][0m joining peer0.athlete.antidoping.org
+[34m2026-10-26 11:00:03.244 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer0.athlete.antidoping.org:7051"
+[34m2026-10-26 11:00:03.244 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer0.athlete.antidoping.org:7051"
+[34m2026-10-26 11:00:03.244 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer0.athlete.antidoping.org:7051", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:03.244 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer0.athlete.antidoping.org:7051"
+[34m2026-10-26 11:00:03.244 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:03.245 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer0.athlete.antidoping.org:7051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.athlete.antidoping.org:7051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:03.245 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:03.245 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x18a115442090] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer0.athlete.antidoping.org:7051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.athlete.antidoping.org:7051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:03.245 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:03.245 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:03.245 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:03.245 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer0.athlete.antidoping.org:7051" to connect
+[34m2026-10-26 11:00:03.254 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:03.254 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x18a115442090] SubConn 0x18a11548a190 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:03.254 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:03.254 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:04.023 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer1.athlete.antidoping.org
+[34m2026-10-26 11:00:05.014 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer1.athlete.antidoping.org:7061"
+[34m2026-10-26 11:00:05.014 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer1.athlete.antidoping.org:7061"
+[34m2026-10-26 11:00:05.014 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer1.athlete.antidoping.org:7061", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:05.014 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer1.athlete.antidoping.org:7061"
+[34m2026-10-26 11:00:05.014 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:05.015 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer1.athlete.antidoping.org:7061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.athlete.antidoping.org:7061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:05.024 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:05.039 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x340ef5898870] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer1.athlete.antidoping.org:7061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.athlete.antidoping.org:7061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:05.056 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:05.056 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:05.056 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:05.056 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer1.athlete.antidoping.org:7061" to connect
+[34m2026-10-26 11:00:05.066 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:05.067 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x340ef5898870] SubConn 0x340ef565abe0 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:05.067 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:05.067 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:06.617 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer0.federation.antidoping.org
+[34m2026-10-26 11:00:07.927 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer0.federation.antidoping.org:8051"
+[34m2026-10-26 11:00:07.927 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer0.federation.antidoping.org:8051"
+[34m2026-10-26 11:00:07.927 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer0.federation.antidoping.org:8051", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:07.927 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer0.federation.antidoping.org:8051"
+[34m2026-10-26 11:00:07.927 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:07.928 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer0.federation.antidoping.org:8051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.federation.antidoping.org:8051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:07.928 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:07.928 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x534899e4900] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer0.federation.antidoping.org:8051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.federation.antidoping.org:8051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:07.928 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:07.928 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:07.928 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:07.928 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer0.federation.antidoping.org:8051" to connect
+[34m2026-10-26 11:00:07.934 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:07.934 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x534899e4900] SubConn 0x534894b9900 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:07.934 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:07.934 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:08.462 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer1.federation.antidoping.org
+[34m2026-10-26 11:00:09.648 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer1.federation.antidoping.org:8061"
+[34m2026-10-26 11:00:09.648 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer1.federation.antidoping.org:8061"
+[34m2026-10-26 11:00:09.648 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer1.federation.antidoping.org:8061", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:09.648 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer1.federation.antidoping.org:8061"
+[34m2026-10-26 11:00:09.649 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:09.649 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer1.federation.antidoping.org:8061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.federation.antidoping.org:8061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:09.649 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:09.649 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1d1d9447b00] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer1.federation.antidoping.org:8061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.federation.antidoping.org:8061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:09.649 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:09.649 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:09.650 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:09.650 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer1.federation.antidoping.org:8061" to connect
+[34m2026-10-26 11:00:09.657 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:09.657 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1d1d9447b00] SubConn 0x1d1d930a230 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:09.657 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:09.657 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:10.144 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer0.nado.antidoping.org
+[34m2026-10-26 11:00:11.496 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer0.nado.antidoping.org:9051"
+[34m2026-10-26 11:00:11.496 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer0.nado.antidoping.org:9051"
+[34m2026-10-26 11:00:11.497 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer0.nado.antidoping.org:9051", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:11.497 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer0.nado.antidoping.org:9051"
+[34m2026-10-26 11:00:11.497 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:11.497 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer0.nado.antidoping.org:9051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.nado.antidoping.org:9051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:11.497 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:11.498 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1b78c6d59950] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer0.nado.antidoping.org:9051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.nado.antidoping.org:9051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:11.501 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:11.501 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:11.501 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:11.501 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer0.nado.antidoping.org:9051" to connect
+[34m2026-10-26 11:00:11.530 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:11.530 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1b78c6d59950] SubConn 0x1b78c6fb0280 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:11.530 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:11.530 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:13.035 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer1.nado.antidoping.org
+[34m2026-10-26 11:00:14.221 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer1.nado.antidoping.org:9061"
+[34m2026-10-26 11:00:14.222 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer1.nado.antidoping.org:9061"
+[34m2026-10-26 11:00:14.222 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer1.nado.antidoping.org:9061", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:14.222 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer1.nado.antidoping.org:9061"
+[34m2026-10-26 11:00:14.222 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:14.222 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer1.nado.antidoping.org:9061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.nado.antidoping.org:9061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:14.223 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:14.223 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1e4d307a8480] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer1.nado.antidoping.org:9061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.nado.antidoping.org:9061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:14.223 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:14.223 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:14.223 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:14.223 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer1.nado.antidoping.org:9061" to connect
+[34m2026-10-26 11:00:14.229 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:14.229 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1e4d307a8480] SubConn 0x1e4d30c859a0 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:14.229 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:14.230 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:14.780 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer0.lab.antidoping.org
+[34m2026-10-26 11:00:16.555 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer0.lab.antidoping.org:10051"
+[34m2026-10-26 11:00:16.556 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer0.lab.antidoping.org:10051"
+[34m2026-10-26 11:00:16.556 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer0.lab.antidoping.org:10051", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:16.556 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer0.lab.antidoping.org:10051"
+[34m2026-10-26 11:00:16.556 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:16.557 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer0.lab.antidoping.org:10051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.lab.antidoping.org:10051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:16.557 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:16.557 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x33314d636090] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer0.lab.antidoping.org:10051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.lab.antidoping.org:10051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:16.557 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:16.557 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:16.557 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:16.557 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer0.lab.antidoping.org:10051" to connect
+[34m2026-10-26 11:00:16.563 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:16.564 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x33314d636090] SubConn 0x33314da63130 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:16.564 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:16.564 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:17.334 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer1.lab.antidoping.org
+[34m2026-10-26 11:00:18.593 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer1.lab.antidoping.org:10061"
+[34m2026-10-26 11:00:18.593 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer1.lab.antidoping.org:10061"
+[34m2026-10-26 11:00:18.593 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer1.lab.antidoping.org:10061", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:18.593 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer1.lab.antidoping.org:10061"
+[34m2026-10-26 11:00:18.594 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:18.594 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer1.lab.antidoping.org:10061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.lab.antidoping.org:10061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:18.594 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:18.594 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x392dff026090] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer1.lab.antidoping.org:10061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.lab.antidoping.org:10061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:18.594 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:18.594 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:18.595 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:18.595 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer1.lab.antidoping.org:10061" to connect
+[34m2026-10-26 11:00:18.602 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:18.602 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x392dff026090] SubConn 0x392dff610370 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:18.602 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:18.602 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:19.159 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer0.research.antidoping.org
+[34m2026-10-26 11:00:20.091 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer0.research.antidoping.org:11051"
+[34m2026-10-26 11:00:20.092 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer0.research.antidoping.org:11051"
+[34m2026-10-26 11:00:20.092 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer0.research.antidoping.org:11051", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:20.092 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer0.research.antidoping.org:11051"
+[34m2026-10-26 11:00:20.092 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:20.092 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer0.research.antidoping.org:11051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.research.antidoping.org:11051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:20.092 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:20.092 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1f47354b8990] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer0.research.antidoping.org:11051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.research.antidoping.org:11051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:20.093 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:20.093 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:20.093 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:20.093 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer0.research.antidoping.org:11051" to connect
+[34m2026-10-26 11:00:20.098 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:20.099 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x1f47354b8990] SubConn 0x1f47355eb0e0 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:20.099 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:20.099 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:20.812 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m joining peer1.research.antidoping.org
+[34m2026-10-26 11:00:22.227 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer1.research.antidoping.org:11061"
+[34m2026-10-26 11:00:22.228 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer1.research.antidoping.org:11061"
+[34m2026-10-26 11:00:22.228 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer1.research.antidoping.org:11061", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:22.228 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer1.research.antidoping.org:11061"
+[34m2026-10-26 11:00:22.228 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:22.229 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer1.research.antidoping.org:11061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.research.antidoping.org:11061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:22.229 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:22.229 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x2a258441fd40] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer1.research.antidoping.org:11061",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer1.research.antidoping.org:11061",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:22.229 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:22.229 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:22.229 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:22.230 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer1.research.antidoping.org:11061" to connect
+[34m2026-10-26 11:00:22.236 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:22.237 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x2a258441fd40] SubConn 0x2a25844a5540 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:22.237 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:22.237 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+[34m2026-10-26 11:00:22.943 UTC 0011 INFO[0m [channelCmd] [34;1mexecuteJoin[0m -> Successfully submitted proposal to join channel
+[0;34m[channel][0m channel antidopingchannel created under raft; 4 orderers and 10 peers joined
+[34m2026-10-26 11:00:24.059 UTC 0001 INFO[0m [grpc] [34;1mInfof[0m -> [core] original dial target is: "peer0.nado.antidoping.org:9051"
+[34m2026-10-26 11:00:24.059 UTC 0002 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel created for target "peer0.nado.antidoping.org:9051"
+[34m2026-10-26 11:00:24.061 UTC 0003 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] parsed dial target is: resolver.Target{URL:url.URL{Scheme:"passthrough", Opaque:"", User:(*url.Userinfo)(nil), Host:"", Path:"/peer0.nado.antidoping.org:9051", Fragment:"", RawQuery:"", RawPath:"", RawFragment:"", ForceQuery:false, OmitHost:false}}
+[34m2026-10-26 11:00:24.061 UTC 0004 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel authority set to "peer0.nado.antidoping.org:9051"
+[34m2026-10-26 11:00:24.062 UTC 0005 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:24.063 UTC 0006 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Resolver state updated: {
+  "Addresses": [
+    {
+      "Addr": "peer0.nado.antidoping.org:9051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.nado.antidoping.org:9051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+} (resolver returned new addresses)
+[34m2026-10-26 11:00:24.063 UTC 0007 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel switches to new LB policy "pick_first"
+[34m2026-10-26 11:00:24.063 UTC 0008 INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x5ba15dca750] Received new config {
+  "shuffleAddressList": false
+}, resolver state {
+  "Addresses": [
+    {
+      "Addr": "peer0.nado.antidoping.org:9051",
+      "ServerName": "",
+      "Attributes": null,
+      "BalancerAttributes": null,
+      "Metadata": null
+    }
+  ],
+  "Endpoints": [
+    {
+      "Addresses": [
+        {
+          "Addr": "peer0.nado.antidoping.org:9051",
+          "ServerName": "",
+          "Attributes": null,
+          "BalancerAttributes": null,
+          "Metadata": null
+        }
+      ],
+      "Attributes": null
+    }
+  ],
+  "ServiceConfig": null,
+  "Attributes": null
+}
+[34m2026-10-26 11:00:24.063 UTC 0009 INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel created
+[34m2026-10-26 11:00:24.063 UTC 000a INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel exiting idle mode
+[34m2026-10-26 11:00:24.064 UTC 000b INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to CONNECTING
+[34m2026-10-26 11:00:24.064 UTC 000c INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel picks a new address "peer0.nado.antidoping.org:9051" to connect
+[34m2026-10-26 11:00:24.080 UTC 000d INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1 SubChannel #2] Subchannel Connectivity change to READY
+[34m2026-10-26 11:00:24.080 UTC 000e INFO[0m [grpc] [34;1mInfof[0m -> [pick-first-leaf-lb] [pick-first-leaf-lb 0x5ba15dca750] SubConn 0x5ba15f80370 reported connectivity state READY and the health listener is disabled. Transitioning SubConn to READY.
+[34m2026-10-26 11:00:24.080 UTC 000f INFO[0m [grpc] [34;1mAddTraceEvent[0m -> [core] [Channel #1] Channel Connectivity change to READY
+[34m2026-10-26 11:00:24.080 UTC 0010 INFO[0m [channelCmd] [34;1mInitCmdFactory[0m -> Endorser and orderer connections initialized
+Channels peers has joined: 
+antidopingchannel
+[0;34m[network-up][0m network is up
+NAME                                STATUS
+ca-athlete                          Up 2 minutes
+ca-federation                       Up 2 minutes
+ca-lab                              Up 2 minutes
+ca-nado                             Up 2 minutes
+ca-research                         Up 2 minutes
+ca-tools                            Up 2 minutes
+cli                                 Up 2 minutes
+couchdb0-athlete                    Up About a minute (healthy)
+couchdb0-federation                 Up About a minute (healthy)
+couchdb0-lab                        Up About a minute (healthy)
+couchdb0-nado                       Up About a minute (healthy)
+couchdb0-research                   Up 56 seconds (healthy)
+couchdb1-athlete                    Up About a minute (healthy)
+couchdb1-federation                 Up About a minute (healthy)
+couchdb1-lab                        Up About a minute (healthy)
+couchdb1-nado                       Up About a minute (healthy)
+couchdb1-research                   Up 56 seconds (healthy)
+ipfs0                               Up About a minute (healthy)
+ipfs1                               Up About a minute (healthy)
+ipfs2                               Up About a minute (healthy)
+orderer.athlete.antidoping.org      Up 2 minutes
+orderer.federation.antidoping.org   Up 2 minutes
+orderer.lab.antidoping.org          Up 2 minutes
+orderer.nado.antidoping.org         Up 2 minutes
+peer0.athlete.antidoping.org        Up About a minute
+peer0.federation.antidoping.org     Up About a minute
+peer0.lab.antidoping.org            Up About a minute
+peer0.nado.antidoping.org           Up About a minute
+peer0.research.antidoping.org       Up 49 seconds
+peer1.athlete.antidoping.org        Up About a minute
+peer1.federation.antidoping.org     Up About a minute
+peer1.lab.antidoping.org            Up About a minute
+peer1.nado.antidoping.org           Up About a minute
+peer1.research.antidoping.org       Up 44 seconds

@@ -1,505 +1,575 @@
 /**
  * Unit tests for the chain-of-custody contract.
  *
- * These cover the properties the manuscript asserts but never demonstrated:
- * organizational-class authorization, cross-organizational endorsement on
- * critical keys, Prohibited List hash verification, the rolling 12-month
- * whereabouts window, the GDPR Article 22 oversight precondition, and the
- * Article 14.1 confidentiality gate.
+ * Beyond organisational-class authorisation and the regulatory preconditions,
+ * these cover the three properties that endorsement alone does not give:
+ * two-party attestation of every handover and of every change to a committed
+ * results-management record; confidentiality of results-management state
+ * (nothing private reaches public state, events or responses); and bounded,
+ * monotonic transaction time.
  */
 
 import { expect } from 'chai';
 import { Context } from 'fabric-contract-api';
 import { KeyEndorsementPolicy } from 'fabric-shim';
-import { CustodyContract } from '../src/custodyContract';
+import { CustodyContract, setPeerClockForTesting } from '../src/custodyContract';
 import { ResultsAction } from '../src/resultsDecision';
-import { asOrg, mockContext } from './mockContext';
+import { RESULTS_COLLECTION } from '../src/types';
+import { asOrg, mockContext, MockStub } from './mockContext';
 
 const SAMPLE = 'SMP-2026-000123';
-const ATHLETE = 'a'.repeat(64); // pseudonymized SHA-256 digest
+const ATHLETE = 'a'.repeat(64); // keyed pseudonym (HMAC-SHA-256, hex)
+const SEAL = 'seal-' + 'b'.repeat(32);
 const LIST_VERSION = '2026-01';
 const LIST_HASH = 'f'.repeat(64);
+const SUBSTANCE = 'Erythropoietin';
+
+/** A fresh contract and context whose endorsing-peer clock follows the transaction clock. */
+function fresh(msp = 'NADOMSP') {
+  const cc = new CustodyContract();
+  const { ctx, stub } = mockContext(msp);
+  setPeerClockForTesting(() => stub.now.getTime());
+  return { cc, ctx, stub };
+}
 
 async function registerList(cc: CustodyContract, ctx: Context) {
   await cc.registerProhibitedList(asOrg(ctx, 'NADOMSP'), LIST_VERSION, LIST_HASH);
 }
 
-/** Drive a sample through a complete, valid chain of custody. */
+async function open(cc: CustodyContract, ctx: Context) {
+  await cc.initiateSampleCustody(asOrg(ctx, 'NADOMSP'), SAMPLE, ATHLETE, SEAL, 'dcf-digest');
+}
+
+/** Drive a sample through a complete, valid, attested chain of custody. */
 async function validCustodyChain(cc: CustodyContract, ctx: Context) {
-  await cc.initiateSampleCustody(
-    asOrg(ctx, 'NADOMSP'),
-    SAMPLE,
-    ATHLETE,
-    'seal-' + 'b'.repeat(32),
-    'Tunis National Testing Centre',
-  );
-  await cc.recordCustodyTransfer(
-    asOrg(ctx, 'NADOMSP'),
-    SAMPLE,
-    'TRANSPORT_HANDOFF',
-    'NADOMSP',
-    'LabMSP',
-    'true',
-    '48',
-  );
-  await cc.recordCustodyTransfer(
-    asOrg(ctx, 'LabMSP'),
-    SAMPLE,
-    'LABORATORY_RECEIPT',
-    'NADOMSP',
-    'LabMSP',
-    'true',
-    '48',
-  );
+  await open(cc, ctx);
+  await cc.acknowledgeSampleCollection(asOrg(ctx, 'AthleteMSP'), SAMPLE, SEAL);
+  await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+  await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL);
+}
+
+async function analyse(cc: CustodyContract, ctx: Context, stub: MockStub, accreditation = 'VERIFIED') {
+  stub.setInput({
+    adverse: true,
+    substance: SUBSTANCE,
+    prohibitedListVersion: LIST_VERSION,
+    prohibitedListHash: LIST_HASH,
+    laboratoryAccreditation: accreditation,
+  });
+  await cc.recordSampleAnalysisResult(asOrg(ctx, 'LabMSP'), SAMPLE);
+}
+
+async function results(cc: CustodyContract, ctx: Context) {
+  return JSON.parse(await cc.getResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE));
 }
 
 describe('initiateSampleCustody — WADA Article 5.3', () => {
   it('only a NADO identity may open a custody chain', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('FederationMSP');
-    await expect(
-      cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Stadium'),
-    ).to.be.rejectedWith(/authorization denied/);
+    const { cc, ctx } = fresh('FederationMSP');
+    await expect(cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, SEAL, 'd')).to.be.rejectedWith(
+      /authorization denied/,
+    );
   });
 
-  it('writes a pseudonymized record and notifies the athlete', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
-    const out = JSON.parse(
-      await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal-hash', 'Tunis'),
-    );
+  it('writes a pseudonymous record, binds it to NADO and laboratory, and notifies the athlete', async () => {
+    const { cc, ctx, stub } = fresh();
+    const out = JSON.parse(await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, SEAL, 'd'));
     expect(out.athleteHash).to.equal(ATHLETE);
     expect(out.status).to.equal('IN_CUSTODY');
     expect(stub.events.map((e) => e.name)).to.include('SampleCustodyInitiated');
-  });
-
-  it('rejects an identifier that is not a pseudonymized digest', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await expect(
-      cc.initiateSampleCustody(ctx, SAMPLE, 'John Smith', 'seal', 'Tunis'),
-    ).to.be.rejectedWith(/pseudonymized digest/);
-  });
-
-  it('refuses to open the same sample twice', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis');
-    await expect(
-      cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis'),
-    ).to.be.rejectedWith(/already exists/);
-  });
-});
-
-describe('recordCustodyTransfer — WADA Article 5.4', () => {
-  it('binds the transfer key to both parties by state-based endorsement', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
-    await validCustodyChain(cc, ctx);
-
-    const key = stub.createCompositeKey('CUSTODY', [SAMPLE, '1']);
-    const ep = await stub.getStateValidationParameter(key);
-    expect(ep.length, 'transfer key carries no endorsement policy').to.be.greaterThan(0);
-    // Decode the serialized SignaturePolicyEnvelope rather than string-matching it.
+    const ep = await stub.getStateValidationParameter(stub.createCompositeKey('SAMPLE', [SAMPLE]));
     expect(new KeyEndorsementPolicy(ep).listOrgs()).to.have.members(['NADOMSP', 'LabMSP']);
   });
 
-  it('rejects a submitter that is party to neither side', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis');
-    await expect(
-      cc.recordCustodyTransfer(
-        asOrg(ctx, 'ResearchMSP'),
-        SAMPLE,
-        'TRANSPORT_HANDOFF',
-        'NADOMSP',
-        'LabMSP',
-        'true',
-        '48',
-      ),
-    ).to.be.rejectedWith(/party to neither side/);
+  it('rejects an identifier that is not a keyed pseudonym', async () => {
+    const { cc, ctx } = fresh();
+    await expect(cc.initiateSampleCustody(ctx, SAMPLE, 'John Smith', SEAL, 'd')).to.be.rejectedWith(
+      /keyed pseudonym/,
+    );
+    // Upper-case or short digests are not the HMAC encoding the network expects.
+    await expect(cc.initiateSampleCustody(ctx, SAMPLE, 'A'.repeat(64), SEAL, 'd')).to.be.rejectedWith(
+      /keyed pseudonym/,
+    );
   });
 
-  it('raises an exception and alerts the NADO when the handover window lapses', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
-    await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis');
+  it('refuses to open the same sample twice', async () => {
+    const { cc, ctx } = fresh();
+    await open(cc, ctx);
+    await expect(open(cc, ctx)).to.be.rejectedWith(/already exists/);
+  });
+});
 
-    stub.advanceHours(72); // window is 48h
-    await cc.recordCustodyTransfer(
-      ctx,
-      SAMPLE,
-      'TRANSPORT_HANDOFF',
-      'NADOMSP',
-      'LabMSP',
-      'true',
-      '48',
-    );
+describe('transaction time — bounded and monotonic', () => {
+  it('refuses a proposal timestamped far from the endorsing peer clock (backdating)', async () => {
+    const { cc, ctx, stub } = fresh();
+    setPeerClockForTesting(() => stub.now.getTime() + 2 * 3600 * 1000); // client claims two hours ago
+    await expect(open(cc, ctx)).to.be.rejectedWith(/from the endorsing peer's clock/);
+  });
 
+  it('accepts a timestamp within the permitted skew', async () => {
+    const { cc, ctx, stub } = fresh();
+    setPeerClockForTesting(() => stub.now.getTime() + 60 * 1000);
+    await open(cc, ctx);
+  });
+
+  it('refuses a receipt that precedes the dispatch it completes', async () => {
+    const { cc, ctx, stub } = fresh();
+    await open(cc, ctx);
+    await cc.acknowledgeSampleCollection(asOrg(ctx, 'AthleteMSP'), SAMPLE, SEAL);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    // Move the transaction clock back while keeping it inside the peer's skew window.
+    stub.now = new Date(stub.now.getTime() - 120 * 1000);
+    setPeerClockForTesting(() => stub.now.getTime());
+    await expect(
+      cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL),
+    ).to.be.rejectedWith(/may not precede/);
+  });
+});
+
+describe('acknowledgeSampleCollection — the athlete attests the collection', () => {
+  it('only an athlete identity may acknowledge', async () => {
+    const { cc, ctx } = fresh();
+    await open(cc, ctx);
+    await expect(
+      cc.acknowledgeSampleCollection(asOrg(ctx, 'NADOMSP'), SAMPLE, SEAL),
+    ).to.be.rejectedWith(/authorization denied/);
+  });
+
+  it('refuses an athlete certificate carrying another athlete pseudonym', async () => {
+    const { cc, ctx } = fresh();
+    await open(cc, ctx);
+    await expect(
+      cc.acknowledgeSampleCollection(asOrg(ctx, 'AthleteMSP', { pseudonym: 'c'.repeat(64) }), SAMPLE, SEAL),
+    ).to.be.rejectedWith(/not the athlete/);
+  });
+
+  it('records a seal mismatch as a dispute, which invalidates the process', async () => {
+    const { cc, ctx, stub } = fresh();
+    await registerList(cc, ctx);
+    await open(cc, ctx);
+    await cc.acknowledgeSampleCollection(asOrg(ctx, 'AthleteMSP'), SAMPLE, 'some-other-seal');
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL);
+    await analyse(cc, ctx, stub);
+    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    expect((await results(cc, ctx)).action).to.equal(ResultsAction.ProcessInvalidated);
+  });
+});
+
+describe('custody transfer — two-party attestation, WADA Article 5.4', () => {
+  it('binds dispatch and receipt keys to both parties by state-based endorsement', async () => {
+    const { cc, ctx, stub } = fresh();
+    await validCustodyChain(cc, ctx);
+    for (const seq of ['0001', '0002']) {
+      const ep = await stub.getStateValidationParameter(stub.createCompositeKey('CUSTODY', [SAMPLE, seq]));
+      expect(new KeyEndorsementPolicy(ep).listOrgs()).to.have.members(['NADOMSP', 'LabMSP']);
+    }
+  });
+
+  it('only the NADO may dispatch, and only to a laboratory', async () => {
+    const { cc, ctx } = fresh();
+    await open(cc, ctx);
+    await expect(
+      cc.proposeCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, 'LabMSP', 'true', '48'),
+    ).to.be.rejectedWith(/authorization denied/);
+    await expect(
+      cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'ResearchMSP', 'true', '48'),
+    ).to.be.rejectedWith(/only to a laboratory/);
+  });
+
+  it('the NADO cannot record the laboratory side of a handover, even with both endorsements', async () => {
+    // The reviewer's insider: the NADO client collects endorsements from its own
+    // peer and the laboratory peer. Both peers run this check under the NADO's
+    // identity and refuse, so no endorsement exists to collect.
+    const { cc, ctx } = fresh();
+    await open(cc, ctx);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    await expect(
+      cc.acceptCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, '1', 'true', SEAL),
+    ).to.be.rejectedWith(/only LabMSP may accept/);
+  });
+
+  it('a receipt without a dispatch, or a second receipt, is refused', async () => {
+    const { cc, ctx } = fresh();
+    await open(cc, ctx);
+    await expect(
+      cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL),
+    ).to.be.rejectedWith(/not found/);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL);
+    await expect(
+      cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL),
+    ).to.be.rejectedWith(/not awaiting receipt/);
+  });
+
+  it('raises an exception and alerts the NADO when the receipt is late', async () => {
+    const { cc, ctx, stub } = fresh();
+    await open(cc, ctx);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    stub.advanceHours(72);
+    setPeerClockForTesting(() => stub.now.getTime());
+    await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL);
     const exception = stub.events.find((e) => e.name === 'CustodyException');
-    expect(exception, 'no exception raised for a late handover').to.exist;
-    expect((exception!.payload as { reason: string }).reason).to.equal(
-      'TRANSFER_WINDOW_EXCEEDED',
-    );
+    expect((exception!.payload as { reason: string }).reason).to.equal('TRANSFER_WINDOW_EXCEEDED');
     expect((exception!.payload as { alertedMSPs: string[] }).alertedMSPs).to.include('NADOMSP');
   });
 
   it('honours a zero-hour handover window instead of silently defaulting to 48', async () => {
-    // Regression: `Number(x) || DEFAULT` treated a zero-hour window as absent,
-    // so a deployment demanding an immediate handover got a 48-hour one.
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
-    await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis');
-
+    const { cc, ctx, stub } = fresh();
+    await open(cc, ctx);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '0');
     stub.advanceHours(1);
-    await cc.recordCustodyTransfer(
-      ctx,
-      SAMPLE,
-      'TRANSPORT_HANDOFF',
-      'NADOMSP',
-      'LabMSP',
-      'true',
-      '0',
-    );
-
+    setPeerClockForTesting(() => stub.now.getTime());
+    await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL);
     const reasons = stub.events
       .filter((e) => e.name === 'CustodyException')
       .map((e) => (e.payload as { reason: string }).reason);
-    expect(reasons, 'a zero-hour window was treated as the 48-hour default').to.include(
+    expect(reasons).to.include('TRANSFER_WINDOW_EXCEEDED');
+  });
+
+  it('keeps both exceptions when a late receipt also reports a broken seal', async () => {
+    const { cc, ctx, stub } = fresh();
+    await open(cc, ctx);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '0');
+    stub.advanceHours(1);
+    setPeerClockForTesting(() => stub.now.getTime());
+    await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'false', SEAL);
+    const chain = JSON.parse(await cc.getCustodyChain(ctx, SAMPLE));
+    expect(chain.exceptions.map((e: { reason: string }) => e.reason)).to.have.members([
       'TRANSFER_WINDOW_EXCEEDED',
-    );
+      'CONTAINER_SEAL_BROKEN',
+    ]);
   });
 
-  it('falls back to the default window when none is supplied', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
-    await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis');
-    stub.advanceHours(1);
-    await cc.recordCustodyTransfer(ctx, SAMPLE, 'TRANSPORT_HANDOFF', 'NADOMSP', 'LabMSP', 'true', '');
-    expect(stub.events.filter((e) => e.name === 'CustodyException')).to.have.lengthOf(0);
-  });
-
-  it('raises an exception when the container seal is reported broken', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
-    await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis');
-    await cc.recordCustodyTransfer(
-      ctx,
-      SAMPLE,
-      'TRANSPORT_HANDOFF',
-      'NADOMSP',
-      'LabMSP',
-      'false',
-      '48',
-    );
-    const reasons = stub.events
-      .filter((e) => e.name === 'CustodyException')
-      .map((e) => (e.payload as { reason: string }).reason);
-    expect(reasons).to.include('CONTAINER_SEAL_BROKEN');
+  it('flags a seal at receipt that differs from the seal acknowledged at collection', async () => {
+    const { cc, ctx } = fresh();
+    await open(cc, ctx);
+    await cc.acknowledgeSampleCollection(asOrg(ctx, 'AthleteMSP'), SAMPLE, SEAL);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', 'substituted-seal');
+    const chain = JSON.parse(await cc.getCustodyChain(ctx, SAMPLE));
+    expect(chain.exceptions.map((e: { reason: string }) => e.reason)).to.include('CONTAINER_SEAL_MISMATCH');
   });
 });
 
 describe('recordSampleAnalysisResult — WADA Article 2.1', () => {
-  it('only a WADA-accredited laboratory identity may commit a result', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
+  it('only a laboratory identity may commit a result', async () => {
+    const { cc, ctx, stub } = fresh();
     await registerList(cc, ctx);
     await validCustodyChain(cc, ctx);
-    await expect(
-      cc.recordSampleAnalysisResult(
-        asOrg(ctx, 'NADOMSP'),
-        SAMPLE,
-        'true',
-        'EPO',
-        LIST_VERSION,
-        LIST_HASH,
-        'VERIFIED',
-      ),
-    ).to.be.rejectedWith(/authorization denied/);
+    stub.setInput({ adverse: true, prohibitedListVersion: LIST_VERSION, prohibitedListHash: LIST_HASH, laboratoryAccreditation: 'VERIFIED' });
+    await expect(cc.recordSampleAnalysisResult(asOrg(ctx, 'NADOMSP'), SAMPLE)).to.be.rejectedWith(
+      /authorization denied/,
+    );
   });
 
-  it('refuses a result citing an unregistered Prohibited List version', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await validCustodyChain(cc, ctx);
-    await expect(
-      cc.recordSampleAnalysisResult(
-        asOrg(ctx, 'LabMSP'),
-        SAMPLE,
-        'true',
-        'EPO',
-        '1999-01',
-        LIST_HASH,
-        'VERIFIED',
-      ),
-    ).to.be.rejectedWith(/not registered on-ledger/);
-  });
-
-  it('refuses a result whose Prohibited List hash does not match the ledger copy', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
+  it('takes its inputs from the transient field, not from arguments', async () => {
+    const { cc, ctx } = fresh();
     await registerList(cc, ctx);
     await validCustodyChain(cc, ctx);
+    await expect(cc.recordSampleAnalysisResult(asOrg(ctx, 'LabMSP'), SAMPLE)).to.be.rejectedWith(
+      /transient field/,
+    );
+  });
+
+  it('refuses an unregistered or mismatched Prohibited List revision', async () => {
+    const { cc, ctx, stub } = fresh();
+    await registerList(cc, ctx);
+    await validCustodyChain(cc, ctx);
+    stub.setInput({ adverse: true, prohibitedListVersion: '1999-01', prohibitedListHash: LIST_HASH, laboratoryAccreditation: 'VERIFIED' });
+    await expect(cc.recordSampleAnalysisResult(asOrg(ctx, 'LabMSP'), SAMPLE)).to.be.rejectedWith(
+      /not registered on-ledger/,
+    );
+    stub.setInput({ adverse: true, prohibitedListVersion: LIST_VERSION, prohibitedListHash: 'deadbeef', laboratoryAccreditation: 'VERIFIED' });
+    await expect(cc.recordSampleAnalysisResult(asOrg(ctx, 'LabMSP'), SAMPLE)).to.be.rejectedWith(
+      /hash mismatch/,
+    );
+  });
+
+  it('a registered Prohibited List revision cannot be replaced', async () => {
+    const { cc, ctx } = fresh();
+    await registerList(cc, ctx);
     await expect(
-      cc.recordSampleAnalysisResult(
-        asOrg(ctx, 'LabMSP'),
-        SAMPLE,
-        'true',
-        'EPO',
-        LIST_VERSION,
-        'deadbeef',
-        'VERIFIED',
-      ),
-    ).to.be.rejectedWith(/hash mismatch/);
+      cc.registerProhibitedList(asOrg(ctx, 'NADOMSP'), LIST_VERSION, 'e'.repeat(64)),
+    ).to.be.rejectedWith(/already registered/);
+  });
+
+  it('a committed analysis cannot be replaced', async () => {
+    const { cc, ctx, stub } = fresh();
+    await registerList(cc, ctx);
+    await validCustodyChain(cc, ctx);
+    await analyse(cc, ctx, stub);
+    await expect(analyse(cc, ctx, stub)).to.be.rejectedWith(/already committed/);
   });
 });
 
 describe('recordWhereaboutsStatus — WADA Article 2.4', () => {
-  it('counts failures inside the rolling 12-month window only', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
+  async function failure(cc: CustodyContract, ctx: Context, stub: MockStub, id: string, verified = true) {
+    stub.setInput({ athleteHash: ATHLETE, filingId: id, failure: true, ledgerVerified: verified });
+    await cc.recordWhereaboutsStatus(ctx);
+  }
 
-    await cc.recordWhereaboutsStatus(ctx, ATHLETE, 'F1', 'true', 'true');
-    stub.advanceHours(24 * 400); // first failure now falls outside the window
-    await cc.recordWhereaboutsStatus(ctx, ATHLETE, 'F2', 'true', 'true');
-    await cc.recordWhereaboutsStatus(ctx, ATHLETE, 'F3', 'true', 'true');
-    const third = JSON.parse(
-      await cc.recordWhereaboutsStatus(ctx, ATHLETE, 'F4', 'true', 'true'),
-    );
-
-    expect(third.failuresInWindow).to.equal(3);
-    expect(third.allFailuresLedgerVerified).to.equal(true);
+  it('counts failures inside the rolling 12-month window only, as results management sees them', async () => {
+    const { cc, ctx, stub } = fresh();
+    await registerList(cc, ctx);
+    await failure(cc, ctx, stub, 'F1');
+    stub.advanceHours(24 * 400);
+    setPeerClockForTesting(() => stub.now.getTime());
+    await failure(cc, ctx, stub, 'F2');
+    await failure(cc, ctx, stub, 'F3');
+    await validCustodyChain(cc, ctx);
+    stub.setInput({ adverse: false, prohibitedListVersion: LIST_VERSION, prohibitedListHash: LIST_HASH, laboratoryAccreditation: 'VERIFIED' });
+    await cc.recordSampleAnalysisResult(asOrg(ctx, 'LabMSP'), SAMPLE);
+    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    const rm = await results(cc, ctx);
+    expect(rm.facts.thirdWhereaboutsFailure, 'a failure outside the window was counted').to.equal(false);
   });
 
-  it('reports unverified failures so Q006 cannot be silently satisfied', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await cc.recordWhereaboutsStatus(ctx, ATHLETE, 'F1', 'true', 'true');
-    await cc.recordWhereaboutsStatus(ctx, ATHLETE, 'F2', 'true', 'false');
-    const out = JSON.parse(await cc.recordWhereaboutsStatus(ctx, ATHLETE, 'F3', 'true', 'true'));
-    expect(out.failuresInWindow).to.equal(3);
-    expect(out.allFailuresLedgerVerified).to.equal(false);
+  it('records a whereabouts ADRV on the third verified failure inside the window', async () => {
+    const { cc, ctx, stub } = fresh();
+    await registerList(cc, ctx);
+    for (const id of ['F1', 'F2', 'F3']) await failure(cc, ctx, stub, id);
+    await validCustodyChain(cc, ctx);
+    stub.setInput({ adverse: false, prohibitedListVersion: LIST_VERSION, prohibitedListHash: LIST_HASH, laboratoryAccreditation: 'VERIFIED' });
+    await cc.recordSampleAnalysisResult(asOrg(ctx, 'LabMSP'), SAMPLE);
+    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    expect((await results(cc, ctx)).action).to.equal(ResultsAction.WhereaboutsAdrv);
+  });
+
+  it('whereabouts failures are private to the results collection', async () => {
+    const { cc, ctx, stub } = fresh();
+    await failure(cc, ctx, stub, 'F1');
+    expect([...stub.state.keys()].some((k) => k.includes('WHEREABOUTS'))).to.equal(false);
+    expect([...stub.privateState.get(RESULTS_COLLECTION)!.keys()].some((k) => k.includes('WHEREABOUTS'))).to.equal(true);
   });
 });
 
 describe('triggerResultsManagement — WADA Article 7.1', () => {
-  it('confirms an AAF and starts the Article 7.3 clock on a valid chain', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
+  it('confirms an AAF and starts the notification deadline on a valid, attested chain', async () => {
+    const { cc, ctx, stub } = fresh();
     await registerList(cc, ctx);
     await validCustodyChain(cc, ctx);
-    await cc.recordSampleAnalysisResult(
-      asOrg(ctx, 'LabMSP'),
-      SAMPLE,
-      'true',
-      'EPO',
-      LIST_VERSION,
-      LIST_HASH,
-      'VERIFIED',
-    );
-
+    await analyse(cc, ctx, stub);
     const out = JSON.parse(await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE));
-    expect(out.action).to.equal(ResultsAction.AafConfirmed);
-    expect(out.statutoryDeadline).to.be.a('string');
-    expect(out.facts.mandatoryCustodyStepVerified).to.equal(true);
-    expect(stub.events.map((e) => e.name)).to.include('ResultsManagementDecided');
+    expect(out).to.deep.equal({ sampleCode: SAMPLE, committed: true });
+    const rm = await results(cc, ctx);
+    expect(rm.action).to.equal(ResultsAction.AafConfirmed);
+    expect(rm.notificationDeadline).to.be.a('string');
+    expect(rm.facts.mandatoryCustodyStepVerified).to.equal(true);
   });
 
-  it('requires cross-organizational endorsement on the results key', async () => {
-    const cc = new CustodyContract();
-    const { ctx, stub } = mockContext('NADOMSP');
+  it('nothing private reaches public state, events or the response', async () => {
+    const { cc, ctx, stub } = fresh();
     await registerList(cc, ctx);
     await validCustodyChain(cc, ctx);
-    await cc.recordSampleAnalysisResult(
-      asOrg(ctx, 'LabMSP'),
-      SAMPLE,
-      'true',
-      'EPO',
-      LIST_VERSION,
-      LIST_HASH,
-      'VERIFIED',
-    );
+    await analyse(cc, ctx, stub);
+    const response = await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    const publicView = JSON.stringify([
+      [...stub.state.values()].map((v) => v.toString()),
+      stub.events,
+      response,
+    ]);
+    for (const secret of [SUBSTANCE, 'AAF_CONFIRMED', 'R1_AAF_CONFIRMED', 'notificationDeadline']) {
+      expect(publicView, `${secret} leaked to the shared ledger`).to.not.include(secret);
+    }
+  });
+
+  it('a committed record is never overwritten, even by a re-trigger both peers would endorse', async () => {
+    const { cc, ctx, stub } = fresh();
+    await registerList(cc, ctx);
+    await validCustodyChain(cc, ctx);
+    await analyse(cc, ctx, stub);
     await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
-
-    const ep = await stub.getStateValidationParameter(
-      stub.createCompositeKey('RESULTS', [SAMPLE]),
+    await expect(cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE)).to.be.rejectedWith(
+      /not overwritten/,
     );
-    expect(new KeyEndorsementPolicy(ep).listOrgs()).to.have.members(['NADOMSP', 'LabMSP']);
   });
 
-  it('invalidates the process when a mandatory custody step is missing', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
+  it('invalidates the process when the laboratory never accepted the dispatch', async () => {
+    const { cc, ctx, stub } = fresh();
     await registerList(cc, ctx);
-    // Collection and transport only — no laboratory receipt.
-    await cc.initiateSampleCustody(ctx, SAMPLE, ATHLETE, 'seal', 'Tunis');
-    await cc.recordCustodyTransfer(
-      ctx,
-      SAMPLE,
-      'TRANSPORT_HANDOFF',
-      'NADOMSP',
-      'LabMSP',
-      'true',
-      '48',
-    );
-    await cc.recordSampleAnalysisResult(
-      asOrg(ctx, 'LabMSP'),
-      SAMPLE,
-      'true',
-      'EPO',
-      LIST_VERSION,
-      LIST_HASH,
-      'VERIFIED',
-    );
-
-    const out = JSON.parse(await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE));
-    expect(out.action).to.equal(ResultsAction.ProcessInvalidated);
-    expect(out.auditAlertRecipients).to.include('WADA');
+    await open(cc, ctx);
+    await cc.acknowledgeSampleCollection(asOrg(ctx, 'AthleteMSP'), SAMPLE, SEAL);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    await analyse(cc, ctx, stub);
+    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    const rm = await results(cc, ctx);
+    expect(rm.action).to.equal(ResultsAction.ProcessInvalidated);
+    expect(rm.auditAlertRecipients).to.include('WADA');
     expect(JSON.parse(await cc.getSample(ctx, SAMPLE)).status).to.equal('INVALIDATED');
   });
 
+  it('invalidates the process when the athlete never acknowledged the collection', async () => {
+    const { cc, ctx, stub } = fresh();
+    await registerList(cc, ctx);
+    await open(cc, ctx);
+    await cc.proposeCustodyTransfer(asOrg(ctx, 'NADOMSP'), SAMPLE, 'LabMSP', 'true', '48');
+    await cc.acceptCustodyTransfer(asOrg(ctx, 'LabMSP'), SAMPLE, '1', 'true', SEAL);
+    await analyse(cc, ctx, stub);
+    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    expect((await results(cc, ctx)).action).to.equal(ResultsAction.ProcessInvalidated);
+  });
+
   it('suspends automation when laboratory accreditation is pending', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
+    const { cc, ctx, stub } = fresh();
     await registerList(cc, ctx);
     await validCustodyChain(cc, ctx);
-    await cc.recordSampleAnalysisResult(
-      asOrg(ctx, 'LabMSP'),
-      SAMPLE,
-      'true',
-      'EPO',
-      LIST_VERSION,
-      LIST_HASH,
-      'PENDING',
+    await analyse(cc, ctx, stub, 'PENDING');
+    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    const rm = await results(cc, ctx);
+    expect(rm.action).to.equal(ResultsAction.AafPendingReview);
+    expect(rm.humanOversightRequired).to.equal(true);
+  });
+});
+
+describe('results amendment — two-party approval', () => {
+  async function confirmed() {
+    const f = fresh();
+    await registerList(f.cc, f.ctx);
+    await validCustodyChain(f.cc, f.ctx);
+    await analyse(f.cc, f.ctx, f.stub);
+    await f.cc.triggerResultsManagement(asOrg(f.ctx, 'NADOMSP'), SAMPLE);
+    return f;
+  }
+
+  it('an amendment proposed by the NADO cannot be approved by the NADO', async () => {
+    const { cc, ctx, stub } = await confirmed();
+    stub.setInput({ action: 'NO_ACTION_REQUIRED', reason: 'insider attempt' });
+    await cc.proposeResultsAmendment(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    await expect(cc.approveResultsAmendment(asOrg(ctx, 'NADOMSP'), SAMPLE, '0')).to.be.rejectedWith(
+      /must be approved by the other organisation/,
     );
-    const out = JSON.parse(await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE));
-    expect(out.action).to.equal(ResultsAction.AafPendingReview);
-    expect(out.humanOversightRequired).to.equal(true);
+    expect((await results(cc, ctx)).action).to.equal(ResultsAction.AafConfirmed);
+  });
+
+  it('an amendment takes effect once the laboratory approves it, and the history is kept', async () => {
+    const { cc, ctx, stub } = await confirmed();
+    stub.setInput({ action: 'AAF_PENDING_REVIEW', reason: 'B-sample analysis requested' });
+    await cc.proposeResultsAmendment(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    await cc.approveResultsAmendment(asOrg(ctx, 'LabMSP'), SAMPLE, '0');
+    const rm = await results(cc, ctx);
+    expect(rm.action).to.equal(ResultsAction.AafPendingReview);
+    expect(rm.amendments).to.deep.include({
+      index: 0,
+      from: 'AAF_CONFIRMED',
+      to: 'AAF_PENDING_REVIEW',
+      approvedAt: rm.amendments[0].approvedAt,
+    });
+    expect(rm.ruleId, 'the original decision must remain on record').to.equal('R1_AAF_CONFIRMED');
+  });
+
+  it('refuses a second open amendment and an unknown action', async () => {
+    const { cc, ctx, stub } = await confirmed();
+    stub.setInput({ action: 'MADE_UP', reason: 'x' });
+    await expect(cc.proposeResultsAmendment(asOrg(ctx, 'NADOMSP'), SAMPLE)).to.be.rejectedWith(/unknown/);
+    stub.setInput({ action: 'NO_ACTION_REQUIRED', reason: 'x' });
+    await cc.proposeResultsAmendment(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    await expect(cc.proposeResultsAmendment(asOrg(ctx, 'LabMSP'), SAMPLE)).to.be.rejectedWith(
+      /awaiting approval/,
+    );
   });
 });
 
 describe('recordProvisionalSuspension — WADA Article 7.9 / GDPR Article 22', () => {
-  async function toConfirmedAaf(cc: CustodyContract, ctx: Context) {
-    await registerList(cc, ctx);
-    await validCustodyChain(cc, ctx);
-    await cc.recordSampleAnalysisResult(
-      asOrg(ctx, 'LabMSP'),
-      SAMPLE,
-      'true',
-      'EPO',
-      LIST_VERSION,
-      LIST_HASH,
-      'VERIFIED',
-    );
-    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+  async function toConfirmedAaf() {
+    const f = fresh();
+    await registerList(f.cc, f.ctx);
+    await validCustodyChain(f.cc, f.ctx);
+    await analyse(f.cc, f.ctx, f.stub);
+    await f.cc.triggerResultsManagement(asOrg(f.ctx, 'NADOMSP'), SAMPLE);
+    return f;
+  }
+
+  async function oversight(cc: CustodyContract, ctx: Context, stub: MockStub, decision: string, reviewerId = 'reviewer-014') {
+    stub.setInput({ reviewerId, decision, rationale: 'recorded rationale' });
+    return cc.enforceOversightRequirement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+  }
+
+  async function suspend(cc: CustodyContract, ctx: Context, stub: MockStub) {
+    stub.setInput({ groundsArticle: 'Article 7.9' });
+    return cc.recordProvisionalSuspension(asOrg(ctx, 'NADOMSP'), SAMPLE);
   }
 
   it('refuses a suspension imposed by automated processing alone', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await toConfirmedAaf(cc, ctx);
-    await expect(
-      cc.recordProvisionalSuspension(asOrg(ctx, 'NADOMSP'), SAMPLE, 'Article 7.9'),
-    ).to.be.rejectedWith(/GDPR Article 22/);
+    const { cc, ctx, stub } = await toConfirmedAaf();
+    await expect(suspend(cc, ctx, stub)).to.be.rejectedWith(/GDPR Article 22/);
   });
 
   it('refuses a suspension when human oversight did not uphold the finding', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await toConfirmedAaf(cc, ctx);
-    await cc.enforceOversightRequirement(
-      asOrg(ctx, 'NADOMSP'),
-      SAMPLE,
-      'reviewer-014',
-      'REQUEST_FURTHER_ANALYSIS',
-      'B-sample analysis requested before any provisional measure',
-    );
-    await expect(
-      cc.recordProvisionalSuspension(asOrg(ctx, 'NADOMSP'), SAMPLE, 'Article 7.9'),
-    ).to.be.rejectedWith(/requires an UPHOLD decision/);
+    const { cc, ctx, stub } = await toConfirmedAaf();
+    await oversight(cc, ctx, stub, 'REQUEST_FURTHER_ANALYSIS');
+    await expect(suspend(cc, ctx, stub)).to.be.rejectedWith(/requires an UPHOLD decision/);
   });
 
   it('permits a suspension once a human reviewer has upheld the finding', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await toConfirmedAaf(cc, ctx);
-    await cc.enforceOversightRequirement(
-      asOrg(ctx, 'NADOMSP'),
-      SAMPLE,
-      'reviewer-014',
-      'UPHOLD',
-      'Chain of custody complete; accredited laboratory; finding upheld',
-    );
-    const out = JSON.parse(
-      await cc.recordProvisionalSuspension(asOrg(ctx, 'NADOMSP'), SAMPLE, 'Article 7.9'),
-    );
-    expect(out.oversightReviewer).to.equal('reviewer-014');
+    const { cc, ctx, stub } = await toConfirmedAaf();
+    await oversight(cc, ctx, stub, 'UPHOLD');
+    await suspend(cc, ctx, stub);
+    expect((await results(cc, ctx)).suspension.oversightReviewer).to.equal('reviewer-014');
   });
 
   it('rejects an oversight record without an identified reviewer', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await expect(
-      cc.enforceOversightRequirement(ctx, SAMPLE, '', 'UPHOLD', 'no reviewer'),
-    ).to.be.rejectedWith(/identified reviewer/);
+    const { cc, ctx, stub } = fresh();
+    await expect(oversight(cc, ctx, stub, 'UPHOLD', '')).to.be.rejectedWith(/identified reviewer/);
   });
 });
 
 describe('enforceResultsConfidentiality — WADA Article 14.1', () => {
-  async function inResultsManagement(cc: CustodyContract, ctx: Context) {
-    await registerList(cc, ctx);
-    await validCustodyChain(cc, ctx);
-    await cc.recordSampleAnalysisResult(
-      asOrg(ctx, 'LabMSP'),
-      SAMPLE,
-      'true',
-      'EPO',
-      LIST_VERSION,
-      LIST_HASH,
-      'VERIFIED',
-    );
-    await cc.triggerResultsManagement(asOrg(ctx, 'NADOMSP'), SAMPLE);
+  async function inResultsManagement() {
+    const f = fresh();
+    await registerList(f.cc, f.ctx);
+    await validCustodyChain(f.cc, f.ctx);
+    await analyse(f.cc, f.ctx, f.stub);
+    await f.cc.triggerResultsManagement(asOrg(f.ctx, 'NADOMSP'), SAMPLE);
+    return f;
   }
 
-  it('denies a research organization during results management', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await inResultsManagement(cc, ctx);
-    const out = JSON.parse(
-      await cc.enforceResultsConfidentiality(asOrg(ctx, 'ResearchMSP'), SAMPLE),
-    );
-    expect(out.granted).to.equal(false);
-    expect(out.wadaArticle).to.equal('Article 14.1');
-  });
-
-  it('denies the federation while the case is open', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await inResultsManagement(cc, ctx);
-    const out = JSON.parse(
-      await cc.enforceResultsConfidentiality(asOrg(ctx, 'FederationMSP'), SAMPLE),
-    );
-    expect(out.granted).to.equal(false);
-  });
-
-  it('grants the NADO and the analysing laboratory', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
-    await inResultsManagement(cc, ctx);
-    for (const org of ['NADOMSP', 'LabMSP', 'AthleteMSP']) {
-      const out = JSON.parse(
-        await cc.enforceResultsConfidentiality(asOrg(ctx, org), SAMPLE),
-      );
+  it('before notice: the NADO and the laboratory only', async () => {
+    const { cc, ctx } = await inResultsManagement();
+    for (const org of ['NADOMSP', 'LabMSP']) {
+      const out = JSON.parse(await cc.enforceResultsConfidentiality(asOrg(ctx, org), SAMPLE));
       expect(out.granted, `${org} was denied`).to.equal(true);
+      expect(out.results.action).to.equal('AAF_CONFIRMED');
     }
+    for (const org of ['AthleteMSP', 'FederationMSP', 'ResearchMSP']) {
+      const out = JSON.parse(await cc.enforceResultsConfidentiality(asOrg(ctx, org), SAMPLE));
+      expect(out.granted, `${org} was granted before notice`).to.equal(false);
+    }
+  });
+
+  it('from notice: the athlete and the federation receive the notice simultaneously (Art. 14.1.2); research never', async () => {
+    const { cc, ctx } = await inResultsManagement();
+    await cc.notifyAthleteOfAAF(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    for (const org of ['AthleteMSP', 'FederationMSP']) {
+      const out = JSON.parse(await cc.enforceResultsConfidentiality(asOrg(ctx, org), SAMPLE));
+      expect(out.granted, `${org} was denied after notice`).to.equal(true);
+      expect(out.notice.analyticalResult).to.equal(SUBSTANCE);
+      expect(out.results, 'the internal record must not be released with the notice').to.equal(undefined);
+    }
+    const research = JSON.parse(await cc.enforceResultsConfidentiality(asOrg(ctx, 'ResearchMSP'), SAMPLE));
+    expect(research.granted).to.equal(false);
+  });
+
+  it('the notice is written to the notice collection, the record stays in the results collection', async () => {
+    const { cc, ctx, stub } = await inResultsManagement();
+    await cc.notifyAthleteOfAAF(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    expect([...stub.privateState.get('noticeCollection')!.keys()].some((k) => k.includes('ADRVNOTICE'))).to.equal(true);
+    expect([...stub.privateState.get('noticeCollection')!.keys()].some((k) => k.includes('RESULTS'))).to.equal(false);
+  });
+
+  it('an approved amendment after notice is reported to the notified parties (Art. 14.1.4)', async () => {
+    const { cc, ctx, stub } = await inResultsManagement();
+    await cc.notifyAthleteOfAAF(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    stub.setInput({ action: 'AAF_PENDING_REVIEW', reason: 'B-sample analysis requested' });
+    await cc.proposeResultsAmendment(asOrg(ctx, 'NADOMSP'), SAMPLE);
+    await cc.approveResultsAmendment(asOrg(ctx, 'LabMSP'), SAMPLE, '0');
+    expect([...stub.privateState.get('noticeCollection')!.keys()].some((k) => k.includes('NOTICESTATUS'))).to.equal(true);
   });
 });
 
 describe('ledger provenance', () => {
   it('exposes the full modification history of a sample record', async () => {
-    const cc = new CustodyContract();
-    const { ctx } = mockContext('NADOMSP');
+    const { cc, ctx } = fresh();
     await registerList(cc, ctx);
     await validCustodyChain(cc, ctx);
     const history = JSON.parse(await cc.getSampleHistory(ctx, SAMPLE));

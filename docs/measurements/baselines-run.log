@@ -1,0 +1,82 @@
+driver/plans/baselines.json: 48 rounds
+[0;34m[baselines][0m stopping the network so the baselines have its processors
+[0;34m[baselines][0m running the baseline plan
+[1/48] b1-baseline-telog-c32 baseline-telog @concurrency 32: provisioning... 0s; running... offered 787.1, committed 787.1 tps; p50 32 p95 83 ms; phases null; failures {}
+[2/48] b1-baseline-couchdb-c8 baseline-couchdb @concurrency 8: provisioning... 0s; running... offered 62.6, committed 62.6 tps; p50 81 p95 400 ms; phases null; failures {}
+[3/48] b1-baseline-couchdb-c4 baseline-couchdb @concurrency 4: provisioning... 0s; running... offered 42.7, committed 42.7 tps; p50 54 p95 386 ms; phases null; failures {}
+[4/48] b1-baseline-couchdb-c32 baseline-couchdb @concurrency 32: provisioning... 0s; running... offered 296.1, committed 296.1 tps; p50 92 p95 200 ms; phases null; failures {}
+[5/48] b1-baseline-telog-c128 baseline-telog @concurrency 128: provisioning... 0s; running... offered 844.3, committed 844.3 tps; p50 137 p95 264 ms; phases null; failures {}
+[6/48] b1-baseline-couchdb-c256 baseline-couchdb @concurrency 256: provisioning... 0s; running... offered 529.2, committed 529.2 tps; p50 435 p95 832 ms; phases null; failures {}
+[7/48] b1-baseline-telog-c64 baseline-telog @concurrency 64: provisioning... 0s; running... offered 942.2, committed 942.2 tps; p50 58 p95 115 ms; phases null; failures {}
+[8/48] b1-baseline-couchdb-c128 baseline-couchdb @concurrency 128: provisioning... 0s; running... offered 583.7, committed 583.7 tps; p50 197 p95 388 ms; phases null; failures {}
+[9/48] b1-baseline-couchdb-c16 baseline-couchdb @concurrency 16: provisioning... 0s; running... offered 164.0, committed 164.0 tps; p50 81 p95 178 ms; phases null; failures {}
+[10/48] b1-baseline-couchdb-lat baseline-couchdb @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 30 p95 60 ms; phases null; failures {}
+[11/48] b1-baseline-telog-c16 baseline-telog @concurrency 16: provisioning... 0s; running... offered 521.4, committed 521.4 tps; p50 19 p95 92 ms; phases null; failures {}
+[12/48] b1-baseline-telog-c256 baseline-telog @concurrency 256: provisioning... 0s; running... offered 833.6, committed 833.6 tps; p50 284 p95 460 ms; phases null; failures {}
+[13/48] b1-baseline-couchdb-c64 baseline-couchdb @concurrency 64: provisioning... 0s; running... offered 407.6, committed 407.6 tps; p50 144 p95 283 ms; phases null; failures {}
+[14/48] b1-baseline-telog-c8 baseline-telog @concurrency 8: provisioning... 0s; running... offered 360.3, committed 360.3 tps; p50 12 p95 68 ms; phases null; failures {}
+[15/48] b1-baseline-telog-lat baseline-telog @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 8 p95 20 ms; phases null; failures {}
+[16/48] b1-baseline-telog-c4 baseline-telog @concurrency 4: provisioning... 0s; running... offered 307.8, committed 307.8 tps; p50 11 p95 23 ms; phases null; failures {}
+[17/48] b2-baseline-couchdb-c16 baseline-couchdb @concurrency 16: provisioning... 0s; running... offered 167.1, committed 167.1 tps; p50 81 p95 173 ms; phases null; failures {}
+[18/48] b2-baseline-couchdb-c256 baseline-couchdb @concurrency 256: provisioning... 0s; running... offered 573.6, committed 573.6 tps; p50 390 p95 797 ms; phases null; failures {}
+[19/48] b2-baseline-couchdb-lat baseline-couchdb @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 26 p95 41 ms; phases null; failures {}
+[20/48] b2-baseline-couchdb-c8 baseline-couchdb @concurrency 8: provisioning... 0s; running... offered 97.8, committed 97.8 tps; p50 72 p95 146 ms; phases null; failures {}
+[21/48] b2-baseline-telog-c128 baseline-telog @concurrency 128: provisioning... 0s; running... offered 991.1, committed 991.1 tps; p50 121 p95 200 ms; phases null; failures {}
+[22/48] b2-baseline-telog-c4 baseline-telog @concurrency 4: provisioning... 0s; running... offered 193.2, committed 193.2 tps; p50 12 p95 87 ms; phases null; failures {}
+[23/48] b2-baseline-telog-c64 baseline-telog @concurrency 64: provisioning... 0s; running... offered 967.0, committed 967.0 tps; p50 56 p95 114 ms; phases null; failures {}
+[24/48] b2-baseline-couchdb-c128 baseline-couchdb @concurrency 128: provisioning... 0s; running... offered 559.5, committed 559.5 tps; p50 206 p95 410 ms; phases null; failures {}
+[25/48] b2-baseline-telog-c256 baseline-telog @concurrency 256: provisioning... 0s; running... offered 900.9, committed 900.9 tps; p50 234 p95 578 ms; phases null; failures {}
+[26/48] b2-baseline-couchdb-c64 baseline-couchdb @concurrency 64: provisioning... 0s; running... offered 412.6, committed 412.6 tps; p50 136 p95 280 ms; phases null; failures {}
+[27/48] b2-baseline-telog-lat baseline-telog @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 8 p95 16 ms; phases null; failures {}
+[28/48] b2-baseline-couchdb-c32 baseline-couchdb @concurrency 32: provisioning... 0s; running... offered 310.9, committed 310.9 tps; p50 90 p95 190 ms; phases null; failures {}
+[29/48] b2-baseline-couchdb-c4 baseline-couchdb @concurrency 4: provisioning... 0s; running... offered 77.0, committed 77.0 tps; p50 49 p95 80 ms; phases null; failures {}
+[30/48] b2-baseline-telog-c32 baseline-telog @concurrency 32: provisioning... 0s; running... offered 1320.6, committed 1320.6 tps; p50 17 p95 64 ms; phases null; failures {}
+[31/48] b2-baseline-telog-c16 baseline-telog @concurrency 16: provisioning... 0s; running... offered 774.1, committed 774.1 tps; p50 11 p95 61 ms; phases null; failures {}
+[32/48] b2-baseline-telog-c8 baseline-telog @concurrency 8: provisioning... 0s; running... offered 722.7, committed 722.7 tps; p50 10 p95 19 ms; phases null; failures {}
+[33/48] b3-baseline-telog-c8 baseline-telog @concurrency 8: provisioning... 0s; running... offered 468.7, committed 468.7 tps; p50 10 p95 37 ms; phases null; failures {}
+[34/48] b3-baseline-telog-c16 baseline-telog @concurrency 16: provisioning... 0s; running... offered 1181.8, committed 1181.8 tps; p50 11 p95 26 ms; phases null; failures {}
+[35/48] b3-baseline-couchdb-c64 baseline-couchdb @concurrency 64: provisioning... 0s; running... offered 438.3, committed 438.3 tps; p50 107 p95 404 ms; phases null; failures {}
+[36/48] b3-baseline-telog-c4 baseline-telog @concurrency 4: provisioning... 0s; running... offered 240.9, committed 240.9 tps; p50 12 p95 26 ms; phases null; failures {}
+[37/48] b3-baseline-couchdb-c32 baseline-couchdb @concurrency 32: provisioning... 0s; running... offered 294.2, committed 294.2 tps; p50 94 p95 201 ms; phases null; failures {}
+[38/48] b3-baseline-telog-c64 baseline-telog @concurrency 64: provisioning... 0s; running... offered 1002.6, committed 1002.6 tps; p50 54 p95 106 ms; phases null; failures {}
+[39/48] b3-baseline-telog-lat baseline-telog @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 8 p95 342 ms; phases null; failures {}
+[40/48] b3-baseline-couchdb-c4 baseline-couchdb @concurrency 4: provisioning... 0s; running... offered 58.5, committed 58.5 tps; p50 60 p95 130 ms; phases null; failures {}
+[41/48] b3-baseline-couchdb-c16 baseline-couchdb @concurrency 16: provisioning... 0s; running... offered 165.7, committed 165.7 tps; p50 83 p95 177 ms; phases null; failures {}
+[42/48] b3-baseline-couchdb-c256 baseline-couchdb @concurrency 256: provisioning... 0s; running... offered 627.1, committed 627.1 tps; p50 376 p95 654 ms; phases null; failures {}
+[43/48] b3-baseline-couchdb-c8 baseline-couchdb @concurrency 8: provisioning... 0s; running... offered 96.8, committed 96.8 tps; p50 74 p95 147 ms; phases null; failures {}
+[44/48] b3-baseline-couchdb-c128 baseline-couchdb @concurrency 128: provisioning... 0s; running... offered 544.9, committed 544.9 tps; p50 207 p95 433 ms; phases null; failures {}
+[45/48] b3-baseline-couchdb-lat baseline-couchdb @2 tps: provisioning... 0s; running... offered 2.0, committed 2.0 tps; p50 26 p95 49 ms; phases null; failures {}
+[46/48] b3-baseline-telog-c128 baseline-telog @concurrency 128: provisioning... 0s; running... offered 946.9, committed 946.9 tps; p50 123 p95 238 ms; phases null; failures {}
+[47/48] b3-baseline-telog-c32 baseline-telog @concurrency 32: provisioning... 0s; running... offered 955.1, committed 955.1 tps; p50 26 p95 68 ms; phases null; failures {}
+[48/48] b3-baseline-telog-c256 baseline-telog @concurrency 256: provisioning... 0s; running... offered 809.2, committed 809.2 tps; p50 281 p95 513 ms; phases null; failures {}
+wrote /out/baselines.json
+[0;34m[baselines][0m verifying the tamper-evident log
+node:internal/deps/undici/undici:14976
+      Error.captureStackTrace(err);
+            ^
+
+TypeError: fetch failed
+    at node:internal/deps/undici/undici:14976:13 {
+  [cause]: SocketError: other side closed
+      at Socket.<anonymous> (node:internal/deps/undici/undici:6436:28)
+      at Socket.emit (node:events:536:35)
+      at endReadableNT (node:internal/streams/readable:1698:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+    code: 'UND_ERR_SOCKET',
+    socket: {
+      localAddress: '192.168.32.4',
+      localPort: 43300,
+      remoteAddress: '192.168.32.2',
+      remotePort: 8080,
+      remoteFamily: 'IPv4',
+      timeout: undefined,
+      bytesWritten: 180,
+      bytesRead: 0
+    },
+    [Symbol(undici.error.UND_ERR)]: true,
+    [Symbol(undici.error.UND_ERR_SOCKET)]: true
+  }
+}
+
+Node.js v20.20.2
+exit 1

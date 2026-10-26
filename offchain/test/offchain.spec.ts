@@ -19,8 +19,22 @@ import {
   retrieveDecrypted,
   storeEncrypted,
 } from '../src/ipfs-client';
-import { destroyIPFSAccessToken, recoverDataAccessKey, revokeDataAccessKey } from '../src/erasure';
-import { RECOVERY_HOLDERS, combine, secretsEqual, split, splitForRecovery } from '../src/shamir';
+import {
+  ShareCustody,
+  destroyIPFSAccessToken,
+  recoverDataAccessKey,
+  revokeDataAccessKey,
+} from '../src/erasure';
+import {
+  RECOVERY_THRESHOLD,
+  combine,
+  holdersCanRecover,
+  secretsEqual,
+  split,
+  splitForRecovery,
+} from '../src/shamir';
+import { PseudonymisationService, pseudonymise } from '../src/pseudonym';
+import { commit } from '../src/ipfs-client';
 
 /** A representative athlete biological payload (ABP haematological module). */
 const SAMPLE_PAYLOAD = Buffer.from(
@@ -66,59 +80,59 @@ describe('AES-256-GCM payload encryption', () => {
   });
 });
 
-describe('Shamir 2-of-3 key recovery', () => {
-  it('reconstructs the key from any two of the three shares', () => {
+describe('Athlete-mandatory key recovery (weighted Shamir, 3 of 4)', () => {
+  const byHolder = (shares: ReturnType<typeof splitForRecovery>, ...holders: string[]) =>
+    shares.filter((s) => holders.includes(s.holder!));
+
+  it('allocates two shares to the athlete and one to each custodian', () => {
+    const holders = splitForRecovery(randomBytes(32)).map((s) => s.holder);
+    expect(holders).to.deep.equal(['athlete', 'athlete', 'physician', 'federation-official']);
+  });
+
+  it('the athlete with either custodian reconstructs the key', () => {
     const key = randomBytes(32);
     const shares = splitForRecovery(key);
-    expect(shares.map((s) => s.holder)).to.deep.equal([...RECOVERY_HOLDERS]);
-
-    for (const pair of [
-      [0, 1],
-      [0, 2],
-      [1, 2],
-    ]) {
-      const recovered = combine([shares[pair[0]], shares[pair[1]]]);
-      expect(secretsEqual(recovered, key), `pair ${pair} failed`).to.equal(true);
+    for (const custodian of ['physician', 'federation-official']) {
+      expect(secretsEqual(combine(byHolder(shares, 'athlete', custodian)), key), custodian).to.equal(true);
     }
   });
 
-  it('reconstructs the key from all three shares', () => {
-    const key = randomBytes(32);
-    expect(secretsEqual(combine(splitForRecovery(key)), key)).to.equal(true);
-  });
-
-  it('a single holder cannot reconstruct the key', () => {
+  it('the two custodians together cannot reconstruct the key without the athlete', () => {
     const key = randomBytes(32);
     const shares = splitForRecovery(key);
-    for (const share of shares) {
-      expect(() => combine([share])).to.throw(/at least two shares/);
-      // The share alone must also not equal the secret.
-      expect(share.value.equals(key)).to.equal(false);
-    }
+    const institutional = byHolder(shares, 'physician', 'federation-official');
+    expect(institutional).to.have.lengthOf(2);
+    expect(holdersCanRecover(['physician', 'federation-official'])).to.equal(false);
+    // Interpolating through too few points yields a wrong key, not an error.
+    expect(secretsEqual(combine(institutional), key)).to.equal(false);
+    expect(() => recoverDataAccessKey(new KeyVault(), 'k', institutional)).to.throw(/at least 3 shares/);
   });
 
-  it('a single share leaks nothing: it is consistent with every possible secret', () => {
-    // Perfect secrecy, stated exactly rather than sampled. Fix any observed
-    // share at x=1. For a 1-byte secret at threshold 2 there are 256 candidate
-    // values for a second share; if for EVERY secret in GF(256) some second
-    // share reconstructs it, then the observed share excludes no secret at all
-    // and therefore carries zero information about it.
-    const observed = split(Buffer.from([0x5a]), 3, 2)[0];
+  it('the athlete alone, or any single custodian, cannot reconstruct the key', () => {
+    expect(holdersCanRecover(['athlete'])).to.equal(false);
+    expect(holdersCanRecover(['physician'])).to.equal(false);
+    expect(holdersCanRecover(['athlete', 'physician'])).to.equal(true);
+    expect(RECOVERY_THRESHOLD).to.equal(3);
+  });
 
+  it('fewer shares than the threshold leak nothing: they are consistent with every secret', () => {
+    // Fix two observed shares of a threshold-3 split of a one-byte secret. If
+    // for every secret in GF(256) some third share reconstructs it, the two
+    // observed shares exclude no secret and carry no information about it.
+    const [a, b] = split(Buffer.from([0x5a]), 4, 3);
     const reachable = new Set<number>();
     for (let w = 0; w < 256; w += 1) {
-      const candidate = { index: 2, value: Buffer.from([w]) };
-      reachable.add(combine([observed, candidate])[0]);
+      reachable.add(combine([a, b, { index: 3, value: Buffer.from([w]) }])[0]);
     }
-    expect(reachable.size, 'one share narrows the secret space').to.equal(256);
+    expect(reachable.size, 'two shares narrow the secret space').to.equal(256);
   });
 
   it('round-trips arbitrary secrets (property-based)', () => {
     fc.assert(
       fc.property(fc.uint8Array({ minLength: 1, maxLength: 128 }), (bytes) => {
         const secret = Buffer.from(bytes);
-        const shares = split(secret, 3, 2);
-        return combine([shares[0], shares[2]]).equals(secret);
+        const shares = split(secret, 4, 3);
+        return combine([shares[0], shares[1], shares[3]]).equals(secret);
       }),
       { numRuns: 500 },
     );
@@ -129,6 +143,33 @@ describe('Shamir 2-of-3 key recovery', () => {
     expect(() => combine([shares[0], shares[0]])).to.throw(/distinct indices/);
     expect(() => split(randomBytes(32), 2, 3)).to.throw(/at least the threshold/);
     expect(() => split(Buffer.alloc(0), 3, 2)).to.throw(/non-empty/);
+  });
+});
+
+describe('Keyed pseudonyms and commitments', () => {
+  it('a pseudonym is keyed: without the key, enumerating identifiers does not reverse it', () => {
+    const service = new PseudonymisationService();
+    const target = service.pseudonym('ADAMS-0004217');
+    // The attack an unkeyed hash invites: hash every candidate identifier.
+    const guesses = Array.from({ length: 5000 }, (_, i) => `ADAMS-${String(i).padStart(7, '0')}`);
+    const attackerKey = randomBytes(32);
+    expect(guesses.some((g) => pseudonymise(g, attackerKey) === target)).to.equal(false);
+    // The service itself maps the identifier stably.
+    expect(service.pseudonym('ADAMS-0004217')).to.equal(target);
+    expect(target).to.match(/^[0-9a-f]{64}$/);
+  });
+
+  it('domains separate pseudonyms, so datasets cannot be joined on them', () => {
+    const service = new PseudonymisationService();
+    expect(service.pseudonym('ADAMS-1', 'antidoping/custody')).to.not.equal(
+      service.pseudonym('ADAMS-1', 'research/export'),
+    );
+  });
+
+  it('a payload commitment depends on the key, so a guessed payload cannot be confirmed without it', () => {
+    const key = randomBytes(32);
+    expect(commit(SAMPLE_PAYLOAD, key)).to.not.equal(commit(SAMPLE_PAYLOAD, randomBytes(32)));
+    expect(commit(SAMPLE_PAYLOAD, key)).to.equal(commit(SAMPLE_PAYLOAD, key));
   });
 });
 
@@ -173,6 +214,7 @@ describe('IPFS off-chain storage and GDPR Article 17 erasure', function () {
     expect(record.keyRef).to.match(/^key-/);
     // Nothing that would be written on-chain may contain the payload.
     const onChain = JSON.stringify(record);
+    expect(record.commitment).to.match(/^[0-9a-f]{64}$/);
     expect(onChain).to.not.contain('OFF-score');
     expect(onChain).to.not.contain('abp_haematological');
   });
@@ -195,13 +237,36 @@ describe('IPFS off-chain storage and GDPR Article 17 erasure', function () {
     expect(raw.toString('utf8')).to.not.contain('OFF-score');
   });
 
-  it('after destroyIPFSAccessToken the payload is unrecoverable', async () => {
+  it('revocation is reversible: the athlete and one custodian restore access', async () => {
     const { record } = await storeEncrypted(SAMPLE_PAYLOAD, { cluster, vault });
-    const certificate = await destroyIPFSAccessToken(record, vault, cluster);
+    const custody = new ShareCustody();
+    custody.deposit(splitForRecovery(vault.exportForSharing(record.keyRef)));
+    revokeDataAccessKey(vault, record.keyRef);
+    expect(() => vault.get(record.keyRef)).to.throw(/destroyed/);
+
+    expect(() =>
+      recoverDataAccessKey(vault, record.keyRef, [
+        ...custody.produce('physician'),
+        ...custody.produce('federation-official'),
+      ]),
+    ).to.throw(/at least 3 shares/);
+    recoverDataAccessKey(vault, record.keyRef, [...custody.produce('athlete'), ...custody.produce('physician')]);
+    expect((await retrieveDecrypted(record, { cluster, vault })).equals(SAMPLE_PAYLOAD)).to.equal(true);
+  });
+
+  it('erasure destroys the key and every share and unpins everywhere: nothing can restore access', async () => {
+    const { record } = await storeEncrypted(SAMPLE_PAYLOAD, { cluster, vault });
+    const custody = new ShareCustody();
+    custody.deposit(splitForRecovery(vault.exportForSharing(record.keyRef)));
+    const certificate = await destroyIPFSAccessToken(record, vault, cluster, custody);
 
     expect(certificate.keyDestroyed).to.equal(true);
+    expect(certificate.sharesDestroyed).to.have.members(['athlete', 'physician', 'federation-official']);
     expect(certificate.unpinResults).to.have.lengthOf(cluster.nodes.length);
+    expect(certificate.complete).to.equal(true);
     expect(certificate.legalCaveat).to.contain('not confirmed by supervisory authorities');
+    expect(custody.holders()).to.be.empty;
+    expect(await cluster.isRetrievableLocally(record.cid)).to.equal(false);
 
     let error: Error | undefined;
     try {
@@ -210,29 +275,9 @@ describe('IPFS off-chain storage and GDPR Article 17 erasure', function () {
       error = e as Error;
     }
     expect(error, 'retrieval succeeded after erasure').to.exist;
-    expect(error!.message).to.contain('GDPR Article 17');
-  });
-
-  it('erasure is irreversible without the recovery shares', async () => {
-    const { record } = await storeEncrypted(SAMPLE_PAYLOAD, { cluster, vault });
-    const key = vault.exportForSharing(record.keyRef);
-    const shares = splitForRecovery(key);
-    await destroyIPFSAccessToken(record, vault, cluster);
-    expect(() => vault.get(record.keyRef)).to.throw(/destroyed/);
-
-    // Two of three shares restore access; this is the §6 recovery path.
-    recoverDataAccessKey(vault, record.keyRef, [shares[0], shares[2]]);
-    expect(vault.get(record.keyRef).equals(key)).to.equal(true);
-  });
-
-  it('a single share cannot restore access after erasure', async () => {
-    const { record } = await storeEncrypted(SAMPLE_PAYLOAD, { cluster, vault });
-    const shares = splitForRecovery(vault.exportForSharing(record.keyRef));
-    await destroyIPFSAccessToken(record, vault, cluster);
-    expect(() => recoverDataAccessKey(vault, record.keyRef, [shares[1]])).to.throw(
-      /at least two of the three shares/,
+    expect(() => recoverDataAccessKey(vault, record.keyRef, custody.produce('athlete'))).to.throw(
+      /at least 3 shares/,
     );
-    expect(vault.wasDestroyed(record.keyRef)).to.equal(true);
   });
 
   it('a ledger record alone is not enough to read the payload', async () => {

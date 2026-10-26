@@ -1,0 +1,489 @@
+{
+ "name": "baselines",
+ "configuration": {
+  "id": "baselines",
+  "seed": 31
+ },
+ "rounds": [
+  {
+   "id": "b1-baseline-telog-c32",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 32,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-c8",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 8,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-c4",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 4,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-c32",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 32,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-telog-c128",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 128,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-c256",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 256,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-telog-c64",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 64,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-c128",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 128,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-c16",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 16,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-lat",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "latency",
+   "tps": 2,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-telog-c16",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 16,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-telog-c256",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 256,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-couchdb-c64",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 64,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-telog-c8",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 8,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-telog-lat",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "latency",
+   "tps": 2,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b1-baseline-telog-c4",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 1,
+   "kind": "sweep",
+   "concurrency": 4,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-c16",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 16,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-c256",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 256,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-lat",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "latency",
+   "tps": 2,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-c8",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 8,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-c128",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 128,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-c4",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 4,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-c64",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 64,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-c128",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 128,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-c256",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 256,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-c64",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 64,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-lat",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "latency",
+   "tps": 2,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-c32",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 32,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-couchdb-c4",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 4,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-c32",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 32,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-c16",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 16,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b2-baseline-telog-c8",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 2,
+   "kind": "sweep",
+   "concurrency": 8,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-c8",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 8,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-c16",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 16,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-c64",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 64,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-c4",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 4,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-c32",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 32,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-c64",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 64,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-lat",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "latency",
+   "tps": 2,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-c4",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 4,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-c16",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 16,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-c256",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 256,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-c8",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 8,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-c128",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 128,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-couchdb-lat",
+   "workload": "baseline-couchdb",
+   "target": "http://baseline-couchdb:5984/custody",
+   "block": 3,
+   "kind": "latency",
+   "tps": 2,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-c128",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 128,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-c32",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 32,
+   "warmup": 15,
+   "duration": 30
+  },
+  {
+   "id": "b3-baseline-telog-c256",
+   "workload": "baseline-telog",
+   "target": "http://baseline-telog:8080",
+   "block": 3,
+   "kind": "sweep",
+   "concurrency": 256,
+   "warmup": 15,
+   "duration": 30
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "resultsCollection",
+    "policy": "OR('NADOMSP.member', 'LabMSP.member')",
+    "requiredPeerCount": 1,
+    "maxPeerCount": 3,
+    "blockToLive": 0,
+    "memberOnlyRead": true,
+    "memberOnlyWrite": true,
+    "endorsementPolicy": {
+      "signaturePolicy": "AND('NADOMSP.peer', 'LabMSP.peer')"
+    }
+  },
+  {
+    "name": "noticeCollection",
+    "policy": "OR('NADOMSP.member', 'LabMSP.member', 'AthleteMSP.member', 'FederationMSP.member')",
+    "requiredPeerCount": 1,
+    "maxPeerCount": 7,
+    "blockToLive": 0,
+    "memberOnlyRead": true,
+    "memberOnlyWrite": true,
+    "endorsementPolicy": {
+      "signaturePolicy": "AND('NADOMSP.peer', 'LabMSP.peer')"
+    }
+  }
+]

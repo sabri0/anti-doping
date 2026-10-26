@@ -56,9 +56,34 @@ desktop.ini
 *.zip
 *.tar.gz
 
-# Submission-strategy material, not part of the artefact.
-# The cover letter names suggested reviewers and declares the manuscript's
-# editorial history; neither belongs in a public repository. The build scripts
-# and their inputs stay, so the .docx remains reproducible from the measurements.
-manuscript-build/cover-letter.md
-manuscript-build/submission-notes.md
+# Manuscript and submission material is not part of the software: its sources,
+# its build, the drawn diagrams and the rendered figures stay out of the
+# repository. The measurement output and the analysis that turns it into the
+# reported numbers stay in.
+manuscript-build/
+manuscript-build-v3-archive/
+scripts/build-v4.sh
+scripts/gen-figure-dsr.py
+scripts/gen-figure-architecture.py
+scripts/gen-figure-logical-view.py
+scripts/gen-figure-consent.py
+docs/figures/
+screenCapture/
+*.docx
+*.pdf
+
+# First build cycle: kept in commit 6f6601d. Only the rounds that
+# scripts/analyse-state-scaling.py reads are versioned here.
+scripts/archive-cycle1/
+docs/archive-cycle1/*
+!docs/archive-cycle1/state-scaling.json
+
+# Test coverage and interpreter caches
+.nyc_output/
+coverage/
+__pycache__/
+
+# Fabric release binaries (downloaded, not versioned)
+network/bin-cache/
+network/tools/bin/
+

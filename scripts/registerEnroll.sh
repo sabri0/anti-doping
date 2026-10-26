@@ -4,8 +4,10 @@
 # Runs INSIDE the ca-tools container (the only image that ships fabric-ca-client),
 # so the host needs no Fabric binaries. Invoked by scripts/network-up.sh.
 #
-# Each of the five organizational classes from §3.2 of the manuscript gets its
-# own CA, its own MSP, and NodeOU-based role separation (client / peer / admin).
+# Each of the five organisational classes gets its own CA, its own MSP, and
+# NodeOU-based role separation (client / peer / admin / orderer). Four of the
+# classes also operate one ordering node each, enrolled against their own CA:
+# there is no separate ordering organisation.
 set -eu
 
 ROOT=/work
@@ -15,6 +17,8 @@ export FABRIC_CA_CLIENT_TLS_CERTFILES=""
 
 # org_key:ca_port
 ORG_LIST="athlete:7054 federation:8054 nado:9054 lab:10054 research:11054"
+# Organisations that operate an ordering node.
+ORDERER_ORGS="athlete federation nado lab"
 
 log() { printf '\033[0;34m[enroll]\033[0m %s\n' "$*"; }
 
@@ -102,11 +106,28 @@ for entry in $ORG_LIST; do
     i=$((i + 1))
   done
 
+  # 3b. Ordering node, for the organisations that operate one.
+  case " $ORDERER_ORGS " in
+    *" $ORG "*)
+      OHOST=orderer.$ORG.$DOMAIN
+      ODIR=$ORG_HOME/orderers/$OHOST
+      mkdir -p "$ODIR"
+      fabric-ca-client register --caname "$CA" --id.name "orderer-$ORG" --id.secret ordererpw         --id.type orderer --tls.certfiles "$CA_CERT" >/dev/null
+      fabric-ca-client enroll -u "https://orderer-$ORG:ordererpw@$CA:$PORT" --caname "$CA"         -M "$ODIR/msp" --csr.hosts "$OHOST" --tls.certfiles "$CA_CERT" >/dev/null
+      write_nodeou_config "$ODIR/msp"
+      fabric-ca-client enroll -u "https://orderer-$ORG:ordererpw@$CA:$PORT" --caname "$CA"         -M "$ODIR/tls" --enrollment.profile tls         --csr.hosts "$OHOST" --csr.hosts localhost         --tls.certfiles "$CA_CERT" >/dev/null
+      normalise_tls "$ODIR/tls"
+      ;;
+  esac
+
   # 4. Org-level trust anchors, referenced by configtx.yaml.
   mkdir -p "$ORG_HOME/msp/tlscacerts" "$ORG_HOME/tlsca" "$ORG_HOME/ca"
   cp "$CA_CERT" "$ORG_HOME/msp/tlscacerts/ca.crt"
   cp "$CA_CERT" "$ORG_HOME/tlsca/tlsca.$ORG.$DOMAIN-cert.pem"
   cp "$CA_CERT" "$ORG_HOME/ca/ca.$ORG.$DOMAIN-cert.pem"
+  # Every orderer trusts every organisation's TLS root for cluster traffic.
+  mkdir -p "$ORGS_DIR/cas"
+  cp "$CA_CERT" "$ORGS_DIR/cas/$ORG.pem"
 
   # 5. Administrator and end-user identities used by the CLI and the gateway.
   fabric-ca-client enroll -u "https://${ORG}admin:${ORG}adminpw@$CA:$PORT" --caname "$CA" \
@@ -118,40 +139,4 @@ for entry in $ORG_LIST; do
   write_nodeou_config "$ORG_HOME/users/User1@$ORG.$DOMAIN/msp"
 done
 
-# ---------------------------------------------------------------- orderer org
-log "org orderer -> ca-orderer:12054"
-ORD_HOME=$ORGS_DIR/ordererOrganizations/$DOMAIN
-ORD_CA_CERT=$ORGS_DIR/fabric-ca/orderer/ca-cert.pem
-mkdir -p "$ORD_HOME"
-export FABRIC_CA_CLIENT_HOME=$ORD_HOME
-
-fabric-ca-client enroll -u "https://admin:adminpw@ca-orderer:12054" \
-  --caname ca-orderer --tls.certfiles "$ORD_CA_CERT" >/dev/null
-write_nodeou_config "$ORD_HOME/msp"
-
-fabric-ca-client register --caname ca-orderer --id.name orderer --id.secret ordererpw \
-  --id.type orderer --tls.certfiles "$ORD_CA_CERT" >/dev/null
-fabric-ca-client register --caname ca-orderer --id.name ordereradmin --id.secret ordereradminpw \
-  --id.type admin --tls.certfiles "$ORD_CA_CERT" >/dev/null
-
-ODIR=$ORD_HOME/orderers/orderer.$DOMAIN
-mkdir -p "$ODIR"
-fabric-ca-client enroll -u "https://orderer:ordererpw@ca-orderer:12054" --caname ca-orderer \
-  -M "$ODIR/msp" --csr.hosts "orderer.$DOMAIN" --tls.certfiles "$ORD_CA_CERT" >/dev/null
-write_nodeou_config "$ODIR/msp"
-
-fabric-ca-client enroll -u "https://orderer:ordererpw@ca-orderer:12054" --caname ca-orderer \
-  -M "$ODIR/tls" --enrollment.profile tls \
-  --csr.hosts "orderer.$DOMAIN" --csr.hosts localhost \
-  --tls.certfiles "$ORD_CA_CERT" >/dev/null
-normalise_tls "$ODIR/tls"
-
-mkdir -p "$ORD_HOME/msp/tlscacerts" "$ORD_HOME/tlsca"
-cp "$ORD_CA_CERT" "$ORD_HOME/msp/tlscacerts/tlsca.$DOMAIN-cert.pem"
-cp "$ORD_CA_CERT" "$ORD_HOME/tlsca/tlsca.$DOMAIN-cert.pem"
-
-fabric-ca-client enroll -u "https://ordereradmin:ordereradminpw@ca-orderer:12054" --caname ca-orderer \
-  -M "$ORD_HOME/users/Admin@$DOMAIN/msp" --tls.certfiles "$ORD_CA_CERT" >/dev/null
-write_nodeou_config "$ORD_HOME/users/Admin@$DOMAIN/msp"
-
-log "all identities enrolled across 6 certification authorities"
+log "all identities enrolled across 5 certification authorities"

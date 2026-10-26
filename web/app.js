@@ -323,8 +323,6 @@
     COLLECTION: "Sample collection",
     TRANSPORT_HANDOFF: "Transport handoff",
     LABORATORY_RECEIPT: "Laboratory receipt",
-    LABORATORY_INTERNAL: "Laboratory internal transfer",
-    ANALYSIS_COMPLETE: "Analysis complete",
   };
   const ORG_LABEL = {
     NADOMSP: "NADO", LabMSP: "Lab", AthleteMSP: "Athlete",
@@ -332,7 +330,8 @@
   };
 
   async function loadChain() {
-    const chain = await GET(`/samples/${encodeURIComponent(state.sampleCode)}/custody-chain`);
+    const custody = await GET(`/samples/${encodeURIComponent(state.sampleCode)}/custody-chain`);
+    const chain = Array.isArray(custody) ? custody : custody.events || [];
     const history = await GET(`/samples/${encodeURIComponent(state.sampleCode)}/history`)
       .catch(() => []);
 
@@ -347,10 +346,9 @@
         time: when(ev.recordedAt),
         hash: txHash,
         prev,
-        // Both parties to a transfer must endorse; collection is NADO alone.
-        end: ev.sequence === 0
-          ? [["NADO", "ok"]]
-          : [[ORG_LABEL[ev.fromMSP] || ev.fromMSP, "ok"], [ORG_LABEL[ev.toMSP] || ev.toMSP, "ok"]],
+        // Each step is signed by the organisation that performed it: the
+        // dispatch by the NADO, the receipt by the laboratory.
+        end: [[ORG_LABEL[ev.submittingMSP] || ev.submittingMSP, ev.status === "PROPOSED" ? "pending" : "ok"]],
         status: ev.containerSealIntact ? "ok" : "broken",
       };
       prev = txHash;
@@ -364,7 +362,7 @@
         const r = rm.results;
         rows.push({
           phase: "Results management",
-          actor: `Table 2 decision engine · ${r.wadaArticle || "Article 7.1"}`,
+          actor: `Table 1 decision engine · ${r.wadaArticle || "Article 7.1"}`,
           time: when(r.decidedAt),
           // The hash column holds transaction hashes; the rule identifier
           // belongs in the note, not here.
@@ -580,9 +578,9 @@
       ui.logFeed("ok", `Chain verified — ${history.length} ledger versions read back`);
     }, "Verification"));
 
-    /* The design's tamper button simulated corruption. The point is that the
-       network refuses it, so the button now attempts a real single-organization
-       write to results-management state and reports the rejection. */
+    /* The tamper button attempts what an insider at the NADO would: re-running
+       results management on a committed case, with endorsements requested from
+       both the NADO and the laboratory peers. The contract refuses on both. */
     rebind("#tamperBtn", "click", () => guard(async () => {
       if (session.org !== "nado") {
         banner("warn",
@@ -594,18 +592,17 @@
         ui.toast("Requires a NADO sign-in");
         return;
       }
-      ui.toast("Attempting a single-organization write…");
+      ui.toast("Attempting to overwrite a committed decision…");
       try {
-        await POST(`/samples/${encodeURIComponent(state.sampleCode)}/results-management?endorsers=NADOMSP`,
-          {});
-        banner("warn", "<b>Unexpected:</b> the network accepted a single-organization write.");
-        ui.logFeed("warn", "Single-organization write was accepted — endorsement policy not enforced");
+        await POST(`/samples/${encodeURIComponent(state.sampleCode)}/results-management`, {});
+        banner("warn", "<b>Unexpected:</b> the network accepted an overwrite of a committed decision.");
+        ui.logFeed("warn", "Overwrite of committed results management was accepted");
       } catch (e) {
         banner("ok",
-          `<b>Rejected by the network.</b> A single organization cannot alter committed ` +
-          `results-management state: that record is bound to a policy requiring peers from ` +
-          `two distinct organizational classes. <span class="mono">${String(e.message).slice(0, 90)}</span>`);
-        ui.logFeed("ok", "Tamper attempt rejected — cross-organizational endorsement enforced");
+          `<b>Refused by both endorsing peers.</b> A committed results-management record is never ` +
+          `overwritten; a change needs a proposal by one organisation and approval by the other. ` +
+          `<span class="mono">${String(e.message).slice(0, 90)}</span>`);
+        ui.logFeed("ok", "Overwrite refused — two-party approval required");
       }
     }, "Tamper attempt"));
   }

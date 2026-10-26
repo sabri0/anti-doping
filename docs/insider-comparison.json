@@ -1,0 +1,31 @@
+{
+  "executedAt": "2026-10-26T19:56:29.800Z",
+  "previouslyReported": {
+    "pinned": {
+      "overwriteResultsManagement": "ENDORSEMENT_POLICY_FAILURE",
+      "resultsRecordReplaced": false,
+      "recordLaboratoryReceiptAsNado": "COMMITTED",
+      "receiptOnLedgerSubmittedBy": "NADOMSP"
+    },
+    "both": {
+      "overwriteResultsManagement": "COMMITTED",
+      "resultsRecordReplaced": true,
+      "recordLaboratoryReceiptAsNado": "COMMITTED",
+      "receiptOnLedgerSubmittedBy": "NADOMSP"
+    }
+  },
+  "revised": {
+    "pinned": {
+      "overwriteResultsManagement": "REFUSED BY CHAINCODE: a results-management record for sample V2-1abe2f65 is already committed and is not overwritten",
+      "resultsRecordReplaced": false,
+      "recordLaboratoryReceiptAsNado": "REFUSED BY CHAINCODE: only LabMSP may accept transfer 1 of sample V2b-6e1ae00b",
+      "receiptOnLedgerSubmittedBy": null
+    },
+    "both": {
+      "overwriteResultsManagement": "REFUSED BY CHAINCODE: a results-management record for sample V2-3e38c854 is already committed and is not overwritten",
+      "resultsRecordReplaced": false,
+      "recordLaboratoryReceiptAsNado": "REFUSED BY CHAINCODE: only LabMSP may accept transfer 1 of sample V2b-c87ddeb0",
+      "receiptOnLedgerSubmittedBy": null
+    }
+  }
+}

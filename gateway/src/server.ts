@@ -102,41 +102,43 @@ const route =
     // No next(): every branch above has already sent a response.
   };
 
-async function submit(org: OrgKey, cc: 'custody' | 'consent', fn: string, args: string[]) {
-  const contract = await contractFor(org, cc);
-  return decode(await contract.submitTransaction(fn, ...args));
-}
-
-async function evaluate(org: OrgKey, cc: 'custody' | 'consent', fn: string, args: string[]) {
-  const contract = await contractFor(org, cc);
-  return decode(await contract.evaluateTransaction(fn, ...args));
+interface SubmitOptions {
+  /** Inputs written to the transient field rather than the shared block. */
+  transient?: unknown;
+  /** Organisations whose peers must endorse; required where a key or collection policy names them. */
+  endorsers?: string[];
 }
 
 /**
- * Submit while restricting endorsement to named organizations.
- *
- * Normally the gateway lets service discovery assemble an endorsement plan that
- * satisfies the policy. Pinning the endorser set is what makes the §4.1
- * collusion mitigation demonstrable through the API: a caller can attempt a
- * results-management write with a single organization's endorsement and observe
- * the network reject it, rather than having to take the claim on trust.
+ * Endorse, submit and wait for commit. Endorsers are named explicitly because
+ * the platform's discovery plan follows the chaincode-level policy only, and a
+ * write to a key bound to the NADO and the laboratory, or to a collection
+ * whose policy names them, would otherwise be endorsed by the wrong pair and
+ * rejected at validation.
  */
-async function submitFrom(
-  org: OrgKey,
-  cc: 'custody' | 'consent',
-  fn: string,
-  args: string[],
-  endorsingOrganizations: string[],
-) {
+async function submit(org: OrgKey, cc: 'custody' | 'consent', fn: string, args: string[], options: SubmitOptions = {}) {
   const contract = await contractFor(org, cc);
-  const proposal = contract.newProposal(fn, { arguments: args, endorsingOrganizations });
+  const proposal = contract.newProposal(fn, {
+    arguments: args,
+    ...(options.transient !== undefined
+      ? { transientData: { input: Buffer.from(JSON.stringify(options.transient)) } }
+      : {}),
+    ...(options.endorsers ? { endorsingOrganizations: options.endorsers } : {}),
+  });
   const transaction = await proposal.endorse();
   const submitted = await transaction.submit();
   const status = await submitted.getStatus();
   if (!status.successful) {
-    throw new Error(`transaction ${status.transactionId} failed validation: code ${status.code}`);
+    const reason = status.code === 10 ? 'ENDORSEMENT_POLICY_FAILURE' : `code ${status.code}`;
+    throw new Error(`transaction ${status.transactionId} failed validation: ${reason}`);
   }
   return decode(transaction.getResult());
+}
+
+/** Evaluate, optionally on a peer of a named organisation (private data lives only on member peers). */
+async function evaluate(org: OrgKey, cc: 'custody' | 'consent', fn: string, args: string[], endorsers?: string[]) {
+  const contract = await contractFor(org, cc);
+  return decode(await contract.evaluate(fn, { arguments: args, ...(endorsers ? { endorsingOrganizations: endorsers } : {}) }));
 }
 
 
@@ -224,7 +226,7 @@ app.get(
       chaincodes: ['custody', 'consent'],
       organizations,
       ipfs: await offchain.ipfsReachable(),
-      orderer: 'orderer.antidoping.org:7050 (Raft)',
+      orderers: ['athlete', 'federation', 'nado', 'lab'].map((o) => `orderer.${o}.antidoping.org`),
     });
   }),
 );
@@ -244,102 +246,146 @@ app.get(
 
 // --------------------------------------------------------------- custody
 
+const NADO_LAB = ['NADOMSP', 'LabMSP'];
+const digest = (s: string) => createHash('sha256').update(s).digest('hex');
+
 app.post(
   '/api/prohibited-list',
   route(async (req, res) => {
     const { version, hash } = req.body;
-    res.json(await submit(actingOrg(req, 'nado'), 'custody', 'registerProhibitedList', [version, hash]));
+    res.json(await submit(actingOrg(req, 'nado'), 'custody', 'registerProhibitedList', [version, hash], { endorsers: NADO_LAB }));
   }),
 );
 
-/** WADA Article 5.3 */
+/** WADA Article 5.3 — the doping control form stays off-chain; its digest is written. */
 app.post(
   '/api/samples',
   route(async (req, res) => {
-    const { sampleCode, athleteHash, sealedContainerHash, collectionLocation } = req.body;
+    const { sampleCode, athleteHash, sealedContainerHash, dopingControlForm } = req.body;
     res.status(201).json(
-      await submit(actingOrg(req, 'nado'), 'custody', 'initiateSampleCustody', [
-        sampleCode,
-        athleteHash,
-        sealedContainerHash,
-        collectionLocation,
-      ]),
+      await submit(
+        actingOrg(req, 'nado'),
+        'custody',
+        'initiateSampleCustody',
+        [sampleCode, athleteHash, sealedContainerHash, digest(JSON.stringify(dopingControlForm ?? {}))],
+        { endorsers: NADO_LAB },
+      ),
     );
   }),
 );
 
-/** WADA Article 5.4 */
+/** The athlete's own attestation of the collection, as on the doping control form. */
 app.post(
-  '/api/samples/:code/transfers',
+  '/api/samples/:code/acknowledge',
   route(async (req, res) => {
-    const { phase, fromMSP, toMSP, containerSealIntact, transferWindowHours } = req.body;
     res.status(201).json(
-      await submit(actingOrg(req, 'nado'), 'custody', 'recordCustodyTransfer', [
-        req.params.code,
-        phase,
-        fromMSP,
-        toMSP,
-        String(containerSealIntact ?? true),
-        String(transferWindowHours ?? 48),
-      ]),
+      await submit(actingOrg(req, 'athlete'), 'custody', 'acknowledgeSampleCollection', [req.params.code, req.body.sealedContainerHash], {
+        endorsers: ['AthleteMSP', 'NADOMSP'],
+      }),
     );
   }),
 );
 
-/** WADA Article 2.1 */
+/** WADA Article 5.4, first half: dispatch, under the NADO's identity. */
+app.post(
+  '/api/samples/:code/dispatch',
+  route(async (req, res) => {
+    const { containerSealIntact, transferWindowHours } = req.body;
+    res.status(201).json(
+      await submit(
+        actingOrg(req, 'nado'),
+        'custody',
+        'proposeCustodyTransfer',
+        [req.params.code, 'LabMSP', String(containerSealIntact ?? true), String(transferWindowHours ?? 48)],
+        { endorsers: NADO_LAB },
+      ),
+    );
+  }),
+);
+
+/** WADA Article 5.4, second half: receipt, under the laboratory's identity. */
+app.post(
+  '/api/samples/:code/receipt',
+  route(async (req, res) => {
+    const { sequence, containerSealIntact, observedSealHash } = req.body;
+    res.status(201).json(
+      await submit(
+        actingOrg(req, 'lab'),
+        'custody',
+        'acceptCustodyTransfer',
+        [req.params.code, String(sequence ?? 1), String(containerSealIntact ?? true), observedSealHash],
+        { endorsers: NADO_LAB },
+      ),
+    );
+  }),
+);
+
+/** WADA Article 2.1 — private; the result travels in the transient field. */
 app.post(
   '/api/samples/:code/analysis',
   route(async (req, res) => {
-    const { adverse, substance, prohibitedListVersion, prohibitedListHash, laboratoryAccreditation } =
-      req.body;
+    const { adverse, substance, prohibitedListVersion, prohibitedListHash, laboratoryAccreditation } = req.body;
     res.status(201).json(
-      await submit(actingOrg(req, 'lab'), 'custody', 'recordSampleAnalysisResult', [
-        req.params.code,
-        String(adverse),
-        substance ?? '',
-        prohibitedListVersion,
-        prohibitedListHash,
-        laboratoryAccreditation ?? 'VERIFIED',
-      ]),
+      await submit(actingOrg(req, 'lab'), 'custody', 'recordSampleAnalysisResult', [req.params.code], {
+        transient: {
+          adverse: adverse === true || adverse === 'true',
+          substance: substance ?? '',
+          prohibitedListVersion,
+          prohibitedListHash,
+          laboratoryAccreditation: laboratoryAccreditation ?? 'VERIFIED',
+        },
+        endorsers: NADO_LAB,
+      }),
     );
   }),
 );
 
-/**
- * WADA Article 7.1 — runs the Table 2 decision engine on-chain.
- *
- * `?endorsers=NADOMSP` pins the endorsing organizations. Used to demonstrate
- * that a single organization cannot alter committed results-management state:
- * the write is rejected at validation with an endorsement policy failure.
- */
+/** WADA Article 7.1 — runs the Table 1 decision engine; the record is then read by a member. */
 app.post(
   '/api/samples/:code/results-management',
   route(async (req, res) => {
     const org = actingOrg(req, 'nado');
-    const pinned = String(req.query.endorsers ?? '')
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const result = pinned.length
-      ? await submitFrom(org, 'custody', 'triggerResultsManagement', [req.params.code], pinned)
-      : await submit(org, 'custody', 'triggerResultsManagement', [req.params.code]);
-    res.json(result);
+    await submit(org, 'custody', 'triggerResultsManagement', [req.params.code], { endorsers: NADO_LAB });
+    res.json(await evaluate(org, 'custody', 'getResultsManagement', [req.params.code], [ORGS[org].msp]));
   }),
 );
 
-/** WADA Article 2.4 — whereabouts filing or failure. */
+/** A change to a committed outcome: proposed by one organisation ... */
+app.post(
+  '/api/samples/:code/amendments',
+  route(async (req, res) => {
+    const { action, reason } = req.body;
+    res.status(201).json(
+      await submit(actingOrg(req, 'nado'), 'custody', 'proposeResultsAmendment', [req.params.code], {
+        transient: { action, reason },
+        endorsers: NADO_LAB,
+      }),
+    );
+  }),
+);
+
+/** ... and approved by the other. */
+app.post(
+  '/api/samples/:code/amendments/:index/approve',
+  route(async (req, res) => {
+    res.json(
+      await submit(actingOrg(req, 'lab'), 'custody', 'approveResultsAmendment', [req.params.code, req.params.index], {
+        endorsers: NADO_LAB,
+      }),
+    );
+  }),
+);
+
+/** WADA Article 2.4 — a failure status; the filing itself stays off-chain. */
 app.post(
   '/api/whereabouts',
   route(async (req, res) => {
     const { athleteHash, filingId, failure, ledgerVerified } = req.body;
     res.status(201).json(
-      await submit(actingOrg(req, 'nado'), 'custody', 'recordWhereaboutsStatus', [
-        athleteHash,
-        filingId,
-        String(failure ?? true),
-        String(ledgerVerified ?? true),
-      ]),
+      await submit(actingOrg(req, 'nado'), 'custody', 'recordWhereaboutsStatus', [], {
+        transient: { athleteHash, filingId, failure: failure !== false, ledgerVerified: ledgerVerified !== false },
+        endorsers: NADO_LAB,
+      }),
     );
   }),
 );
@@ -349,28 +395,24 @@ app.post(
   '/api/passport-evaluation',
   route(async (req, res) => {
     const { athleteHash, anomaly, expertPanelRequired } = req.body;
-    await submit(actingOrg(req, 'lab'), 'custody', 'recordPassportEvaluation', [
-      athleteHash,
-      String(anomaly ?? true),
-      String(expertPanelRequired ?? true),
-    ]);
-    res.status(201).json({ athleteHash, anomaly, expertPanelRequired });
+    await submit(actingOrg(req, 'lab'), 'custody', 'recordPassportEvaluation', [], {
+      transient: { athleteHash, anomaly: anomaly !== false, expertPanelRequired: expertPanelRequired !== false },
+      endorsers: NADO_LAB,
+    });
+    res.status(201).json({ recorded: true });
   }),
 );
 
-/** Register an off-chain payload: only the CID and key reference go on-ledger. */
+/** Register an off-chain payload: CID, key reference and keyed commitment, privately. */
 app.post(
   '/api/offchain-payload',
   route(async (req, res) => {
-    const { athleteHash, category, cid, keyRef, plaintextDigest } = req.body;
+    const { athleteHash, category, cid, keyRef, commitment } = req.body;
     res.status(201).json(
-      await submit(actingOrg(req, 'lab'), 'consent', 'registerOffchainPayload', [
-        athleteHash,
-        category,
-        cid,
-        keyRef,
-        plaintextDigest,
-      ]),
+      await submit(actingOrg(req, 'lab'), 'consent', 'registerOffchainPayload', [], {
+        transient: { athleteHash, category, cid, keyRef, commitment },
+        endorsers: ['AthleteMSP'],
+      }),
     );
   }),
 );
@@ -379,7 +421,7 @@ app.post(
 app.post(
   '/api/samples/:code/notify',
   route(async (req, res) => {
-    res.json(await submit(actingOrg(req, 'nado'), 'custody', 'notifyAthleteOfAAF', [req.params.code]));
+    res.json(await submit(actingOrg(req, 'nado'), 'custody', 'notifyAthleteOfAAF', [req.params.code], { endorsers: NADO_LAB }));
   }),
 );
 
@@ -389,25 +431,23 @@ app.post(
   route(async (req, res) => {
     const { reviewerId, decision, rationale } = req.body;
     res.status(201).json(
-      await submit(actingOrg(req, 'nado'), 'custody', 'enforceOversightRequirement', [
-        req.params.code,
-        reviewerId,
-        decision,
-        rationale,
-      ]),
+      await submit(actingOrg(req, 'nado'), 'custody', 'enforceOversightRequirement', [req.params.code], {
+        transient: { reviewerId, decision, rationale },
+        endorsers: NADO_LAB,
+      }),
     );
   }),
 );
 
-/** WADA Article 7.9 — refused unless an oversight record exists. */
+/** WADA Article 7.9 — refused unless an upholding oversight record exists. */
 app.post(
   '/api/samples/:code/provisional-suspension',
   route(async (req, res) => {
     res.status(201).json(
-      await submit(actingOrg(req, 'nado'), 'custody', 'recordProvisionalSuspension', [
-        req.params.code,
-        req.body.groundsArticle ?? 'Article 7.9',
-      ]),
+      await submit(actingOrg(req, 'nado'), 'custody', 'recordProvisionalSuspension', [req.params.code], {
+        transient: { groundsArticle: req.body.groundsArticle ?? 'Article 7.9' },
+        endorsers: NADO_LAB,
+      }),
     );
   }),
 );
@@ -433,50 +473,55 @@ app.get(
   }),
 );
 
-/** WADA Article 14.1 — the confidentiality gate, evaluated as the caller. */
+/**
+ * WADA Article 14.1 — the confidentiality gate, evaluated as the caller on
+ * the caller's own peer: a federation or research peer holds no results to
+ * return even if asked.
+ */
 app.get(
   '/api/samples/:code/results',
   route(async (req, res) => {
-    const decision = (await evaluate(
-      actingOrg(req, 'nado'),
-      'custody',
-      'enforceResultsConfidentiality',
-      [req.params.code],
-    )) as { granted: boolean };
+    const org = actingOrg(req, 'nado');
+    const decision = (await evaluate(org, 'custody', 'enforceResultsConfidentiality', [req.params.code], [ORGS[org].msp])) as {
+      granted: boolean;
+    };
     res.status(decision.granted ? 200 : 403).json(decision);
   }),
 );
 
-/** Table 2 evaluated directly, for the decision-table explorer in the UI. */
+/** Table 1 evaluated directly, for the decision-table explorer in the UI. */
 app.post(
   '/api/decision-table/evaluate',
   route(async (req, res) => {
-    res.json(
-      await evaluate(actingOrg(req, 'nado'), 'custody', 'evaluateDecisionTable', [
-        JSON.stringify(req.body),
-      ]),
-    );
+    res.json(await evaluate(actingOrg(req, 'nado'), 'custody', 'evaluateDecisionTable', [JSON.stringify(req.body)]));
   }),
 );
 
 // --------------------------------------------------------------- consent
+// Consent state lives only on athlete-organisation peers, so every consent
+// transaction and read is directed there.
 
-/** GDPR Article 7 — only the athlete organization may write consent. */
+const ATHLETE_PEERS = ['AthleteMSP'];
+const csv = (v: unknown) => (Array.isArray(v) ? v.join(',') : String(v));
+
+/** GDPR Article 7 — only the athlete organisation may write consent. */
 app.post(
   '/api/consent',
   route(async (req, res) => {
-    const { athleteHash, grantedToMSP, purpose, categories, validFrom, validUntil, specialCategoryAuthorised } =
-      req.body;
+    const { athleteHash, grantedToMSP, purpose, categories, validFrom, validUntil, specialCategoryAuthorised } = req.body;
     res.status(201).json(
-      await submit(actingOrg(req, 'athlete'), 'consent', 'recordConsentTransaction', [
-        athleteHash,
-        grantedToMSP,
-        purpose,
-        Array.isArray(categories) ? categories.join(',') : String(categories),
-        validFrom,
-        validUntil,
-        String(specialCategoryAuthorised ?? false),
-      ]),
+      await submit(actingOrg(req, 'athlete'), 'consent', 'recordConsentTransaction', [], {
+        transient: {
+          athleteHash,
+          grantedToMSP,
+          purpose,
+          categories: csv(categories),
+          validFrom,
+          validUntil,
+          specialCategoryAuthorised: specialCategoryAuthorised === true,
+        },
+        endorsers: ATHLETE_PEERS,
+      }),
     );
   }),
 );
@@ -487,11 +532,10 @@ app.delete(
   route(async (req, res) => {
     const { athleteHash, grantedToMSP, purpose } = req.body;
     res.json(
-      await submit(actingOrg(req, 'athlete'), 'consent', 'withdrawConsent', [
-        athleteHash,
-        grantedToMSP,
-        purpose,
-      ]),
+      await submit(actingOrg(req, 'athlete'), 'consent', 'withdrawConsent', [], {
+        transient: { athleteHash, grantedToMSP, purpose },
+        endorsers: ATHLETE_PEERS,
+      }),
     );
   }),
 );
@@ -499,64 +543,39 @@ app.delete(
 app.get(
   '/api/consent/:athleteHash',
   route(async (req, res) => {
-    res.json(
-      await evaluate(actingOrg(req, 'athlete'), 'consent', 'listConsents', [req.params.athleteHash]),
-    );
+    res.json(await evaluate(actingOrg(req, 'athlete'), 'consent', 'listConsents', [req.params.athleteHash], ATHLETE_PEERS));
   }),
 );
 
-/** The ABAC gate. Writes an access-audit record for every decision. */
+/** The ABAC gate: records the decision, then reads it back for the requester. */
 app.post(
   '/api/access-request',
   route(async (req, res) => {
+    const org = actingOrg(req, 'research');
     const { athleteHash, purpose, categories } = req.body;
-    const decision = (await submit(actingOrg(req, 'research'), 'consent', 'validateConsent', [
-      athleteHash,
-      purpose,
-      Array.isArray(categories) ? categories.join(',') : String(categories),
-    ])) as { anyGranted: boolean };
+    const { auditRef } = (await submit(org, 'consent', 'validateConsent', [], {
+      transient: { athleteHash, declaredPurpose: purpose, requestedCategories: csv(categories) },
+      endorsers: ATHLETE_PEERS,
+    })) as { auditRef: string };
+    const decision = (await evaluate(org, 'consent', 'getAccessDecision', [athleteHash, ORGS[org].msp, auditRef], ATHLETE_PEERS)) as {
+      anyGranted: boolean;
+    };
     res.status(decision.anyGranted ? 200 : 403).json(decision);
   }),
 );
 
 /**
- * Read-only ABAC preview: what would the research organization receive?
- *
- * Deliberately evaluated as ResearchMSP whatever the caller's session, because
- * the chaincode decides from the *caller's* identity and the question being
- * asked is about the requester, not the viewer. It is safe to expose to an
- * athlete: it discloses only the entitlement of a third party to that athlete's
- * own data, and writes nothing.
+ * Read-only ABAC preview: what would the research organisation receive?
+ * Evaluated as ResearchMSP whatever the caller's session, because the decision
+ * depends on the requester's identity; it writes nothing.
  */
 app.post(
   '/api/access-request/preview',
   route(async (req, res) => {
     const { athleteHash, purpose, categories } = req.body;
-    res.json(
-      await evaluate('research', 'consent', 'previewConsentDecision', [
-        athleteHash,
-        purpose,
-        Array.isArray(categories) ? categories.join(',') : String(categories),
-      ]),
-    );
+    res.json(await evaluate('research', 'consent', 'previewConsentDecision', [athleteHash, purpose, csv(categories)], ATHLETE_PEERS));
   }),
 );
-
-/** GDPR Article 17 */
-app.post(
-  '/api/erasure',
-  route(async (req, res) => {
-    const { athleteHash, category, erasureCertificate } = req.body;
-    res.json(
-      await submit(actingOrg(req, 'athlete'), 'consent', 'destroyIPFSAccessToken', [
-        athleteHash,
-        category,
-        JSON.stringify(erasureCertificate),
-      ]),
-    );
-  }),
-);
-
 
 // ---------------------------------------------------------- platform bootstrap
 
@@ -570,7 +589,7 @@ async function tolerate<T>(label: string, fn: () => Promise<T>): Promise<T | nul
     return await fn();
   } catch (error) {
     const detail = chaincodeMessage(error);
-    if (/already exists|already registered/i.test(detail)) return null;
+    if (/already exists|already registered|already committed|already been acknowledged|not awaiting receipt/i.test(detail)) return null;
     // eslint-disable-next-line no-console
     console.warn(`[seed] ${label}: ${detail.slice(0, 140)}`);
     return null;
@@ -578,26 +597,21 @@ async function tolerate<T>(label: string, fn: () => Promise<T>): Promise<T | nul
 }
 
 /**
- * Seed the ledger with a complete, realistic case so the platform has something
- * to display, then return the identifiers to read it back by.
- *
- * This writes real transactions; it does not fabricate a view. Everything the
- * dashboard shows afterwards is read from the ledger. Idempotent: re-running it
- * against an already-seeded network is a no-op.
+ * Seed the ledger with a complete case so the platform has something to show,
+ * then return the identifiers to read it back by. Writes real transactions;
+ * idempotent.
  */
 app.post(
   '/api/demo/seed',
   route(async (req, res) => {
-    const sampleCode = String(req.body?.sampleCode ?? 'SMP-PLATFORM-0002');
+    const sampleCode = String(req.body?.sampleCode ?? 'SMP-PLATFORM-0003');
     const athleteHash = String(req.body?.athleteHash ?? DEMO_ATHLETE);
+    const seal = 'seal-platform-0003';
 
-    // Seeding is idempotent but not free: every step is a transaction, and the
-    // page calls this on load. If the case is already on the ledger there is
-    // nothing to write, so return the identifiers and skip the round trips.
     if (!req.body?.force) {
       const [sample, consents] = await Promise.all([
         evaluate('nado', 'custody', 'getSample', [sampleCode]).catch(() => null),
-        evaluate('athlete', 'consent', 'listConsents', [athleteHash]).catch(() => []),
+        evaluate('athlete', 'consent', 'listConsents', [athleteHash], ATHLETE_PEERS).catch(() => []),
       ]);
       if (sample && Array.isArray(consents) && consents.length > 0) {
         res.json({ athleteHash, sampleCode, seeded: false, reason: 'already present' });
@@ -605,82 +619,59 @@ app.post(
       }
     }
 
-    await tolerate('prohibited list', () =>
-      submit('nado', 'custody', 'registerProhibitedList', [LIST_VERSION, LIST_HASH]),
-    );
+    await tolerate('prohibited list', () => submit('nado', 'custody', 'registerProhibitedList', [LIST_VERSION, LIST_HASH], { endorsers: NADO_LAB }));
     await tolerate('custody', () =>
-      submit('nado', 'custody', 'initiateSampleCustody', [
-        sampleCode, athleteHash, 'seal-platform-0001', 'Tunis National Testing Centre',
-      ]),
+      submit('nado', 'custody', 'initiateSampleCustody', [sampleCode, athleteHash, seal, digest('platform demo form')], { endorsers: NADO_LAB }),
     );
-    // A custody transfer is an append, not an upsert: re-running the seed would
-    // legitimately add a second handoff every time and the chain would grow a
-    // duplicate pair per call. Only add phases the chain does not already hold.
-    const existing = (await evaluate('nado', 'custody', 'getCustodyChain', [sampleCode]).catch(
-      () => [],
-    )) as { phase: string }[];
-    const recorded = new Set((existing || []).map((e) => e.phase));
-
-    for (const [phase, org] of [
-      ['TRANSPORT_HANDOFF', 'nado'],
-      ['LABORATORY_RECEIPT', 'lab'],
-    ] as [string, OrgKey][]) {
-      if (recorded.has(phase)) continue;
-      await tolerate(phase, () =>
-        submit(org, 'custody', 'recordCustodyTransfer', [
-          sampleCode, phase, 'NADOMSP', 'LabMSP', 'true', '48',
-        ]),
-      );
-    }
+    await tolerate('acknowledge', () =>
+      submit('athlete', 'custody', 'acknowledgeSampleCollection', [sampleCode, seal], { endorsers: ['AthleteMSP', 'NADOMSP'] }),
+    );
+    await tolerate('dispatch', () =>
+      submit('nado', 'custody', 'proposeCustodyTransfer', [sampleCode, 'LabMSP', 'true', '48'], { endorsers: NADO_LAB }),
+    );
+    await tolerate('receipt', () =>
+      submit('lab', 'custody', 'acceptCustodyTransfer', [sampleCode, '1', 'true', seal], { endorsers: NADO_LAB }),
+    );
     // A negative result: the dashboard is an athlete's ordinary view, not a case file.
     await tolerate('analysis', () =>
-      submit('lab', 'custody', 'recordSampleAnalysisResult', [
-        sampleCode, 'false', '', LIST_VERSION, LIST_HASH, 'VERIFIED',
-      ]),
+      submit('lab', 'custody', 'recordSampleAnalysisResult', [sampleCode], {
+        transient: { adverse: false, substance: '', prohibitedListVersion: LIST_VERSION, prohibitedListHash: LIST_HASH, laboratoryAccreditation: 'VERIFIED' },
+        endorsers: NADO_LAB,
+      }),
     );
-    await tolerate('results management', () =>
-      submit('nado', 'custody', 'triggerResultsManagement', [sampleCode]),
+    await tolerate('results management', () => submit('nado', 'custody', 'triggerResultsManagement', [sampleCode], { endorsers: NADO_LAB }));
+    await tolerate('consent', () =>
+      submit('athlete', 'consent', 'recordConsentTransaction', [], {
+        transient: {
+          athleteHash,
+          grantedToMSP: 'ResearchMSP',
+          purpose: 'cardiovascular_research',
+          categories: 'abp_haematological,gps_accelerometry',
+          validFrom: '2026-01-01T00:00:00.000Z',
+          validUntil: '2027-12-31T00:00:00.000Z',
+          specialCategoryAuthorised: true,
+        },
+        endorsers: ATHLETE_PEERS,
+      }),
     );
 
-    // Two categories shared, four withheld - the §3.5 starting position.
-    for (const [purpose, categories] of [
-      ['cardiovascular_research', 'abp_haematological,gps_accelerometry'],
-    ] as [string, string][]) {
-      await tolerate('consent', () =>
-        submit('athlete', 'consent', 'recordConsentTransaction', [
-          athleteHash, 'ResearchMSP', purpose, categories,
-          '2026-01-01T00:00:00.000Z', '2027-01-01T00:00:00.000Z', 'true',
-        ]),
-      );
-    }
-
-    // An off-chain payload so the Article 17 control operates on real content.
     const key = offchain.payloadKey(athleteHash, 'abp_haematological');
     if (!offchain.payloads.has(key) && (await offchain.ipfsReachable())) {
-      const payload = Buffer.from(
-        JSON.stringify({
-          athleteHash,
-          category: 'abp_haematological',
-          observations: [
-            { marker: 'HGB', value: 15.2, unit: 'g/dL' },
-            { marker: 'RET%', value: 1.06, unit: '%' },
-          ],
-        }),
-      );
+      const payload = Buffer.from(JSON.stringify({ athleteHash, category: 'abp_haematological', observations: [{ marker: 'HGB', value: 15.2 }] }));
       const stored = await offchain.store(payload);
       offchain.payloads.set(key, stored);
       await tolerate('offchain payload', () =>
-        submit('lab', 'consent', 'registerOffchainPayload', [
-          athleteHash, 'abp_haematological', stored.cid, stored.keyRef, stored.plaintextDigest,
-        ]),
+        submit('lab', 'consent', 'registerOffchainPayload', [], {
+          transient: { athleteHash, category: 'abp_haematological', cid: stored.cid, keyRef: stored.keyRef, commitment: stored.commitment },
+          endorsers: ATHLETE_PEERS,
+        }),
       );
     }
-
     res.json({ athleteHash, sampleCode, seeded: true });
   }),
 );
 
-/** GDPR Article 17 end to end: destroy the key, unpin, record the certificate. */
+/** GDPR Article 17 end to end: destroy the key, unpin, record the certificate and the 17(2) notice. */
 app.post(
   '/api/offchain/erase',
   route(async (req, res) => {
@@ -688,17 +679,15 @@ app.post(
     const key = offchain.payloadKey(athleteHash, category);
     const record = offchain.payloads.get(key);
     if (!record) {
-      res.status(404).json({
-        error: 'no off-chain payload registered for that category',
-        hint: 'only categories with stored biological data can be erased',
-      });
+      res.status(404).json({ error: 'no off-chain payload registered for that category' });
       return;
     }
     const certificate = await offchain.erase(record);
     offchain.payloads.delete(key);
-    const receipt = await submit(actingOrg(req, 'athlete'), 'consent', 'destroyIPFSAccessToken', [
-      athleteHash, category, JSON.stringify(certificate),
-    ]);
+    const receipt = await submit(actingOrg(req, 'athlete'), 'consent', 'destroyIPFSAccessToken', [], {
+      transient: { athleteHash, category, erasureCertificate: certificate },
+      endorsers: ATHLETE_PEERS,
+    });
     res.json({ certificate, receipt });
   }),
 );

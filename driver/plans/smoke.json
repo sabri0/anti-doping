@@ -1,0 +1,11 @@
+{ "name": "smoke", "rounds": [
+  {"id":"s1","workload":"initiateSampleCustody","tps":10,"warmup":3,"duration":8},
+  {"id":"s2","workload":"acceptCustodyTransfer","tps":5,"warmup":2,"duration":6},
+  {"id":"s3","workload":"triggerResultsManagement","tps":5,"warmup":2,"duration":6},
+  {"id":"s4","workload":"validateConsent","tps":5,"warmup":2,"duration":6},
+  {"id":"s5","workload":"evaluateDecisionTable","tps":40,"warmup":2,"duration":6},
+  {"id":"s6","workload":"previewConsentDecision","tps":20,"warmup":2,"duration":6},
+  {"id":"s7","workload":"getCustodyChain","tps":20,"warmup":2,"duration":6},
+  {"id":"s8","workload":"recordWhereaboutsStatus","tps":5,"warmup":2,"duration":6},
+  {"id":"s9","workload":"initiateOr1","tps":5,"warmup":2,"duration":6}
+]}

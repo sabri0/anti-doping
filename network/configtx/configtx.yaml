@@ -1,44 +1,26 @@
 # configtx.yaml — channel configuration for the anti-doping governance network.
 #
-# Mirrors §3.2 of the manuscript: five classes of institutional participant
-# (Athlete, Federation/Club, NADO, WADA-accredited Laboratory, Research), each
-# backed by its own certification authority, plus a separate orderer CA.
+# Five organisational classes (Athlete, Federation/Club, NADO, WADA-accredited
+# Laboratory, Research), each with its own certification authority. Four of
+# them — athlete, federation, NADO and laboratory — also operate one ordering
+# node each, so the ordering service is not run by any single organisation.
+#
+# Two profiles differ only in the consensus protocol of those four nodes:
+#   AntidopingRaft  — etcdraft, crash fault tolerant (tolerates 1 of 4 crashing)
+#   AntidopingBFT   — SmartBFT, Byzantine fault tolerant (tolerates 1 of 4 lying)
 
 Organizations:
-  - &OrdererOrg
-    Name: OrdererOrg
-    ID: OrdererMSP
-    MSPDir: ../organizations/ordererOrganizations/antidoping.org/msp
-    Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('OrdererMSP.member')"
-      Writers:
-        Type: Signature
-        Rule: "OR('OrdererMSP.member')"
-      Admins:
-        Type: Signature
-        Rule: "OR('OrdererMSP.admin')"
-    OrdererEndpoints:
-      - orderer.antidoping.org:7050
-
   - &Athlete
     Name: AthleteMSP
     ID: AthleteMSP
     MSPDir: ../organizations/peerOrganizations/athlete.antidoping.org/msp
     Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('AthleteMSP.admin', 'AthleteMSP.peer', 'AthleteMSP.client')"
-      Writers:
-        Type: Signature
-        Rule: "OR('AthleteMSP.admin', 'AthleteMSP.client')"
-      Admins:
-        Type: Signature
-        Rule: "OR('AthleteMSP.admin')"
-      Endorsement:
-        Type: Signature
-        Rule: "OR('AthleteMSP.peer')"
+      Readers: { Type: Signature, Rule: "OR('AthleteMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('AthleteMSP.member')" }
+      Admins: { Type: Signature, Rule: "OR('AthleteMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('AthleteMSP.peer')" }
+    OrdererEndpoints:
+      - orderer.athlete.antidoping.org:7050
     AnchorPeers:
       - Host: peer0.athlete.antidoping.org
         Port: 7051
@@ -48,18 +30,12 @@ Organizations:
     ID: FederationMSP
     MSPDir: ../organizations/peerOrganizations/federation.antidoping.org/msp
     Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('FederationMSP.admin', 'FederationMSP.peer', 'FederationMSP.client')"
-      Writers:
-        Type: Signature
-        Rule: "OR('FederationMSP.admin', 'FederationMSP.client')"
-      Admins:
-        Type: Signature
-        Rule: "OR('FederationMSP.admin')"
-      Endorsement:
-        Type: Signature
-        Rule: "OR('FederationMSP.peer')"
+      Readers: { Type: Signature, Rule: "OR('FederationMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('FederationMSP.member')" }
+      Admins: { Type: Signature, Rule: "OR('FederationMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('FederationMSP.peer')" }
+    OrdererEndpoints:
+      - orderer.federation.antidoping.org:8050
     AnchorPeers:
       - Host: peer0.federation.antidoping.org
         Port: 8051
@@ -69,18 +45,12 @@ Organizations:
     ID: NADOMSP
     MSPDir: ../organizations/peerOrganizations/nado.antidoping.org/msp
     Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('NADOMSP.admin', 'NADOMSP.peer', 'NADOMSP.client')"
-      Writers:
-        Type: Signature
-        Rule: "OR('NADOMSP.admin', 'NADOMSP.client')"
-      Admins:
-        Type: Signature
-        Rule: "OR('NADOMSP.admin')"
-      Endorsement:
-        Type: Signature
-        Rule: "OR('NADOMSP.peer')"
+      Readers: { Type: Signature, Rule: "OR('NADOMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('NADOMSP.member')" }
+      Admins: { Type: Signature, Rule: "OR('NADOMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('NADOMSP.peer')" }
+    OrdererEndpoints:
+      - orderer.nado.antidoping.org:9050
     AnchorPeers:
       - Host: peer0.nado.antidoping.org
         Port: 9051
@@ -90,18 +60,12 @@ Organizations:
     ID: LabMSP
     MSPDir: ../organizations/peerOrganizations/lab.antidoping.org/msp
     Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('LabMSP.admin', 'LabMSP.peer', 'LabMSP.client')"
-      Writers:
-        Type: Signature
-        Rule: "OR('LabMSP.admin', 'LabMSP.client')"
-      Admins:
-        Type: Signature
-        Rule: "OR('LabMSP.admin')"
-      Endorsement:
-        Type: Signature
-        Rule: "OR('LabMSP.peer')"
+      Readers: { Type: Signature, Rule: "OR('LabMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('LabMSP.member')" }
+      Admins: { Type: Signature, Rule: "OR('LabMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('LabMSP.peer')" }
+    OrdererEndpoints:
+      - orderer.lab.antidoping.org:10050
     AnchorPeers:
       - Host: peer0.lab.antidoping.org
         Port: 10051
@@ -111,25 +75,17 @@ Organizations:
     ID: ResearchMSP
     MSPDir: ../organizations/peerOrganizations/research.antidoping.org/msp
     Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('ResearchMSP.admin', 'ResearchMSP.peer', 'ResearchMSP.client')"
-      Writers:
-        Type: Signature
-        Rule: "OR('ResearchMSP.admin', 'ResearchMSP.client')"
-      Admins:
-        Type: Signature
-        Rule: "OR('ResearchMSP.admin')"
-      Endorsement:
-        Type: Signature
-        Rule: "OR('ResearchMSP.peer')"
+      Readers: { Type: Signature, Rule: "OR('ResearchMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('ResearchMSP.member')" }
+      Admins: { Type: Signature, Rule: "OR('ResearchMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('ResearchMSP.peer')" }
     AnchorPeers:
       - Host: peer0.research.antidoping.org
         Port: 11051
 
 Capabilities:
   Channel: &ChannelCapabilities
-    V2_0: true
+    V3_0: true
   Orderer: &OrdererCapabilities
     V2_0: true
   Application: &ApplicationCapabilities
@@ -138,83 +94,120 @@ Capabilities:
 Application: &ApplicationDefaults
   Organizations:
   Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
-    LifecycleEndorsement:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Endorsement"
-    Endorsement:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Endorsement"
+    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
+    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
+    Admins: { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
+    LifecycleEndorsement: { Type: ImplicitMeta, Rule: "MAJORITY Endorsement" }
+    Endorsement: { Type: ImplicitMeta, Rule: "MAJORITY Endorsement" }
   Capabilities:
     <<: *ApplicationCapabilities
 
+# Batching is the same under both protocols, so that a comparison between
+# them isolates consensus: a block is cut at 500 transactions or after one
+# second, whichever comes first.
 Orderer: &OrdererDefaults
-  OrdererType: etcdraft
-  Addresses:
-    - orderer.antidoping.org:7050
-  EtcdRaft:
-    Consenters:
-      - Host: orderer.antidoping.org
-        Port: 7050
-        ClientTLSCert: ../organizations/ordererOrganizations/antidoping.org/orderers/orderer.antidoping.org/tls/server.crt
-        ServerTLSCert: ../organizations/ordererOrganizations/antidoping.org/orderers/orderer.antidoping.org/tls/server.crt
-  BatchTimeout: 2s
+  BatchTimeout: 1s
   BatchSize:
     MaxMessageCount: 500
     AbsoluteMaxBytes: 10 MB
     PreferredMaxBytes: 2 MB
   Organizations:
   Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
-    BlockValidation:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
+    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
+    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
+    Admins: { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
+    BlockValidation: { Type: ImplicitMeta, Rule: "ANY Writers" }
 
 Channel: &ChannelDefaults
   Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
+    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
+    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
+    Admins: { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
   Capabilities:
     <<: *ChannelCapabilities
 
 Profiles:
-  # Baseline profile: Raft ordering, all five organizational classes.
-  AntidopingChannel:
+  AntidopingRaft:
     <<: *ChannelDefaults
     Orderer:
       <<: *OrdererDefaults
-      Organizations:
-        - *OrdererOrg
+      OrdererType: etcdraft
+      EtcdRaft:
+        Consenters:
+          - Host: orderer.athlete.antidoping.org
+            Port: 7050
+            ClientTLSCert: ../organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/server.crt
+            ServerTLSCert: ../organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/server.crt
+          - Host: orderer.federation.antidoping.org
+            Port: 8050
+            ClientTLSCert: ../organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/server.crt
+            ServerTLSCert: ../organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/server.crt
+          - Host: orderer.nado.antidoping.org
+            Port: 9050
+            ClientTLSCert: ../organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/server.crt
+            ServerTLSCert: ../organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/server.crt
+          - Host: orderer.lab.antidoping.org
+            Port: 10050
+            ClientTLSCert: ../organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/server.crt
+            ServerTLSCert: ../organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/server.crt
+      Organizations: [*Athlete, *Federation, *NADO, *Lab]
       Capabilities: *OrdererCapabilities
     Application:
       <<: *ApplicationDefaults
-      Organizations:
-        - *Athlete
-        - *Federation
-        - *NADO
-        - *Lab
-        - *Research
+      Organizations: [*Athlete, *Federation, *NADO, *Lab, *Research]
+      Capabilities: *ApplicationCapabilities
+
+  AntidopingBFT:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      OrdererType: BFT
+      ConsenterMapping:
+        - ID: 1
+          Host: orderer.athlete.antidoping.org
+          Port: 7050
+          MSPID: AthleteMSP
+          ClientTLSCert: ../organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/server.crt
+          ServerTLSCert: ../organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/tls/server.crt
+          Identity: ../organizations/peerOrganizations/athlete.antidoping.org/orderers/orderer.athlete.antidoping.org/msp/signcerts/cert.pem
+        - ID: 2
+          Host: orderer.federation.antidoping.org
+          Port: 8050
+          MSPID: FederationMSP
+          ClientTLSCert: ../organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/server.crt
+          ServerTLSCert: ../organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/tls/server.crt
+          Identity: ../organizations/peerOrganizations/federation.antidoping.org/orderers/orderer.federation.antidoping.org/msp/signcerts/cert.pem
+        - ID: 3
+          Host: orderer.nado.antidoping.org
+          Port: 9050
+          MSPID: NADOMSP
+          ClientTLSCert: ../organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/server.crt
+          ServerTLSCert: ../organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/tls/server.crt
+          Identity: ../organizations/peerOrganizations/nado.antidoping.org/orderers/orderer.nado.antidoping.org/msp/signcerts/cert.pem
+        - ID: 4
+          Host: orderer.lab.antidoping.org
+          Port: 10050
+          MSPID: LabMSP
+          ClientTLSCert: ../organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/server.crt
+          ServerTLSCert: ../organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/tls/server.crt
+          Identity: ../organizations/peerOrganizations/lab.antidoping.org/orderers/orderer.lab.antidoping.org/msp/signcerts/cert.pem
+      SmartBFT:
+        RequestBatchMaxCount: 500
+        RequestBatchMaxBytes: 10485760
+        RequestBatchMaxInterval: 1s
+        IncomingMessageBufferSize: 200
+        RequestPoolSize: 100000
+        RequestForwardTimeout: 2s
+        RequestComplainTimeout: 20s
+        RequestAutoRemoveTimeout: 3m0s
+        ViewChangeResendInterval: 5s
+        ViewChangeTimeout: 20s
+        LeaderHeartbeatTimeout: 1m0s
+        LeaderHeartbeatCount: 10
+        CollectTimeout: 1s
+      Organizations: [*Athlete, *Federation, *NADO, *Lab]
+      Capabilities: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations: [*Athlete, *Federation, *NADO, *Lab, *Research]
       Capabilities: *ApplicationCapabilities

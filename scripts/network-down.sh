@@ -13,7 +13,9 @@ if [ "${1:-}" = "--purge" ]; then
   rm -rf network/organizations/peerOrganizations \
          network/organizations/ordererOrganizations \
          network/organizations/fabric-ca \
+         network/organizations/cas \
          network/channel-artifacts
+  docker rm -f custodyv1-cc >/dev/null 2>&1 || true
   echo "[network-down] purged crypto material and channel artifacts"
 fi
 echo "[network-down] done"

@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [chaincode/custody, chaincode/consent, fhir-adapter]
+        package: [chaincode/custody, chaincode/consent, offchain, fhir-adapter]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,14 +43,17 @@ jobs:
         with:
           node-version: 20
       - name: Bring up the network
-        run: ./scripts/network-up.sh
+        run: NET_CPUS=none PY=python3 ./scripts/network-up.sh
       - name: Deploy chaincode
-        run: ./scripts/deploy-chaincode.sh
+        run: PY=python3 ./scripts/deploy-chaincode.sh
       - name: Off-chain and erasure acceptance tests
         run: npm install --no-audit --no-fund && npm test
         working-directory: offchain
-      - name: End-to-end regulatory workflow
-        run: ./scripts/e2e-demo.sh
+      - name: Regulatory scenarios on the deployed network
+        run: |
+          (cd offchain && npx tsc)
+          docker build -t antidoping/driver:2.0 -f driver/Dockerfile .
+          docker run --rm --network antidoping_v2 -v "$PWD/network/organizations":/work/network/organizations:ro             antidoping/driver:2.0 scenarios.js
       - name: Tear down
         if: always()
         run: ./scripts/network-down.sh --purge

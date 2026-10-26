@@ -1,0 +1,3 @@
+{ "name": "K1-cpu", "rounds": [
+  {"id":"cpu","workload":"initiateSampleCustody","concurrency":32,"warmup":15,"duration":75}
+]}
